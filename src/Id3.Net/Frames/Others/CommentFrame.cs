@@ -30,6 +30,11 @@ namespace Id3
                 comment.Description == Description;
         }
 
+        public override string ToString()
+        {
+            return Comment ?? base.ToString();
+        }
+
         public string Comment { get; set; }
 
         public string Description { get; set; }

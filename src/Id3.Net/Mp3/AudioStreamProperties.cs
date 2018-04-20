@@ -1,6 +1,6 @@
 ﻿#region --- License & Copyright Notice ---
 /*
-Copyright (c) 2005-2012 Jeevan James
+Copyright (c) 2005-2018 Jeevan James
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,37 +23,20 @@ namespace Id3
 {
     public sealed class AudioStreamProperties
     {
-        private readonly int _bitrate;
-        private readonly TimeSpan _duration;
-        private readonly int _frequency;
-        private readonly AudioMode _mode;
-
         public AudioStreamProperties(int bitrate, int frequency, TimeSpan duration, AudioMode mode)
         {
-            _bitrate = bitrate;
-            _frequency = frequency;
-            _duration = duration;
-            _mode = mode;
+            Bitrate = bitrate;
+            Frequency = frequency;
+            Duration = duration;
+            Mode = mode;
         }
 
-        public int Bitrate
-        {
-            get { return _bitrate; }
-        }
+        public int Bitrate { get; }
 
-        public TimeSpan Duration
-        {
-            get { return _duration; }
-        }
+        public TimeSpan Duration { get; }
 
-        public int Frequency
-        {
-            get { return _frequency; }
-        }
+        public int Frequency { get; }
 
-        public AudioMode Mode
-        {
-            get { return _mode; }
-        }
+        public AudioMode Mode { get; }
     }
 }

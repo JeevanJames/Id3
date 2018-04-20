@@ -326,9 +326,7 @@ namespace Id3.v2
 
         private static Id3Frame DecodeComment(byte[] data)
         {
-            var frame = new CommentFrame();
-
-            frame.EncodingType = (Id3TextEncoding)data[0];
+            var frame = new CommentFrame {EncodingType = (Id3TextEncoding) data[0]};
 
             string language = TextEncodingHelper.GetDefaultEncoding().GetString(data, 1, 3).ToLowerInvariant();
             if (!Enum.IsDefined(typeof(Id3Language), language))

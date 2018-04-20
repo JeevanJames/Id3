@@ -1,6 +1,6 @@
 #region --- License & Copyright Notice ---
 /*
-Copyright (c) 2005-2012 Jeevan James
+Copyright (c) 2005-2018 Jeevan James
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -38,7 +37,6 @@ namespace Id3
     {
         #region Fields and properties
         //MP3 file stream-related
-        private Stream _stream;
         private Mp3Permissions _permissions;
 
         //Audio stream properties
@@ -47,15 +45,7 @@ namespace Id3
         //ID3 Handler management
         private RegisteredId3Handlers _existingHandlers;
 
-        private Stream Stream
-        {
-            get => _stream;
-            set
-            {
-                Debug.Assert(_stream == null);
-                _stream = value;
-            }
-        }
+        private Stream Stream { get; set; }
 
         protected bool StreamOwned { get; set; }
         #endregion
@@ -92,11 +82,12 @@ namespace Id3
             StreamOwned = true;
         }
 
-        private static readonly Dictionary<Mp3Permissions, FileAccess> PermissionsToFileAccessMapping = new Dictionary<Mp3Permissions, FileAccess>(3) {
-            { Mp3Permissions.Read, FileAccess.Read },
-            { Mp3Permissions.Write, FileAccess.Write },
-            { Mp3Permissions.ReadWrite, FileAccess.ReadWrite },
-        };
+        private static readonly Dictionary<Mp3Permissions, FileAccess> PermissionsToFileAccessMapping =
+            new Dictionary<Mp3Permissions, FileAccess>(3) {
+                {Mp3Permissions.Read, FileAccess.Read},
+                {Mp3Permissions.Write, FileAccess.Write},
+                {Mp3Permissions.ReadWrite, FileAccess.ReadWrite}
+            };
 
         /// <summary>
         ///     Creates an instance of the Mp3 class by passing in a Stream object containing the
@@ -172,7 +163,7 @@ namespace Id3
             RegisteredId3Handler registeredHandler = ExistingHandlers.GetHandler(majorVersion, minorVersion);
             if (registeredHandler != null)
             {
-                registeredHandler.Handler.DeleteTag(_stream);
+                registeredHandler.Handler.DeleteTag(Stream);
                 InvalidateExistingHandlers();
             }
         }
@@ -189,7 +180,7 @@ namespace Id3
             if (registeredHandler != null)
             {
                 Id3Handler handler = registeredHandler.Handler;
-                handler.DeleteTag(_stream);
+                handler.DeleteTag(Stream);
                 InvalidateExistingHandlers();
             }
         }
@@ -201,7 +192,7 @@ namespace Id3
         {
             EnsureWritePermissions(Mp3Messages.NoWritePermissions_CannotDeleteTag);
             foreach (RegisteredId3Handler existingHandler in ExistingHandlers)
-                existingHandler.Handler.DeleteTag(_stream);
+                existingHandler.Handler.DeleteTag(Stream);
             InvalidateExistingHandlers();
         }
         #endregion
@@ -217,7 +208,7 @@ namespace Id3
             for (int i = 0; i < tags.Length; i++)
             {
                 Id3Handler handler = ExistingHandlers[i].Handler;
-                tags[i] = handler.ReadTag(_stream);
+                tags[i] = handler.ReadTag(Stream);
             }
 
             return tags;
@@ -236,7 +227,7 @@ namespace Id3
             if (familyHandler == null)
                 return null;
             Id3Handler handler = familyHandler.Handler;
-            Id3Tag tag = handler.ReadTag(_stream);
+            Id3Tag tag = handler.ReadTag(Stream);
             return tag;
         }
 
@@ -249,17 +240,21 @@ namespace Id3
         public Id3Tag GetTag(int majorVersion, int minorVersion)
         {
             RegisteredId3Handler registeredHandler = ExistingHandlers.GetHandler(majorVersion, minorVersion);
-            return registeredHandler?.Handler.ReadTag(_stream);
+            return registeredHandler?.Handler.ReadTag(Stream);
         }
 
-        //Retrieves the tag as a byte array. This method does not attempt to read the tag data,
-        //it simply reads the header and if present the tag bytes are read directly from the
-        //stream. This means that typical exceptions that get thrown in a tag read will not
-        //occur in this method.
+        /// <summary>
+        ///     Retrieves the specified tag data as a byte array. This method does not attempt to read the tag data, it simply
+        ///     reads the header and if present the tag bytes are read directly from the stream. This means that typical exceptions
+        ///     that get thrown in a tag read will not occur in this method.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The minor version number.</param>
+        /// <returns>A byte array of the tag data.</returns>
         public byte[] GetTagBytes(int majorVersion, int minorVersion)
         {
             RegisteredId3Handler registeredHandler = RegisteredHandlers.GetHandler(majorVersion, minorVersion);
-            byte[] tagBytes = registeredHandler.Handler.GetTagBytes(_stream);
+            byte[] tagBytes = registeredHandler.Handler.GetTagBytes(Stream);
             return tagBytes;
         }
         #endregion
@@ -272,9 +267,8 @@ namespace Id3
 
         public bool HasTagOfVersion(int majorVersion, int minorVersion)
         {
-            return
-                ExistingHandlers.Any(handler =>
-                    handler.Handler.MajorVersion == majorVersion && handler.Handler.MinorVersion == minorVersion);
+            return ExistingHandlers.Any(handler =>
+                handler.Handler.MajorVersion == majorVersion && handler.Handler.MinorVersion == minorVersion);
         }
 
         public IEnumerable<Version> AvailableTagVersions
@@ -316,14 +310,14 @@ namespace Id3
                     if (conflictAction == WriteConflictAction.Replace)
                     {
                         Id3Handler handlerCopy = handler;
-                        handlerCopy.DeleteTag(_stream);
+                        handlerCopy.DeleteTag(Stream);
                     }
                 }
             }
 
             //Write the tag to the file. The handler will know how to overwrite itself.
             RegisteredId3Handler registeredHandler = RegisteredHandlers.GetHandler(tag.MajorVersion, tag.MinorVersion);
-            bool writeSuccessful = registeredHandler.Handler.WriteTag(_stream, tag);
+            bool writeSuccessful = registeredHandler.Handler.WriteTag(Stream, tag);
             if (writeSuccessful)
                 InvalidateExistingHandlers();
             return writeSuccessful;
@@ -345,15 +339,15 @@ namespace Id3
             foreach (RegisteredId3Handler registeredHandler in ExistingHandlers)
             {
                 if (registeredHandler.Handler.Family == Id3TagFamily.Version2X)
-                    startBytes = registeredHandler.Handler.GetTagBytes(_stream);
+                    startBytes = registeredHandler.Handler.GetTagBytes(Stream);
                 else
-                    endBytes = registeredHandler.Handler.GetTagBytes(_stream);
+                    endBytes = registeredHandler.Handler.GetTagBytes(Stream);
             }
 
-            long audioStreamLength = _stream.Length - (startBytes?.Length ?? 0) - (endBytes?.Length ?? 0);
+            long audioStreamLength = Stream.Length - (startBytes?.Length ?? 0) - (endBytes?.Length ?? 0);
             var audioStream = new byte[audioStreamLength];
-            _stream.Seek(startBytes?.Length ?? 0, SeekOrigin.Begin);
-            _stream.Read(audioStream, 0, (int) audioStreamLength);
+            Stream.Seek(startBytes?.Length ?? 0, SeekOrigin.Begin);
+            Stream.Read(audioStream, 0, (int) audioStreamLength);
             return audioStream;
         }
 
@@ -399,7 +393,7 @@ namespace Id3
                     Id3Handler handler = registeredHandler.Handler;
                     if (handler.Family == Id3TagFamily.Version2X && v2HandlerFound)
                         continue;
-                    if (handler.HasTag(_stream))
+                    if (handler.HasTag(Stream))
                     {
                         _existingHandlers.Add(registeredHandler);
                         v2HandlerFound = handler.Family == Id3TagFamily.Version2X;
@@ -412,6 +406,7 @@ namespace Id3
 
         static Mp3()
         {
+            //Register the most-commonly used handlers first
             RegisteredHandlers.Register<Id3V23Handler>();
             RegisteredHandlers.Register<Id3V1Handler>();
             RegisteredHandlers.Register<Id3V24Handler>();

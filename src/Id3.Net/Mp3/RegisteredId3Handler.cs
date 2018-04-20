@@ -1,6 +1,6 @@
 #region --- License & Copyright Notice ---
 /*
-Copyright (c) 2005-2012 Jeevan James
+Copyright (c) 2005-2018 Jeevan James
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,9 +36,15 @@ namespace Id3
             Type = type;
         }
 
+        /// <summary>
+        ///     Instance of the ID3 handler. This is lazily instantiated on first access to the property.
+        /// </summary>
         internal Id3Handler Handler =>
             _handler ?? (_handler = (Id3Handler) Activator.CreateInstance(Type));
 
+        /// <summary>
+        ///     The type of the ID3 handler class
+        /// </summary>
         internal Type Type { get; }
     }
 
@@ -49,7 +55,7 @@ namespace Id3
     internal sealed class RegisteredId3Handlers : Collection<RegisteredId3Handler>
     {
         /// <summary>
-        ///     Returns the ID3 tag handler for the specific tag version.
+        ///     Returns the ID3 tag handler for the specified tag version.
         /// </summary>
         /// <param name="majorVersion">Major version of ID3 tag</param>
         /// <param name="minorVersion">Minor version of ID3 tag</param>
@@ -62,11 +68,20 @@ namespace Id3
             return registeredHandler;
         }
 
+        /// <summary>
+        ///     Returns all ID3 tag handlers for the specified tag version family.
+        /// </summary>
+        /// <param name="family">The tag version family</param>
+        /// <returns>All registered tag handlers that match</returns>
         internal IEnumerable<RegisteredId3Handler> GetHandlers(Id3TagFamily family)
         {
             return this.Where(handler => handler.Handler.Family == family);
         }
 
+        /// <summary>
+        ///     Registers a handler with this collection.
+        /// </summary>
+        /// <typeparam name="THandler">The type of ID3 handler</typeparam>
         internal void Register<THandler>() where THandler : Id3Handler
         {
             Type handlerType = typeof(THandler);

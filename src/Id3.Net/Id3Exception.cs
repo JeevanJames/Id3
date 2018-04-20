@@ -23,6 +23,10 @@ namespace Id3
 {
     public sealed class Id3Exception : Exception
     {
+        public Id3Exception()
+        {
+        }
+
         public Id3Exception(string message) : base(message)
         {
         }
