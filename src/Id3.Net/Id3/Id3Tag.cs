@@ -98,8 +98,7 @@ namespace Id3
             Id3Tag destinationTag = destinationHandler.Handler.CreateTag();
             foreach (Id3Frame sourceFrame in Frames)
             {
-                var unknownFrame = sourceFrame as UnknownFrame;
-                if (unknownFrame != null)
+                if (sourceFrame is UnknownFrame unknownFrame)
                 {
                     string frameId = unknownFrame.Id;
                     Id3Frame destinationFrame = destinationHandler.Handler.GetFrameFromFrameId(frameId);
@@ -163,7 +162,7 @@ namespace Id3
         public bool Contains<TFrame>(Expression<Func<Id3Tag, TFrame>> frameProperty) where TFrame : Id3Frame
         {
             if (frameProperty == null)
-                throw new ArgumentNullException("frameProperty");
+                throw new ArgumentNullException(nameof(frameProperty));
 
             var lambda = (LambdaExpression)frameProperty;
             var memberExpression = (MemberExpression)lambda.Body;
@@ -191,8 +190,7 @@ namespace Id3
             int removalCount = 0;
             for (int i = Frames.Count - 1; i >= 0; i--)
             {
-                var frame = Frames[i] as TFrame;
-                if (frame != null && (predicate == null || predicate(frame)))
+                if (Frames[i] is TFrame frame && (predicate == null || predicate(frame)))
                 {
                     if (frame.IsAssigned)
                         removalCount++;
@@ -204,165 +202,69 @@ namespace Id3
         #endregion
 
         #region Frame properties
-        public AlbumFrame Album
-        {
-            get { return GetSingleFrame(ref _album); }
-        }
+        public AlbumFrame Album => GetSingleFrame(ref _album);
 
-        public ArtistsFrame Artists
-        {
-            get { return GetSingleFrame(ref _artists); }
-        }
+        public ArtistsFrame Artists => GetSingleFrame(ref _artists);
 
-        public ArtistUrlFrameList ArtistUrls
-        {
-            get { return _artistUrls ?? (_artistUrls = new ArtistUrlFrameList(Frames)); }
-        }
+        public ArtistUrlFrameList ArtistUrls => _artistUrls ?? (_artistUrls = new ArtistUrlFrameList(Frames));
 
-        public AudioFileUrlFrame AudioFileUrl
-        {
-            get { return GetSingleFrame(ref _audioFileUrl); }
-        }
+        public AudioFileUrlFrame AudioFileUrl => GetSingleFrame(ref _audioFileUrl);
 
-        public AudioSourceUrlFrame AudioSourceUrl
-        {
-            get { return GetSingleFrame(ref _audioSourceUrl); }
-        }
+        public AudioSourceUrlFrame AudioSourceUrl => GetSingleFrame(ref _audioSourceUrl);
 
-        public BandFrame Band
-        {
-            get { return GetSingleFrame(ref _band); }
-        }
+        public BandFrame Band => GetSingleFrame(ref _band);
 
-        public BeatsPerMinuteFrame BeatsPerMinute
-        {
-            get { return GetSingleFrame(ref _beatsPerMinute); }
-        }
+        public BeatsPerMinuteFrame BeatsPerMinute => GetSingleFrame(ref _beatsPerMinute);
 
-        public CommentFrameList Comments
-        {
-            get { return _comments ?? (_comments = new CommentFrameList(Frames)); }
-        }
+        public CommentFrameList Comments => _comments ?? (_comments = new CommentFrameList(Frames));
 
-        public CommercialUrlFrameList CommercialUrls
-        {
-            get { return _commercialUrls ?? (_commercialUrls = new CommercialUrlFrameList(Frames)); }
-        }
+        public CommercialUrlFrameList CommercialUrls => _commercialUrls ?? (_commercialUrls = new CommercialUrlFrameList(Frames));
 
-        public ComposersFrame Composers
-        {
-            get { return GetSingleFrame(ref _composers); }
-        }
+        public ComposersFrame Composers => GetSingleFrame(ref _composers);
 
-        public ConductorFrame Conductor
-        {
-            get { return GetSingleFrame(ref _conductor); }
-        }
+        public ConductorFrame Conductor => GetSingleFrame(ref _conductor);
 
-        public ContentGroupDescriptionFrame ContentGroupDescription
-        {
-            get { return GetSingleFrame(ref _contentGroupDescription); }
-        }
+        public ContentGroupDescriptionFrame ContentGroupDescription => GetSingleFrame(ref _contentGroupDescription);
 
-        public CopyrightFrame Copyright
-        {
-            get { return GetSingleFrame(ref _copyright); }
-        }
+        public CopyrightFrame Copyright => GetSingleFrame(ref _copyright);
 
-        public CopyrightUrlFrame CopyrightUrl
-        {
-            get { return GetSingleFrame(ref _copyrightUrl); }
-        }
+        public CopyrightUrlFrame CopyrightUrl => GetSingleFrame(ref _copyrightUrl);
 
-        public Id3SyncFrameList<CustomTextFrame> CustomTexts
-        {
-            get { return GetMultipleFrames(ref _customTexts); }
-        }
+        public Id3SyncFrameList<CustomTextFrame> CustomTexts => GetMultipleFrames(ref _customTexts);
 
-        public EncoderFrame Encoder
-        {
-            get { return GetSingleFrame(ref _encoder); }
-        }
+        public EncoderFrame Encoder => GetSingleFrame(ref _encoder);
 
-        public EncodingSettingsFrame EncodingSettings
-        {
-            get { return GetSingleFrame(ref _encodingSettings); }
-        }
+        public EncodingSettingsFrame EncodingSettings => GetSingleFrame(ref _encodingSettings);
 
-        public FileOwnerFrame FileOwner
-        {
-            get { return GetSingleFrame(ref _fileOwner); }
-        }
+        public FileOwnerFrame FileOwner => GetSingleFrame(ref _fileOwner);
 
-        public FileTypeFrame FileType
-        {
-            get { return GetSingleFrame(ref _fileType); }
-        }
+        public FileTypeFrame FileType => GetSingleFrame(ref _fileType);
 
-        public GenreFrame Genre
-        {
-            get { return GetSingleFrame(ref _genre); }
-        }
+        public GenreFrame Genre => GetSingleFrame(ref _genre);
 
-        public LengthFrame Length
-        {
-            get { return GetSingleFrame(ref _length); }
-        }
+        public LengthFrame Length => GetSingleFrame(ref _length);
 
-        public LyricistsFrame Lyricists
-        {
-            get { return GetSingleFrame(ref _lyricists); }
-        }
+        public LyricistsFrame Lyricists => GetSingleFrame(ref _lyricists);
 
-        public Id3SyncFrameList<LyricsFrame> Lyrics
-        {
-            get { return GetMultipleFrames(ref _lyrics); }
-        }
+        public Id3SyncFrameList<LyricsFrame> Lyrics => GetMultipleFrames(ref _lyrics);
 
-        public PaymentUrlFrame PaymentUrl
-        {
-            get { return GetSingleFrame(ref _paymentUrl); }
-        }
+        public PaymentUrlFrame PaymentUrl => GetSingleFrame(ref _paymentUrl);
 
-        public PublisherFrame Publisher
-        {
-            get { return GetSingleFrame(ref _publisher); }
-        }
+        public PublisherFrame Publisher => GetSingleFrame(ref _publisher);
 
-        public Id3SyncFrameList<PictureFrame> Pictures
-        {
-            get { return GetMultipleFrames(ref _pictures); }
-        }
+        public Id3SyncFrameList<PictureFrame> Pictures => GetMultipleFrames(ref _pictures);
 
-        public PrivateFrameList PrivateData
-        {
-            get { return _privateData ?? (_privateData = new PrivateFrameList(Frames)); }
-        }
+        public PrivateFrameList PrivateData => _privateData ?? (_privateData = new PrivateFrameList(Frames));
 
-        public RecordingDateFrame RecordingDate
-        {
-            get { return GetSingleFrame(ref _recordingDate); }
-        }
+        public RecordingDateFrame RecordingDate => GetSingleFrame(ref _recordingDate);
 
-        public SubtitleFrame Subtitle
-        {
-            get { return GetSingleFrame(ref _subtitle); }
-        }
+        public SubtitleFrame Subtitle => GetSingleFrame(ref _subtitle);
 
-        public TitleFrame Title
-        {
-            get { return GetSingleFrame(ref _title); }
-        }
+        public TitleFrame Title => GetSingleFrame(ref _title);
 
-        public TrackFrame Track
-        {
-            get { return GetSingleFrame(ref _track); }
-        }
+        public TrackFrame Track => GetSingleFrame(ref _track);
 
-        public YearFrame Year
-        {
-            get { return GetSingleFrame(ref _year); }
-        }
+        public YearFrame Year => GetSingleFrame(ref _year);
         #endregion
 
         #region IComparable<Id3Tag> and IEquatable<Id3Tag> implementations
@@ -420,7 +322,7 @@ namespace Id3
         public static Id3Tag Merge(params Id3Tag[] tags)
         {
             if (tags.Length == 0)
-                throw new ArgumentNullException("tags", "Specify 2 or more tags to merge");
+                throw new ArgumentNullException(nameof(tags), "Specify 2 or more tags to merge");
 
             if (tags.Length == 1)
                 return tags[0];
