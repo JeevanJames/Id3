@@ -8,16 +8,14 @@
     <Version>0.5.0</Version>
     <Authors>Jeevan James</Authors>
     <Product>ID3.NET</Product>
-    <Description>ID3.NET is a set of libraries for reading, modifying and writing ID3 and Lyrics3 tags in MP3 audio files.
-The core library is a portable class library compatible with the .NET Framework 4 and higher, Silverlight 4 and higher, Windows Phone 7.5 and .NET for Metro style apps. It contains the bulk of the code needed to read, modify and write ID3 tags.
-Additional NuGet packages are available that contains non-portable libraries that provide additional platform-specific support.
-See the project site for documentation.</Description>
+    <Description>ID3.NET is a set of libraries for reading, modifying and writing ID3 and Lyrics3 tags in MP3 audio files.</Description>
     <Copyright>Copyright (c) Jeevan James 2005-2018</Copyright>
     <PackageLicenseUrl>https://github.com/JeevanJames/Id3/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/JeevanJames/Id3</PackageProjectUrl>
     <RepositoryUrl>https://github.com/JeevanJames/Id3</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>ID3 ID3.NET Lyrics3 MP3 ID3v1 ID3v1.0 ID3v1.1 ID3v2.3 Tag Tags Tagging Audio</PackageTags>
+    <PackageReleaseNotes>Migrated to netstandard20 and .NET 4.x framework.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -32,6 +30,14 @@ See the project site for documentation.</Description>
     <WarningsAsErrors />
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <WarningLevel>2</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\Id3.Net.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\Id3.Net.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -110,7 +110,7 @@ namespace Id3.v2
             var tagData = new byte[tagSize];
             stream.Read(tagData, 0, tagSize);
 
-            int currentPos = 0;
+            var currentPos = 0;
             if (header.ExtendedHeader)
             {
                 SyncSafeNumber.DecodeSafe(tagData, currentPos, 4);
@@ -180,40 +180,40 @@ namespace Id3.v2
 
         protected override void BuildFrameHandlers(FrameHandlers mappings)
         {
-            mappings.Add<AlbumFrame>("TALB", EncodeAlbum, DecodeAlbum);
-            mappings.Add<ArtistsFrame>("TPE1", EncodeArtists, DecodeArtists);
-            mappings.Add<ArtistUrlFrame>("WOAR", EncodeArtistUrl, DecodeArtistUrl);
+            mappings.Add<AlbumFrame>("TALB", EncodeText<AlbumFrame>, DecodeText<AlbumFrame>);
+            mappings.Add<ArtistsFrame>("TPE1", EncodeText<ArtistsFrame>, DecodeText<ArtistsFrame>);
+            mappings.Add<ArtistUrlFrame>("WOAR", EncodeUrlLink<ArtistUrlFrame>, DecodeUrlLink<ArtistUrlFrame>);
             //mappings.Add<AudioEncryptionFrame>("AENC", null, null);
-            mappings.Add<AudioFileUrlFrame>("WOAF", EncodeAudioFileUrl, DecodeAudioFileUrl);
-            mappings.Add<AudioSourceUrlFrame>("WOAS", EncodeAudioSourceUrl, DecodeAudioSourceUrl);
-            mappings.Add<BandFrame>("TPE2", EncodeBand, DecodeBand);
-            mappings.Add<BeatsPerMinuteFrame>("TBPM", EncodeBeatsPerMinute, DecodeBeatsPerMinute);
+            mappings.Add<AudioFileUrlFrame>("WOAF", EncodeUrlLink<AudioFileUrlFrame>, DecodeUrlLink<AudioFileUrlFrame>);
+            mappings.Add<AudioSourceUrlFrame>("WOAS", EncodeUrlLink<AudioSourceUrlFrame>, DecodeUrlLink<AudioSourceUrlFrame>);
+            mappings.Add<BandFrame>("TPE2", EncodeText<BandFrame>, DecodeText<BandFrame>);
+            mappings.Add<BeatsPerMinuteFrame>("TBPM", EncodeText<BeatsPerMinuteFrame>, DecodeText<BeatsPerMinuteFrame>);
             mappings.Add<CommentFrame>("COMM", EncodeComment, DecodeComment);
             //mappings.Add<CommercialFrame>("COMR", null, null);
-            mappings.Add<CommercialUrlFrame>("WCOM", EncodeCommercialUrl, DecodeCommercialUrl);
-            mappings.Add<ComposersFrame>("TCOM", EncodeComposers, DecodeComposers);
-            mappings.Add<ConductorFrame>("TPE3", EncodeConductor, DecodeConductor);
-            mappings.Add<ContentGroupDescriptionFrame>("TIT1", EncodeContentGroupDescription, DecodeContentGroupDescription);
-            mappings.Add<CopyrightFrame>("TCOP", null, null);
-            mappings.Add<CopyrightUrlFrame>("WCOP", EncodeCopyrightUrl, DecodeCopyrightUrl);
-            mappings.Add<CustomTextFrame>("TXXX", EncodeCustomText, DecodeCustomText);
+            mappings.Add<CommercialUrlFrame>("WCOM", EncodeUrlLink<CommercialUrlFrame>, DecodeUrlLink<CommercialUrlFrame>);
+            mappings.Add<ComposersFrame>("TCOM", EncodeText<ComposersFrame>, DecodeText<ComposersFrame>);
+            mappings.Add<ConductorFrame>("TPE3", EncodeText<ConductorFrame>, DecodeText<ConductorFrame>);
+            mappings.Add<ContentGroupDescriptionFrame>("TIT1", EncodeText<ContentGroupDescriptionFrame>, DecodeText<ContentGroupDescriptionFrame>);
+            mappings.Add<CopyrightFrame>("TCOP", EncodeText<CopyrightFrame>, DecodeText<CopyrightFrame>);
+            mappings.Add<CopyrightUrlFrame>("WCOP", EncodeUrlLink<CopyrightUrlFrame>, DecodeUrlLink<CopyrightUrlFrame>);
+            mappings.Add<CustomTextFrame>("TXXX", EncodeText<CustomTextFrame>, DecodeText<CustomTextFrame>);
             mappings.Add<CustomUrlLinkFrame>("WXXX", EncodeCustomUrlLink, DecodeCustomUrlLink);
-            mappings.Add<EncoderFrame>("TENC", EncodeEncoder, DecodeEncoder);
-            mappings.Add<EncodingSettingsFrame>("TSSE", EncodeEncodingSettings, DecodeEncodingSettings);
+            mappings.Add<EncoderFrame>("TENC", EncodeText<EncoderFrame>, DecodeText<EncoderFrame>);
+            mappings.Add<EncodingSettingsFrame>("TSSE", EncodeText<EncodingSettingsFrame>, DecodeText<EncodingSettingsFrame>);
             //mappings.Add<EncryptionMethodRegistrationFrame>("ENCR", null, null);
             //mappings.Add<EqualizationFrame>("EQUA", null, null);
             //mappings.Add<EventTimingCodesFrame>("ETCO", null, null);
-            mappings.Add<FileOwnerFrame>("TOWN", EncodeFileOwner, DecodeFileOwner);
-            mappings.Add<FileTypeFrame>("TFLT", null, null);
+            mappings.Add<FileOwnerFrame>("TOWN", EncodeText<FileOwnerFrame>, DecodeText<FileOwnerFrame>);
+            mappings.Add<FileTypeFrame>("TFLT", EncodeText<FileTypeFrame>, DecodeText<FileTypeFrame>);
             //mappings.Add<GeneralEncapsulationObjectFrame>("GEOB", null, null);
-            mappings.Add<GenreFrame>("TCON", EncodeGenre, DecodeGenre);
+            mappings.Add<GenreFrame>("TCON", EncodeText<GenreFrame>, DecodeText<GenreFrame>);
             //mappings.Add<GroupIdentificationRegistrationFrame>("GRID", null, null);
             //mappings.Add<InitialKeyFrame>("TKEY", null, null);
             //mappings.Add<InvolvedPeopleFrame>("IPLS", null, null);
             //mappings.Add<LanguagesFrame>("TLAN", null, null);
-            mappings.Add<LengthFrame>("TLEN", null, null);
+            mappings.Add<LengthFrame>("TLEN", EncodeText<LengthFrame>, DecodeText<LengthFrame>);
             //mappings.Add<LinkedInformationFrame>("LINK", null, null);
-            mappings.Add<LyricistsFrame>("TEXT", null, null);
+            mappings.Add<LyricistsFrame>("TEXT", EncodeText<LyricistsFrame>, DecodeText<LyricistsFrame>);
             mappings.Add<LyricsFrame>("USLT", EncodeLyrics, DecodeLyrics);
             //mappings.Add<MediaTypeFrame>("TMED", null, null);
             //mappings.Add<ModifiersFrame>("TPE4", null, null);
@@ -226,34 +226,34 @@ namespace Id3.v2
             //mappings.Add<OriginalReleaseYearFrame>("TORY", null, null);
             //mappings.Add<OwnershipFrame>("OWNE", null, null);
             //mappings.Add<PartOfASetFrame>("TPOS", null, null);
-            mappings.Add<PaymentUrlFrame>("WPAY", EncodePaymentUrl, DecodePaymentUrl);
+            mappings.Add<PaymentUrlFrame>("WPAY", EncodeUrlLink<PaymentUrlFrame>, DecodeUrlLink<PaymentUrlFrame>);
             mappings.Add<PictureFrame>("APIC", EncodePicture, DecodePicture);
             //mappings.Add<PlayCounterFrame>("PCNT", null, null);
             //mappings.Add<PlaylistDelayFrame>("TDLY", null, null);
             //mappings.Add<PopularimeterFrame>("POPM", null, null);
             //mappings.Add<PositionSynchronizationFrame>("POSS", null, null);
             mappings.Add<PrivateFrame>("PRIV", EncodePrivate, DecodePrivate);
-            mappings.Add<PublisherFrame>("TPUB", EncodePublisher, DecodePublisher);
+            mappings.Add<PublisherFrame>("TPUB", EncodeText<PublisherFrame>, DecodeText<PublisherFrame>);
             //mappings.Add<PublisherUrlFrame>("WPUB", null, null);
             //mappings.Add<RadioStationNameFrame>("TRSN", null, null);
             //mappings.Add<RadioStationOwnerFrame>("TRSO", null, null);
             //mappings.Add<RadioStationUrlFrame>("WORS", null, null);
             //mappings.Add<RecommendedBufferSizeFrame>("RBUF", null, null);
-            mappings.Add<RecordingDateFrame>("TDAT", EncodeRecordingDate, DecodeRecordingDate);
+            mappings.Add<RecordingDateFrame>("TDAT", EncodeText<RecordingDateFrame>, DecodeText<RecordingDateFrame>);
             //mappings.Add<RecordingDatesFrame>("TRDA", null, null);
             //mappings.Add<RelativeVolumeAdjustmentFrame>("RVAD", null, null);
             //mappings.Add<ReverbFrame>("RVRB", null, null);
             //mappings.Add<SizeFrame>("TSIZ", null, null);
             //mappings.Add<StandardRecordingCodeFrame>("TSRC", null, null);
-            mappings.Add<SubtitleFrame>("TIT3", EncodeSubtitle, DecodeSubtitle);
+            mappings.Add<SubtitleFrame>("TIT3", EncodeText<SubtitleFrame>, DecodeText<SubtitleFrame>);
             //mappings.Add<SynchronizedTempoCodesFrame>("SYTC", null, null);
             //mappings.Add<SynchronizedTextFrame>("SYLT", null, null);
             //mappings.Add<TermsOfUseFrame>("USER", null, null);
             //mappings.Add<TimeFrame>("TIME", null, null);
-            mappings.Add<TitleFrame>("TIT2", EncodeTitle, DecodeTitle);
-            mappings.Add<TrackFrame>("TRCK", EncodeTrack, DecodeTrack);
+            mappings.Add<TitleFrame>("TIT2", EncodeText<TitleFrame>, DecodeText<TitleFrame>);
+            mappings.Add<TrackFrame>("TRCK", EncodeText<TrackFrame>, DecodeText<TrackFrame>);
             //mappings.Add<UniqueFileIDFrame>("UFID", null, null);
-            mappings.Add<YearFrame>("TYER", EncodeYear, DecodeYear);
+            mappings.Add<YearFrame>("TYER", EncodeText<YearFrame>, DecodeText<YearFrame>);
         }
 
         private byte[] GetTagBytes(Id3Tag tag)

@@ -23,42 +23,27 @@ using System.Linq;
 
 namespace Id3
 {
-    //Represents the details of a frame and how it can be encoded or decoded. Handlers use this information
-    //to process frames.
+    /// <summary>
+    ///     Represents the details of a frame and how it can be encoded or decoded.
+    ///     Handlers use this information to process frames.
+    /// </summary>
     internal sealed class FrameHandler
     {
-        private readonly string _frameId;
-        private readonly Type _type;
-        private readonly Func<Id3Frame, byte[]> _encoder;
-        private readonly Func<byte[], Id3Frame> _decoder;
-
         internal FrameHandler(string frameId, Type type, Func<Id3Frame, byte[]> encoder, Func<byte[], Id3Frame> decoder)
         {
-            _frameId = frameId;
-            _type = type;
-            _encoder = encoder;
-            _decoder = decoder;
+            FrameId = frameId;
+            Type = type;
+            Encoder = encoder;
+            Decoder = decoder;
         }
 
-        internal string FrameId
-        {
-            get { return _frameId; }
-        }
+        internal string FrameId { get; }
 
-        internal Type Type
-        {
-            get { return _type; }
-        }
+        internal Type Type { get; }
 
-        internal Func<Id3Frame, byte[]> Encoder
-        {
-            get { return _encoder; }
-        }
+        internal Func<Id3Frame, byte[]> Encoder { get; }
 
-        internal Func<byte[], Id3Frame> Decoder
-        {
-            get { return _decoder; }
-        }
+        internal Func<byte[], Id3Frame> Decoder { get; }
     }
 
     internal sealed class FrameHandlers : Collection<FrameHandler>

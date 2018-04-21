@@ -17,16 +17,14 @@ limitations under the License.
 */
 #endregion
 
-using System.Diagnostics;
-
 namespace Id3
 {
-    [DebuggerDisplay("{ToString()}")]
     public abstract class UrlLinkFrame : Id3Frame
     {
         public override bool Equals(Id3Frame other)
         {
-            return other is UrlLinkFrame urlLink &&
+            return base.Equals(other) &&
+                other is UrlLinkFrame urlLink &&
                 Url == urlLink.Url;
         }
 
