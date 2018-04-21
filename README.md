@@ -15,7 +15,10 @@ You can track the progress of frame implementation and see the list of currently
 We will start on ID3 v2.2 and v2.4 tag support as soon as the v2.3 codebase is done.
 Please see the [project roadmap](Roadmap) for more details.
 
-## Example
+## Examples
+
+### Reading ID3 tags
+Reads all .mp3 files in a directory and outputs their title, artist and album details to the console.
 ```cs
 string[] musicFiles = Directory.GetFiles(@"C:\Music", "*.mp3");
 foreach (string musicFile in musicFiles)
@@ -26,6 +29,43 @@ foreach (string musicFile in musicFiles)
         Console.WriteLine("Title: {0}", tag.Title.Value);
         Console.WriteLine("Artist: {0}", tag.Artists.Value);
         Console.WriteLine("Album: {0}", tag.Album.Value);
+    }
+}
+```
+
+Method to enumerate theough the specified MP3 files and return those from the 1980's.
+```cs
+IEnumerable<string> GetMusicFrom80s(IEnumerable<string> mp3FilePaths)
+{
+    foreach (var mp3FilePath in mp3FilePaths)
+    {
+        using (var mp3 = new Mp3(mp3FilePath))
+        {
+            Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
+            if (!tag.Year.HasValue)
+                continue;
+            if (tag.Year >= 1980 && tag.Year < 1990)
+                yield return mp3FilePath;
+        }
+    }
+}
+```
+
+### Writing ID3 tags
+Method to write a generic copyright message to the ID3 tag, if one does not exist.
+```cs
+void SetCopyright(string mp3FilePath)
+{
+    using (var mp3 = new Mp3(mp3FilePath, Mp3Permissions.ReadWrite))
+    {
+        Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
+        if (!tag.Copyright.IsAssigned)
+        {
+            int year = tag.Year.Value.GetValueOrDefault(2000);
+            string artists = tag.Artists.ToString();
+            tag.Copyright.Value = $"{year} {artists}";
+            mp3.WriteTag(tag, WriteConflictAction.Replace);
+        }
     }
 }
 ```
