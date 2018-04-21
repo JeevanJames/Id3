@@ -13,7 +13,7 @@ While ID3.NET can read v2.3 tags, it does not recognize all v2.3 frames yet. Unr
 You can track the progress of frame implementation and see the list of currently supported frames [here](https://github.com/JeevanJames/Id3/wiki/Supported-ID3-v2.3-frames).
 
 We will start on ID3 v2.2 and v2.4 tag support as soon as the v2.3 codebase is done.
-Please see the [project roadmap](Roadmap) for more details.
+Please see the [project roadmap](https://github.com/JeevanJames/Id3/wiki/Project-Roadmap) for more details.
 
 ## Examples
 
