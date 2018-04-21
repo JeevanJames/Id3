@@ -26,7 +26,7 @@ namespace Id3
     {
         internal override string TextValue
         {
-            get => Value != TimeSpan.Zero ? Value.TotalMilliseconds.ToString() : string.Empty;
+            get => Value != TimeSpan.Zero ? Value.TotalMilliseconds.ToString(CultureInfo.InvariantCulture) : string.Empty;
             set
             {
                 if (string.IsNullOrWhiteSpace(value))

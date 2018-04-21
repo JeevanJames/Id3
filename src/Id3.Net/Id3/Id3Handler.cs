@@ -1,6 +1,6 @@
 #region --- License & Copyright Notice ---
 /*
-Copyright (c) 2005-2012 Jeevan James
+Copyright (c) 2005-2018 Jeevan James
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,15 +22,19 @@ using System.IO;
 
 namespace Id3
 {
-    //Represents an ID3 handler, which can manipulate ID3 tags in an MP3 file stream.
-    //There is a derived class for each version of ID3 supported by this framework.
+    /// <summary>
+    ///     Represents an ID3 handler, which can manipulate ID3 tags in an MP3 file stream.
+    ///     ID3 handlers specify how to serialize/deserialize frames and write/read/delete tags from an MP3 file.
+    ///     There is a derived class for each version of ID3 supported by this framework.
+    /// </summary>
     internal abstract class Id3Handler
     {
-        //Specifies the details of each frame supported by the handler, including information on how
-        //to encode and decode them. This structure is built by derived handlers by overridding the
-        //BuildFrameHandlers method.
         private FrameHandlers _frameHandlers;
 
+        /// <summary>
+        ///     Creates a basic tag corresponding to the version of the handler.
+        /// </summary>
+        /// <returns>The basic ID3 tag.</returns>
         internal Id3Tag CreateTag()
         {
             var tag = new Id3Tag {
@@ -41,44 +45,67 @@ namespace Id3
             return tag;
         }
 
+        /// <summary>
+        ///     Creates a frame instance from the specified frame ID.
+        ///     If there is a registered frame handler for the frame ID, it is used to instantiate the frame object. If not, an
+        ///     UnknownFrame instance is created.
+        /// </summary>
+        /// <param name="frameId">The frame ID</param>
+        /// <returns>An instance of the frame.</returns>
         internal Id3Frame GetFrameFromFrameId(string frameId)
         {
             FrameHandler handler = FrameHandlers[frameId];
             if (handler != null)
-                return (Id3Frame)Activator.CreateInstance(handler.Type);
+                return (Id3Frame) Activator.CreateInstance(handler.Type);
             return new UnknownFrame {
                 Id = frameId
             };
         }
 
+        /// <summary>
+        ///     Retrieves the frame ID from the specified frame instance.
+        /// </summary>
+        /// <param name="frame">The frame instance.</param>
+        /// <returns>The frame ID, or null if there is no frame handler for the specified frame instance.</returns>
         internal string GetFrameIdFromFrame(Id3Frame frame)
         {
-            var unknownFrame = frame as UnknownFrame;
-            if (unknownFrame != null)
+            if (frame is UnknownFrame unknownFrame)
                 return unknownFrame.Id;
 
             Type frameType = frame.GetType();
 
             FrameHandler handler = FrameHandlers[frameType];
-            return handler != null ? handler.FrameId : null;
+            return handler?.FrameId;
         }
 
-        //Stream-manipulation overrides for the handler
+        #region Stream-manipulation overrides for the handler
         internal abstract void DeleteTag(Stream stream);
         internal abstract byte[] GetTagBytes(Stream stream);
         internal abstract bool HasTag(Stream stream);
         internal abstract Id3Tag ReadTag(Stream stream);
         internal abstract bool WriteTag(Stream stream, Id3Tag tag);
+        #endregion
 
-        //ID3 tag properties for the handler
+        #region ID3 tag properties for the handler
         internal abstract Id3TagFamily Family { get; }
         internal abstract int MajorVersion { get; }
         internal abstract int MinorVersion { get; }
+        #endregion
 
-        //Override this in each derived handler to specify the valid frame types for the handler and
-        //the frame IDs to which they correspond.
+        /// <summary>
+        ///     Override this in each derived handler to specify the valid frame types for the handler and the frame IDs to which
+        ///     they correspond.
+        /// </summary>
+        /// <param name="mappings">
+        ///     The frame handlers mapping structure. Derived classes should call the Add method for each frame
+        ///     handler they want to register with this class.
+        /// </param>
         protected abstract void BuildFrameHandlers(FrameHandlers mappings);
 
+        /// <summary>
+        ///     Specifies the details of each frame supported by the handler, including information on how to encode and decode
+        ///     them. This structure is built by derived handlers by overridding the BuildFrameHandlers method.
+        /// </summary>
         protected FrameHandlers FrameHandlers
         {
             get
@@ -88,6 +115,7 @@ namespace Id3
                     _frameHandlers = new FrameHandlers();
                     BuildFrameHandlers(_frameHandlers);
                 }
+
                 return _frameHandlers;
             }
         }

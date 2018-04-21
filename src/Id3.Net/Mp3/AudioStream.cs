@@ -20,7 +20,6 @@ limitations under the License.
 //http://www.devhood.com/tutorials/tutorial_details.aspx?tutorial_id=79
 
 using System;
-using System.Collections.Generic;
 
 namespace Id3
 {
@@ -69,7 +68,7 @@ namespace Id3
             return new AudioStreamProperties(Bitrate, Frequency, Duration, AudioMode);
         }
 
-        private void CheckVariableBitrateHeader(IReadOnlyList<byte> header)
+        private void CheckVariableBitrateHeader(byte[] header)
         {
             _isVariableBitrate = false;
 

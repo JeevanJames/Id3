@@ -26,6 +26,8 @@ namespace Id3
     {
         public int TrackCount { get; set; }
 
+        public bool Pad { get; set; }
+
         internal override string TextValue
         {
             get
@@ -34,7 +36,11 @@ namespace Id3
                     return null;
                 if (TrackCount <= 0)
                     return Value.ToString(CultureInfo.InvariantCulture);
-                return Value <= 0 ? $"0/{TrackCount}" : $"{Value}/{TrackCount}";
+                if (Value <= 0)
+                    return $"0/{TrackCount}";
+                string valueString =
+                    Pad ? Value.ToString().PadLeft(TrackCount.ToString().Length, '0') : Value.ToString();
+                return $"{valueString}/{TrackCount}";
             }
             set
             {
@@ -55,6 +61,7 @@ namespace Id3
                         TrackCount = !string.IsNullOrEmpty(match.Groups[2].Value)
                             ? int.Parse(match.Groups[2].Value)
                             : 0;
+                        Pad = match.Groups[1].Value.StartsWith("0");
                     }
                 }
             }

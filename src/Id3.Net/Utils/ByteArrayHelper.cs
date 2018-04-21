@@ -1,6 +1,6 @@
 #region --- License & Copyright Notice ---
 /*
-Copyright (c) 2005-2012 Jeevan James
+Copyright (c) 2005-2018 Jeevan James
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,9 +32,9 @@ namespace Id3
                 return false;
             if (bytes1.Length != bytes2.Length)
                 return false;
-            for (int byteIdx = 0; byteIdx < bytes1.Length; byteIdx++)
+            for (var i = 0; i < bytes1.Length; i++)
             {
-                if (bytes1[byteIdx] != bytes2[byteIdx])
+                if (bytes1[i] != bytes2[i])
                     return false;
             }
             return true;
@@ -108,7 +108,7 @@ namespace Id3
                 return new[] { bytes };
 
             var results = new List<byte[]>(locations.Length + 1);
-            for (int locationIdx = 0; locationIdx < locations.Length; locationIdx++)
+            for (var locationIdx = 0; locationIdx < locations.Length; locationIdx++)
             {
                 int startIndex = locationIdx > 0 ? locations[locationIdx - 1] + sequence.Length : start;
                 int endIndex = locations[locationIdx] - 1;
