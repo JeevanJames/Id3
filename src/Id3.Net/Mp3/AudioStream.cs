@@ -51,7 +51,7 @@ namespace Id3
             } while (position < _audioStream.Length - 4 && !isValidHeader);
 
             if (!isValidHeader)
-                throw new AudioStreamException("Invalid header format for MP3 audio stream");
+                throw new Id3Exception("Invalid header format for MP3 audio stream");
 
             position += 3;
 

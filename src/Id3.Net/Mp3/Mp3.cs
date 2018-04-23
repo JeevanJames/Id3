@@ -359,7 +359,7 @@ namespace Id3
                 {
                     byte[] audioStream = GetAudioStream();
                     if (audioStream == null || audioStream.Length == 0)
-                        throw new AudioStreamException(Mp3Messages.AudioStreamMissing);
+                        throw new Id3Exception(Mp3Messages.AudioStreamMissing);
                     _audioProperties = new AudioStream(audioStream).Calculate();
                 }
 
