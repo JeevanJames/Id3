@@ -344,7 +344,7 @@ namespace Id3
         /// </summary>
         /// <typeparam name="TFrame">Type of frame to retrieve</typeparam>
         /// <param name="frame">Reference to the frame field instance</param>
-        /// <returns></returns>
+        /// <returns>Instance of existing frame, or new instance, if it does not already exist</returns>
         private TFrame GetSingleFrame<TFrame>(ref TFrame frame) where TFrame : Id3Frame, new()
         {
             //If frame field is already assigned, simply return it.

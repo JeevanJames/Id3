@@ -263,18 +263,16 @@ namespace Id3.v2
             bytes.AddRange(new byte[] { 3, 0, 0 });
             foreach (Id3Frame frame in tag.Frames)
             {
-                if (frame.IsAssigned)
-                {
-                    FrameHandler mapping = FrameHandlers[frame.GetType()];
-                    if (mapping != null)
-                    {
-                        byte[] frameBytes = mapping.Encoder(frame);
-                        bytes.AddRange(Encoding.ASCII.GetBytes(GetFrameIdFromFrame(frame)));
-                        bytes.AddRange(SyncSafeNumber.EncodeNormal(frameBytes.Length));
-                        bytes.AddRange(new byte[] {0, 0});
-                        bytes.AddRange(frameBytes);
-                    }
-                }
+                if (!frame.IsAssigned)
+                    continue;
+                FrameHandler mapping = FrameHandlers[frame.GetType()];
+                if (mapping == null)
+                    continue;
+                byte[] frameBytes = mapping.Encoder(frame);
+                bytes.AddRange(Encoding.ASCII.GetBytes(GetFrameIdFromFrame(frame)));
+                bytes.AddRange(SyncSafeNumber.EncodeNormal(frameBytes.Length));
+                bytes.AddRange(new byte[] {0, 0});
+                bytes.AddRange(frameBytes);
             }
             int framesSize = bytes.Count - 6;
             bytes.InsertRange(6, SyncSafeNumber.EncodeSafe(framesSize));

@@ -41,40 +41,25 @@ namespace Id3
 
         private void FireCollectionChangedEvent(FrameListChangeType changeType, Id3Frame frame)
         {
-            EventHandler<FrameListChangedEventArgs> collectionChanged = CollectionChanged;
-            if (collectionChanged != null)
-                collectionChanged(this, new FrameListChangedEventArgs(changeType, frame));
+            CollectionChanged?.Invoke(this, new FrameListChangedEventArgs(changeType, frame));
         }
     }
 
     internal sealed class FrameListChangedEventArgs : EventArgs
     {
-        private readonly FrameListChangeType _changeType;
-        private readonly Id3Frame _frame;
-        private readonly Type _frameType;
-
         internal FrameListChangedEventArgs(FrameListChangeType changeType, Id3Frame frame)
         {
-            _changeType = changeType;
-            _frame = frame;
+            ChangeType = changeType;
+            Frame = frame;
             if (frame != null)
-                _frameType = frame.GetType();
+                FrameType = frame.GetType();
         }
 
-        internal FrameListChangeType ChangeType
-        {
-            get { return _changeType; }
-        }
+        internal FrameListChangeType ChangeType { get; }
 
-        public Id3Frame Frame
-        {
-            get { return _frame; }
-        }
+        internal Id3Frame Frame { get; }
 
-        internal Type FrameType
-        {
-            get { return _frameType; }
-        }
+        internal Type FrameType { get; }
     }
 
     internal enum FrameListChangeType

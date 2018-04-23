@@ -18,6 +18,7 @@ limitations under the License.
 #endregion
 
 using System;
+using System.Linq;
 
 namespace Id3
 {
@@ -55,17 +56,20 @@ namespace Id3
 
         public CommentFrame[] ByLanguage(Id3Language language)
         {
-            return FindAll(commentFrame => commentFrame.Language == language);
+            return this.Where(commentFrame => commentFrame.Language == language).ToArray();
         }
 
         public CommentFrame[] ByDescription(string description)
         {
-            return FindAll(frame => frame.Description.Equals(description, StringComparison.OrdinalIgnoreCase));
+            return this.Where(frame => frame.Description.Equals(description, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
         }
 
         public CommentFrame ByLanguageAndDescription(Id3Language language, string description)
         {
-            return Find(frame => (frame.Language == language) && frame.Description.Equals(description, StringComparison.OrdinalIgnoreCase));
+            return this.FirstOrDefault(frame =>
+                frame.Language == language &&
+                frame.Description.Equals(description, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

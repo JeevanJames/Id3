@@ -18,6 +18,7 @@ limitations under the License.
 #endregion
 
 using System;
+using System.Linq;
 
 namespace Id3
 {
@@ -51,7 +52,7 @@ namespace Id3
 
         public PrivateFrame[] ByOwnerId(string ownerId)
         {
-            return FindAll(frame => frame.OwnerId.Equals(ownerId, StringComparison.OrdinalIgnoreCase));
+            return this.Where(frame => frame.OwnerId.Equals(ownerId, StringComparison.OrdinalIgnoreCase)).ToArray();
         }
     }
 }

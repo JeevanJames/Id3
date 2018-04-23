@@ -50,7 +50,7 @@ namespace Id3
 
     /// <inheritdoc />
     /// <summary>
-    ///     Collection of ID3 tag handlers.
+    ///     Collection of registered ID3 tag handlers.
     /// </summary>
     internal sealed class RegisteredId3Handlers : Collection<RegisteredId3Handler>
     {

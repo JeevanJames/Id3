@@ -26,11 +26,15 @@ namespace Id3
     public class Id3SyncFrameList<TFrame> : Collection<TFrame>
         where TFrame : Id3Frame
     {
-        //Reference to the main frame list
+        /// <summary>
+        ///     Reference to the main frame list
+        /// </summary>
         private readonly Id3FrameList _mainList;
 
-        //If true, indicates that an internal list update is taking place, and the list change
-        //notification methods should not perform the corresponding updates on the main list.
+        /// <summary>
+        ///     If true, indicates that an internal list update is taking place, and the list change notification methods should
+        ///     not perform the corresponding updates on the main list.
+        /// </summary>
         private bool _internalUpdate;
 
         internal Id3SyncFrameList(Id3FrameList mainList)
@@ -40,13 +44,23 @@ namespace Id3
 
             //Extract all frames of type TFrame and store then in this collection.
             //The list change notification events should not be fired during this process.
+            RunWithoutMainListSync(() => {
+                foreach (TFrame frame in _mainList.OfType<TFrame>())
+                    Add(frame);
+            });
+        }
+
+        /// <summary>
+        ///     Runs the specified action, which can make changes to the collection, without syncing the main list.
+        /// </summary>
+        /// <param name="action">The action to run</param>
+        private void RunWithoutMainListSync(Action action)
+        {
             _internalUpdate = true;
             try
             {
-                foreach (TFrame frame in _mainList.OfType<TFrame>())
-                    Add(frame);
-            }
-            finally
+                action();
+            } finally
             {
                 _internalUpdate = false;
             }
@@ -54,37 +68,17 @@ namespace Id3
 
         private void OnMainListChanged(object sender, FrameListChangedEventArgs e)
         {
-            _internalUpdate = true;
-            try
-            {
-                switch (e.ChangeType)
+            RunWithoutMainListSync(() => {
+                if (e.ChangeType == FrameListChangeType.Removed)
                 {
-                    case FrameListChangeType.Removed:
-                        if (e.FrameType == typeof(TFrame))
-                            Remove((TFrame)e.Frame);
-                        break;
-                    case FrameListChangeType.Cleared:
-                        Clear();
-                        break;
+                    if (e.FrameType == typeof(TFrame))
+                        Remove((TFrame) e.Frame);
+                } else if (e.ChangeType == FrameListChangeType.Cleared)
+                {
+                    Clear();
                 }
-            }
-            finally
-            {
-                _internalUpdate = false;
-            }
+            });
         }
-
-        #region Public utility methods
-        public TFrame Find(Func<TFrame, bool> predicate)
-        {
-            return this.FirstOrDefault(predicate);
-        }
-
-        public TFrame[] FindAll(Func<TFrame, bool> predicate)
-        {
-            return this.Where(predicate).ToArray();
-        }
-        #endregion
 
         #region List change notification methods
         protected override void ClearItems()
@@ -97,6 +91,7 @@ namespace Id3
                         _mainList.RemoveAt(i);
                 }
             }
+
             base.ClearItems();
         }
 
@@ -114,6 +109,7 @@ namespace Id3
                 TFrame frame = this[index];
                 _mainList.Remove(frame);
             }
+
             base.RemoveItem(index);
         }
 
@@ -125,6 +121,7 @@ namespace Id3
                 int mainIndex = _mainList.IndexOf(frame);
                 _mainList[mainIndex] = item;
             }
+
             base.SetItem(index, item);
         }
         #endregion
