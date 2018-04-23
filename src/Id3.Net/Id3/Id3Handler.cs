@@ -18,7 +18,14 @@ limitations under the License.
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+
+using Id3.v1;
+using Id3.v2;
+
+using JetBrains.Annotations;
 
 namespace Id3
 {
@@ -38,8 +45,7 @@ namespace Id3
         internal Id3Tag CreateTag()
         {
             var tag = new Id3Tag {
-                MajorVersion = MajorVersion,
-                MinorVersion = MinorVersion,
+                Version = Version,
                 Family = Family
             };
             return tag;
@@ -88,8 +94,7 @@ namespace Id3
 
         #region ID3 tag properties for the handler
         internal abstract Id3TagFamily Family { get; }
-        internal abstract int MajorVersion { get; }
-        internal abstract int MinorVersion { get; }
+        internal abstract Id3Version Version { get; }
         #endregion
 
         /// <summary>
@@ -119,5 +124,45 @@ namespace Id3
                 return _frameHandlers;
             }
         }
+
+        internal static readonly List<Id3HandlerMetadata> AvailableHandlers = new List<Id3HandlerMetadata>(4) {
+            new Id3HandlerMetadata(Id3Version.V23, Id3TagFamily.Version2X, typeof(Id3V23Handler)),
+            new Id3HandlerMetadata(Id3Version.V1X, Id3TagFamily.Version1X, typeof(Id3V1Handler)),
+            new Id3HandlerMetadata(Id3Version.V24, Id3TagFamily.Version2X, typeof(Id3V24Handler)),
+            new Id3HandlerMetadata(Id3Version.V22, Id3TagFamily.Version2X, typeof(Id3V22Handler)),
+        };
+
+        /// <summary>
+        ///     Returns the ID3 tag handler for the specified tag version.
+        /// </summary>
+        /// <param name="version">Version of ID3 tag</param>
+        /// <returns>The tag handler for the specified version or null if it is not in the collection.</returns>
+        [NotNull]
+        internal static Id3Handler GetHandler(Id3Version version)
+        {
+            Id3HandlerMetadata foundHandler = AvailableHandlers.First(ah => ah.Version == version);
+            return foundHandler.Instance;
+        }
+    }
+
+    internal sealed class Id3HandlerMetadata
+    {
+        private Id3Handler _instance;
+
+        internal Id3HandlerMetadata(Id3Version version, Id3TagFamily family, Type type)
+        {
+            Version = version;
+            Family = family;
+            Type = type;
+        }
+
+        internal Id3Version Version { get; }
+
+        internal Id3TagFamily Family { get; }
+
+        internal Type Type { get; }
+
+        internal Id3Handler Instance =>
+            _instance ?? (_instance = (Id3Handler) Activator.CreateInstance(Type));
     }
 }

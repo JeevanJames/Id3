@@ -49,8 +49,7 @@ namespace Id3.v2
         internal override Id3Tag ReadTag(Stream stream)
         {
             var tag = new Id3Tag {
-                MajorVersion = 2,
-                MinorVersion = 4,
+                Version = Id3Version.V24,
                 Family = Id3TagFamily.Version2X,
                 IsSupported = false
             };
@@ -62,7 +61,7 @@ namespace Id3.v2
             throw new NotSupportedException("ID3 v2.4 is not yet supported in the ID3.NET library.");
         }
 
-        internal override int MinorVersion => 4;
+        internal override Id3Version Version => Id3Version.V24;
 
         protected override void BuildFrameHandlers(FrameHandlers mappings)
         {

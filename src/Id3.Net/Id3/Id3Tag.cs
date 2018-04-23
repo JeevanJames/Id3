@@ -91,26 +91,24 @@ namespace Id3
         ///     UnknownFrame objects.
         ///     Similarly, frames recognized in the output tag version, but not in the source version are converted accordingly.
         /// </summary>
-        /// <param name="majorVersion">Major version of the tag to convert to.</param>
-        /// <param name="minorVersion">Minor version of the tag to convert to.</param>
+        /// <param name="version">Version of the tag to convert to.</param>
         /// <returns>The converted tag of the specified version, or null if there were any errors.</returns>
-        public Id3Tag ConvertTo(int majorVersion, int minorVersion)
+        public Id3Tag ConvertTo(Id3Version version)
         {
-            if (MajorVersion == majorVersion && MinorVersion == minorVersion)
+            //If the requested version is the same as this version, just return the same instance.
+            if (Version == version)
                 return this;
-            RegisteredId3Handler sourceHandler = Mp3.RegisteredHandlers.GetHandler(MajorVersion, MinorVersion);
-            if (sourceHandler == null)
-                return null;
-            RegisteredId3Handler destinationHandler = Mp3.RegisteredHandlers.GetHandler(majorVersion, minorVersion);
-            if (destinationHandler == null)
-                return null;
-            Id3Tag destinationTag = destinationHandler.Handler.CreateTag();
+
+            //Get the ID3 tag handlers for the destination and create a empty tag
+            Id3Handler destinationHandler = Id3Handler.GetHandler(version);
+            Id3Tag destinationTag = destinationHandler.CreateTag();
+
             foreach (Id3Frame sourceFrame in Frames)
             {
                 if (sourceFrame is UnknownFrame unknownFrame)
                 {
                     string frameId = unknownFrame.Id;
-                    Id3Frame destinationFrame = destinationHandler.Handler.GetFrameFromFrameId(frameId);
+                    Id3Frame destinationFrame = destinationHandler.GetFrameFromFrameId(frameId);
                     destinationTag.Frames.Add(destinationFrame);
                 } else
                     destinationTag.Frames.Add(sourceFrame);
@@ -132,14 +130,9 @@ namespace Id3
         public Id3TagFamily Family { get; internal set; }
 
         /// <summary>
-        ///     Major version number of the ID3 tag
+        /// Version of the ID3 tag
         /// </summary>
-        public int MajorVersion { get; internal set; }
-
-        /// <summary>
-        ///     Minor version number of the ID3 tag
-        /// </summary>
-        public int MinorVersion { get; internal set; }
+        public Id3Version Version { get; internal set; }
 
         /// <summary>
         ///     Indicates whether this tag version is currently implemented by the framework.
@@ -321,16 +314,14 @@ namespace Id3
         {
             if (other == null)
                 return 1;
-            int majorComparison = MajorVersion.CompareTo(other.MajorVersion);
-            int minorComparison = MinorVersion.CompareTo(other.MinorVersion);
-            if (majorComparison == 0 && minorComparison == 0)
-                return 0;
-            return majorComparison != 0 ? majorComparison : minorComparison;
+            return Version.CompareTo(other.Version);
         }
 
         public bool Equals(Id3Tag other)
         {
-            return MajorVersion == other.MajorVersion && MinorVersion == other.MinorVersion;
+            if (other == null)
+                return false;
+            return Version == other.Version;
         }
         #endregion
 

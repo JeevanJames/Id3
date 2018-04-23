@@ -84,8 +84,7 @@ namespace Id3.v2
                 return null;
 
             var tag = new Id3Tag {
-                MajorVersion = 2,
-                MinorVersion = 3,
+                Version = Id3Version.V23,
                 Family = Id3TagFamily.Version2X,
                 IsSupported = true,
             };
@@ -176,7 +175,7 @@ namespace Id3.v2
             return true;
         }
 
-        internal override int MinorVersion => 3;
+        internal override Id3Version Version => Id3Version.V23;
 
         protected override void BuildFrameHandlers(FrameHandlers mappings)
         {

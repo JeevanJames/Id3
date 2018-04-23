@@ -141,9 +141,7 @@ namespace Id3.v1
 
         internal override Id3TagFamily Family => Id3TagFamily.Version1X;
 
-        internal override int MajorVersion => 1;
-
-        internal override int MinorVersion => 0;
+        internal override Id3Version Version => Id3Version.V1X;
 
         protected override void BuildFrameHandlers(FrameHandlers mappings)
         {

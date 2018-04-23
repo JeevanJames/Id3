@@ -1,4 +1,4 @@
-#region --- License & Copyright Notice ---
+﻿#region --- License & Copyright Notice ---
 /*
 Copyright (c) 2005-2018 Jeevan James
 All rights reserved.
@@ -17,11 +17,13 @@ limitations under the License.
 */
 #endregion
 
-namespace Id3.v2
+namespace Id3
 {
-    /// <inheritdoc />
-    internal abstract class Id3V2Handler : Id3Handler
+    public enum Id3Version
     {
-        internal sealed override Id3TagFamily Family => Id3TagFamily.Version2X;
+        V1X = 1,
+        V22 = 2,
+        V23 = 3,
+        V24 = 4
     }
 }
