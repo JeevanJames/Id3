@@ -21,6 +21,14 @@ namespace Id3
 {
     public abstract class TextFrame : TextFrameBase<string>
     {
+        protected TextFrame()
+        {
+        }
+
+        protected TextFrame(string value) : base(value)
+        {
+        }
+
         internal override string TextValue
         {
             get => Value;

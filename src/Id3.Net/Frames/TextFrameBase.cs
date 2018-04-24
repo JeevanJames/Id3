@@ -58,6 +58,15 @@ namespace Id3
 
     public abstract class TextFrameBase<TValue> : TextFrameBase
     {
+        protected TextFrameBase()
+        {
+        }
+
+        protected TextFrameBase(TValue value)
+        {
+            Value = value;
+        }
+
         /// <summary>
         ///     Natively-typed value of the frame. Derived classes will override the <see cref="TextFrameBase.TextValue" /> to get
         ///     and set this value.

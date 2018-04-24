@@ -21,6 +21,14 @@ namespace Id3
 {
     public sealed class AlbumFrame : TextFrame
     {
+        public AlbumFrame()
+        {
+        }
+
+        public AlbumFrame(string value) : base(value)
+        {
+        }
+
         public static implicit operator AlbumFrame(string value)
         {
             return new AlbumFrame {Value = value};
