@@ -117,12 +117,6 @@ namespace Id3
             return destinationTag;
         }
 
-        public void MergeWith(params Id3Tag[] tags)
-        {
-            Array.Sort(tags);
-            //TODO:
-        }
-
         #region Metadata properties
         /// <summary>
         ///     Version family of the ID3 tag - 1.x or 2.x
@@ -130,7 +124,7 @@ namespace Id3
         public Id3TagFamily Family { get; internal set; }
 
         /// <summary>
-        /// Version of the ID3 tag
+        ///     Version of the ID3 tag
         /// </summary>
         public Id3Version Version { get; internal set; }
 
