@@ -99,12 +99,10 @@ namespace Id3.InfoFx
 
         private static bool FramesMeetCriteria(Id3Tag tag, IEnumerable<Type> frameTypes)
         {
-            if (tag?.Frames == null)
-                return false;
             foreach (Type frameType in frameTypes)
             {
                 Type frameTypeCopy = frameType;
-                bool frameExists = tag.Frames.Any(frame => frame.GetType() == frameTypeCopy && frame.IsAssigned);
+                bool frameExists = tag.Any(frame => frame.GetType() == frameTypeCopy && frame.IsAssigned);
                 if (!frameExists)
                     return false;
             }

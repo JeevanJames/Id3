@@ -17,6 +17,8 @@ limitations under the License.
 */
 #endregion
 
+using System.Collections.ObjectModel;
+
 namespace Id3
 {
     public sealed class LyricsFrame : Id3Frame
@@ -37,5 +39,9 @@ namespace Id3
         public Id3Language Language { get; set; } = Id3Language.eng;
 
         public string Lyrics { get; set; }
+    }
+
+    public sealed class LyricsFrameList : Collection<LyricsFrame>
+    {
     }
 }

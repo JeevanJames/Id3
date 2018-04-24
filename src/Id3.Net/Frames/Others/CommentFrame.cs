@@ -18,6 +18,7 @@ limitations under the License.
 #endregion
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Id3
@@ -47,13 +48,8 @@ namespace Id3
         public Id3Language Language { get; set; } = Id3Language.eng;
     }
 
-    public sealed class CommentFrameList : Id3SyncFrameList<CommentFrame>
+    public sealed class CommentFrameList : Collection<CommentFrame>
     {
-        internal CommentFrameList(Id3FrameList mainList)
-            : base(mainList)
-        {
-        }
-
         public CommentFrame[] ByLanguage(Id3Language language)
         {
             return this.Where(commentFrame => commentFrame.Language == language).ToArray();

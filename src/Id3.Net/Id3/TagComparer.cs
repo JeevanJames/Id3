@@ -18,6 +18,7 @@ limitations under the License.
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Id3
 {
@@ -32,7 +33,7 @@ namespace Id3
                 return true;
             if (tag1 == null || tag2 == null)
                 return false;
-            if (tag1.Frames.Count != tag2.Frames.Count)
+            if (tag1.Count() != tag2.Count())
                 return false;
 
             //TODO: Compare frames

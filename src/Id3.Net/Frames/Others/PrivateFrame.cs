@@ -18,6 +18,7 @@ limitations under the License.
 #endregion
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Id3
@@ -43,13 +44,8 @@ namespace Id3
         }
     }
 
-    public sealed class PrivateFrameList : Id3SyncFrameList<PrivateFrame>
+    public sealed class PrivateFrameList : Collection<PrivateFrame>
     {
-        internal PrivateFrameList(Id3FrameList mainList)
-            : base(mainList)
-        {
-        }
-
         public PrivateFrame[] ByOwnerId(string ownerId)
         {
             return this.Where(frame => frame.OwnerId.Equals(ownerId, StringComparison.OrdinalIgnoreCase)).ToArray();

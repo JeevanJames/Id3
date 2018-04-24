@@ -17,6 +17,7 @@ limitations under the License.
 */
 #endregion
 
+using System.Collections.ObjectModel;
 using System.IO;
 
 namespace Id3
@@ -79,6 +80,10 @@ namespace Id3
         public byte[] PictureData { get; set; }
 
         public PictureType PictureType { get; set; }
+    }
+
+    public sealed class PictureFrameList : Collection<PictureFrame>
+    {
     }
 
     public enum PictureType : byte

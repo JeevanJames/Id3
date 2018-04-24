@@ -17,9 +17,15 @@ limitations under the License.
 */
 #endregion
 
+using System.Collections.ObjectModel;
+
 namespace Id3
 {
     public sealed class CustomTextFrame : TextFrame
+    {
+    }
+
+    public sealed class CustomTextFrameList : Collection<CustomTextFrame>
     {
     }
 }

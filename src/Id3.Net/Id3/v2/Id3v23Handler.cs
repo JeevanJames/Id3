@@ -147,7 +147,7 @@ namespace Id3.v2
                 if (mapping != null)
                 {
                     Id3Frame frame = mapping.Decoder(frameData);
-                    tag.Frames.Add(frame);
+                    tag.AddUntypedFrame(frame);
                 }
 
                 currentPos += frameSize;
@@ -260,7 +260,7 @@ namespace Id3.v2
             var bytes = new List<byte>();
             bytes.AddRange(Encoding.ASCII.GetBytes("ID3"));
             bytes.AddRange(new byte[] { 3, 0, 0 });
-            foreach (Id3Frame frame in tag.Frames)
+            foreach (Id3Frame frame in tag)
             {
                 if (!frame.IsAssigned)
                     continue;

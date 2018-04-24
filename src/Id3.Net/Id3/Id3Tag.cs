@@ -24,6 +24,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 
 namespace Id3
 {
@@ -34,55 +35,15 @@ namespace Id3
     /// </summary>
     public sealed class Id3Tag : IEnumerable<Id3Frame>, IComparable<Id3Tag>, IEquatable<Id3Tag>
     {
-        #region Single instance frames
-        private AlbumFrame _album;
-        private ArtistsFrame _artists;
-        private AudioFileUrlFrame _audioFileUrl;
-        private AudioSourceUrlFrame _audioSourceUrl;
-        private BandFrame _band;
-        private BeatsPerMinuteFrame _beatsPerMinute;
-        private ComposersFrame _composers;
-        private ConductorFrame _conductor;
-        private ContentGroupDescriptionFrame _contentGroupDescription;
-        private CopyrightFrame _copyright;
-        private CopyrightUrlFrame _copyrightUrl;
-        private EncoderFrame _encoder;
-        private EncodingSettingsFrame _encodingSettings;
-        private FileOwnerFrame _fileOwner;
-        private FileTypeFrame _fileType;
-        private GenreFrame _genre;
-        private LengthFrame _length;
-        private LyricistsFrame _lyricists;
-        private PaymentUrlFrame _paymentUrl;
-        private PublisherFrame _publisher;
-        private RecordingDateFrame _recordingDate;
-        private SubtitleFrame _subtitle;
-        private TitleFrame _title;
-        private TrackFrame _track;
-        private YearFrame _year;
-        #endregion
-
-        #region Multiple instance frames
-        private ArtistUrlFrameList _artistUrls;
-        private CommentFrameList _comments;
-        private CommercialUrlFrameList _commercialUrls;
-        private Id3SyncFrameList<CustomTextFrame> _customTexts;
-        private Id3SyncFrameList<LyricsFrame> _lyrics;
-        private Id3SyncFrameList<PictureFrame> _pictures;
-        private PrivateFrameList _privateData;
-        #endregion
-
         public Id3Tag()
         {
             IsSupported = true;
-            Frames = new Id3FrameList();
         }
 
         [OnDeserializing]
         private void OnDeserialized(StreamingContext context)
         {
             IsSupported = true;
-            Frames = new Id3FrameList();
         }
 
         /// <summary>
@@ -103,21 +64,23 @@ namespace Id3
             Id3Handler destinationHandler = Id3Handler.GetHandler(version);
             Id3Tag destinationTag = destinationHandler.CreateTag();
 
-            foreach (Id3Frame sourceFrame in Frames)
+            foreach (Id3Frame sourceFrame in this)
             {
                 if (sourceFrame is UnknownFrame unknownFrame)
                 {
                     string frameId = unknownFrame.Id;
                     Id3Frame destinationFrame = destinationHandler.GetFrameFromFrameId(frameId);
-                    destinationTag.Frames.Add(destinationFrame);
+                    destinationTag.AddUntypedFrame(destinationFrame);
                 } else
-                    destinationTag.Frames.Add(sourceFrame);
+                    destinationTag.AddUntypedFrame(sourceFrame);
             }
 
             return destinationTag;
         }
 
         #region Metadata properties
+        //TODO: Since Id3Tag is supposed to be version-agnostic, should it contain these properties?
+
         /// <summary>
         ///     Version family of the ID3 tag - 1.x or 2.x
         /// </summary>
@@ -139,9 +102,7 @@ namespace Id3
         public object AdditionalData { get; internal set; }
         #endregion
 
-        #region Main frames list and associated operations
-        internal Id3FrameList Frames { get; private set; }
-
+        #region Frame operations
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable<Id3Frame>) this).GetEnumerator();
@@ -149,7 +110,15 @@ namespace Id3
 
         IEnumerator<Id3Frame> IEnumerable<Id3Frame>.GetEnumerator()
         {
-            return Frames.Where(frame => frame.IsAssigned).GetEnumerator();
+            foreach (KeyValuePair<Type, object> kvp in _frames)
+            {
+                if (kvp.Value is IList list)
+                {
+                    foreach (Id3Frame frame in list)
+                        yield return frame;
+                } else
+                    yield return (Id3Frame) kvp.Value;
+            }
         }
 
         /// <summary>
@@ -157,11 +126,33 @@ namespace Id3
         /// </summary>
         public void Cleanup()
         {
-            for (int i = Frames.Count - 1; i >= 0; i--)
-            {
-                if (!Frames[i].IsAssigned)
-                    Frames.RemoveAt(i);
-            }
+            //Build a list of keys from the _frames dictionary to delete
+            var keysToDelete = new List<Type>(_frames.Count);
+
+            Parallel.ForEach(_frames, (kvp, state) => {
+                //If the item value is a list, remove any item that is not assigned
+                if (kvp.Value is IList frameList)
+                {
+                    for (int i = frameList.Count - 1; i >= 0; i--)
+                    {
+                        var frame = (Id3Frame) frameList[i];
+                        if (!frame.IsAssigned)
+                            frameList.RemoveAt(i);
+                    }
+                    //If the list is empty, mark the item for removal
+                    if (frameList.Count == 0)
+                        keysToDelete.Add(kvp.Key);
+                } else
+                {
+                    //Get the item value as a frame and mark it for removal if it is unassigned
+                    var frame = (Id3Frame)kvp.Value;
+                    if (!frame.IsAssigned)
+                        keysToDelete.Add(kvp.Key);
+                }
+            });
+
+            foreach (Type keyToDelete in keysToDelete)
+                _frames.Remove(keyToDelete);
         }
 
         /// <summary>
@@ -171,7 +162,7 @@ namespace Id3
         public int Clear()
         {
             int clearedCount = this.Count();
-            Frames.Clear();
+            _frames.Clear();
             return clearedCount;
         }
 
@@ -187,23 +178,19 @@ namespace Id3
         }
 
         /// <summary>
-        ///     Removes a single frame of the specified type from the tag.
+        ///     Removes any frames of the specified type from the tag.
         /// </summary>
         /// <typeparam name="TFrame">Type of frame to remove</typeparam>
-        /// <returns>True, if a matching frame was removed, otherwise false.</returns>
+        /// <returns>True, if matching frames were removed, otherwise false.</returns>
         public bool Remove<TFrame>() where TFrame : Id3Frame
         {
-            for (var i = 0; i < Frames.Count; i++)
-            {
-                Id3Frame frame = Frames[i];
-                if (frame.IsAssigned && frame.GetType() == typeof(TFrame))
-                {
-                    Frames.RemoveAt(i);
-                    return true;
-                }
-            }
+            Type frameType = typeof(TFrame);
 
-            return false;
+            if (!_frames.ContainsKey(frameType))
+                return false;
+
+            _frames.Remove(frameType);
+            return true;
         }
 
         /// <summary>
@@ -213,17 +200,36 @@ namespace Id3
         /// <typeparam name="TFrame">Type of frame to remove.</typeparam>
         /// <param name="predicate">Optional predicate to control the frames that are removed</param>
         /// <returns>The number of frames removed.</returns>
-        public int RemoveAll<TFrame>(Func<TFrame, bool> predicate = null)
+        public int RemoveWhere<TFrame>(Func<TFrame, bool> predicate)
             where TFrame : Id3Frame
         {
+            Type frameType = typeof(TFrame);
+
+            if (!_frames.ContainsKey(frameType))
+                return 0;
+
+            object frameObj = _frames[frameType];
             var removalCount = 0;
-            for (int i = Frames.Count - 1; i >= 0; i--)
+            if (frameObj is IList list)
             {
-                if (Frames[i] is TFrame frame && (predicate == null || predicate(frame)))
+                for (int i = list.Count - 1; i >= 0; i--)
                 {
-                    if (frame.IsAssigned)
+                    if (predicate((TFrame) list[i]))
+                    {
+                        list.RemoveAt(i);
                         removalCount++;
-                    Frames.RemoveAt(i);
+                    }
+                }
+
+                if (list.Count == 0)
+                    _frames.Remove(frameType);
+            } else
+            {
+                var frame = (TFrame) frameObj;
+                if (predicate(frame))
+                {
+                    _frames.Remove(frameType);
+                    removalCount++;
                 }
             }
 
@@ -232,70 +238,169 @@ namespace Id3
         #endregion
 
         #region Frame properties
-        public AlbumFrame Album => GetSingleFrame(ref _album);
+        public AlbumFrame Album
+        {
+            get => GetSingleFrame<AlbumFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public ArtistsFrame Artists => GetSingleFrame(ref _artists);
+        public ArtistsFrame Artists
+        {
+            get => GetSingleFrame<ArtistsFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public ArtistUrlFrameList ArtistUrls => _artistUrls ?? (_artistUrls = new ArtistUrlFrameList(Frames));
+        public ArtistUrlFrameList ArtistUrls => GetMultipleFrames<ArtistUrlFrame, ArtistUrlFrameList>();
 
-        public AudioFileUrlFrame AudioFileUrl => GetSingleFrame(ref _audioFileUrl);
+        public AudioFileUrlFrame AudioFileUrl
+        {
+            get => GetSingleFrame<AudioFileUrlFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public AudioSourceUrlFrame AudioSourceUrl => GetSingleFrame(ref _audioSourceUrl);
+        public AudioSourceUrlFrame AudioSourceUrl
+        {
+            get => GetSingleFrame<AudioSourceUrlFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public BandFrame Band => GetSingleFrame(ref _band);
+        public BandFrame Band
+        {
+            get => GetSingleFrame<BandFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public BeatsPerMinuteFrame BeatsPerMinute => GetSingleFrame(ref _beatsPerMinute);
+        public BeatsPerMinuteFrame BeatsPerMinute
+        {
+            get => GetSingleFrame<BeatsPerMinuteFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public CommentFrameList Comments => _comments ?? (_comments = new CommentFrameList(Frames));
+        public CommentFrameList Comments => GetMultipleFrames<CommentFrame, CommentFrameList>();
 
-        public CommercialUrlFrameList CommercialUrls =>
-            _commercialUrls ?? (_commercialUrls = new CommercialUrlFrameList(Frames));
+        public CommercialUrlFrameList CommercialUrls => GetMultipleFrames<CommercialUrlFrame, CommercialUrlFrameList>();
 
-        public ComposersFrame Composers => GetSingleFrame(ref _composers);
+        public ComposersFrame Composers
+        {
+            get => GetSingleFrame<ComposersFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public ConductorFrame Conductor => GetSingleFrame(ref _conductor);
+        public ConductorFrame Conductor
+        {
+            get => GetSingleFrame<ConductorFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public ContentGroupDescriptionFrame ContentGroupDescription => GetSingleFrame(ref _contentGroupDescription);
+        public ContentGroupDescriptionFrame ContentGroupDescription
+        {
+            get => GetSingleFrame<ContentGroupDescriptionFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public CopyrightFrame Copyright => GetSingleFrame(ref _copyright);
+        public CopyrightFrame Copyright
+        {
+            get => GetSingleFrame<CopyrightFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public CopyrightUrlFrame CopyrightUrl => GetSingleFrame(ref _copyrightUrl);
+        public CopyrightUrlFrame CopyrightUrl
+        {
+            get => GetSingleFrame<CopyrightUrlFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public Id3SyncFrameList<CustomTextFrame> CustomTexts => GetMultipleFrames(ref _customTexts);
+        public CustomTextFrameList CustomTexts => GetMultipleFrames<CustomTextFrame, CustomTextFrameList>();
 
-        public EncoderFrame Encoder => GetSingleFrame(ref _encoder);
+        public EncoderFrame Encoder
+        {
+            get => GetSingleFrame<EncoderFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public EncodingSettingsFrame EncodingSettings => GetSingleFrame(ref _encodingSettings);
+        public EncodingSettingsFrame EncodingSettings
+        {
+            get => GetSingleFrame<EncodingSettingsFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public FileOwnerFrame FileOwner => GetSingleFrame(ref _fileOwner);
+        public FileOwnerFrame FileOwner
+        {
+            get => GetSingleFrame<FileOwnerFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public FileTypeFrame FileType => GetSingleFrame(ref _fileType);
+        public FileTypeFrame FileType
+        {
+            get => GetSingleFrame<FileTypeFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public GenreFrame Genre => GetSingleFrame(ref _genre);
+        public GenreFrame Genre
+        {
+            get => GetSingleFrame<GenreFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public LengthFrame Length => GetSingleFrame(ref _length);
+        public LengthFrame Length
+        {
+            get => GetSingleFrame<LengthFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public LyricistsFrame Lyricists => GetSingleFrame(ref _lyricists);
+        public LyricistsFrame Lyricists
+        {
+            get => GetSingleFrame<LyricistsFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public Id3SyncFrameList<LyricsFrame> Lyrics => GetMultipleFrames(ref _lyrics);
+        public LyricsFrameList Lyrics => GetMultipleFrames<LyricsFrame, LyricsFrameList>();
 
-        public PaymentUrlFrame PaymentUrl => GetSingleFrame(ref _paymentUrl);
+        public PaymentUrlFrame PaymentUrl
+        {
+            get => GetSingleFrame<PaymentUrlFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public PublisherFrame Publisher => GetSingleFrame(ref _publisher);
+        public PublisherFrame Publisher
+        {
+            get => GetSingleFrame<PublisherFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public Id3SyncFrameList<PictureFrame> Pictures => GetMultipleFrames(ref _pictures);
+        public PictureFrameList Pictures => GetMultipleFrames<PictureFrame, PictureFrameList>();
 
-        public PrivateFrameList PrivateData => _privateData ?? (_privateData = new PrivateFrameList(Frames));
+        public PrivateFrameList PrivateData => GetMultipleFrames<PrivateFrame, PrivateFrameList>();
 
-        public RecordingDateFrame RecordingDate => GetSingleFrame(ref _recordingDate);
+        public RecordingDateFrame RecordingDate
+        {
+            get => GetSingleFrame<RecordingDateFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public SubtitleFrame Subtitle => GetSingleFrame(ref _subtitle);
+        public SubtitleFrame Subtitle
+        {
+            get => GetSingleFrame<SubtitleFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public TitleFrame Title => GetSingleFrame(ref _title);
+        public TitleFrame Title
+        {
+            get => GetSingleFrame<TitleFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public TrackFrame Track => GetSingleFrame(ref _track);
+        public TrackFrame Track
+        {
+            get => GetSingleFrame<TrackFrame>();
+            set => SetSingleFrame(value);
+        }
 
-        public YearFrame Year => GetSingleFrame(ref _year);
+        public YearFrame Year
+        {
+            get => GetSingleFrame<YearFrame>();
+            set => SetSingleFrame(value);
+        }
         #endregion
 
         #region IComparable<Id3Tag> and IEquatable<Id3Tag> implementations
@@ -303,7 +408,7 @@ namespace Id3
         ///     Compares two tags based on their version details.
         /// </summary>
         /// <param name="other">The tag instance to compare against.</param>
-        /// <returns>TODO:</returns>
+        /// <returns>A signed number that indicates the relative values of this instance and another instance of Id3Tag.</returns>
         public int CompareTo(Id3Tag other)
         {
             if (other == null)
@@ -319,55 +424,78 @@ namespace Id3
         }
         #endregion
 
-        #region Frame retrieval helper methods
-        /// <summary>
-        ///     Retrieves a single-occuring frame from the main frames list. This method is called from the corresponding property
-        ///     getters.
-        ///     Since each frame already has private field declared, we simply need to get a reference to that field, instead of
-        ///     creating a new object. However, if the field is not available, we create a new one with default values, which is
-        ///     then assigned to the private field. Hence the use of a ref parameter.
-        /// </summary>
-        /// <typeparam name="TFrame">Type of frame to retrieve</typeparam>
-        /// <param name="frame">Reference to the frame field instance</param>
-        /// <returns>Instance of existing frame, or new instance, if it does not already exist</returns>
-        private TFrame GetSingleFrame<TFrame>(ref TFrame frame) where TFrame : Id3Frame, new()
+        private readonly Dictionary<Type, object> _frames = new Dictionary<Type, object>(50);
+
+        private static readonly Dictionary<Type, Func<IList>> MultiInstanceFrameTypes = new Dictionary<Type, Func<IList>> {
+            [typeof(ArtistUrlFrame)] = () => new ArtistUrlFrameList(),
+            [typeof(CommentFrame)] = () => new CommentFrameList(),
+            [typeof(CommercialUrlFrame)] = () => new CommercialUrlFrameList(),
+            [typeof(CustomTextFrame)] = () => new CustomTextFrameList(),
+            [typeof(LyricsFrame)] = () => new LyricsFrameList(),
+            [typeof(PictureFrame)] = () => new PictureFrameList(),
+            [typeof(PrivateFrame)] = () => new PrivateFrameList()
+        };
+
+        internal void AddUntypedFrame(Id3Frame frame)
         {
-            //If frame field is already assigned, simply return it.
-            if (frame != null)
-                return frame;
-
-            frame = Frames.OfType<TFrame>().FirstOrDefault();
-            if (frame == null)
+            Type frameType = frame.GetType();
+            bool containsKey = _frames.ContainsKey(frameType);
+            if (MultiInstanceFrameTypes.ContainsKey(frameType))
             {
-                frame = new TFrame();
-                Frames.Add(frame);
-            }
+                IList list;
+                if (containsKey)
+                    list = (IList) _frames[frameType];
+                else
+                {
+                    list = MultiInstanceFrameTypes[frameType]();
+                    _frames.Add(frameType, list);
+                }
 
+                list.Add(frame);
+            } else
+            {
+                if (containsKey)
+                    _frames[frameType] = frame;
+                else
+                    _frames.Add(frameType, frame);
+            }
+        }
+
+        private TFrame GetSingleFrame<TFrame>() where TFrame : Id3Frame, new()
+        {
+            if (_frames.TryGetValue(typeof(TFrame), out object frameObj))
+                return (TFrame) frameObj;
+            var frame = new TFrame();
+            _frames.Add(typeof(TFrame), frame);
             return frame;
         }
 
-        private Id3SyncFrameList<TFrame> GetMultipleFrames<TFrame>(ref Id3SyncFrameList<TFrame> frames)
+        private void SetSingleFrame<TFrame>(TFrame frame) where TFrame : Id3Frame
+        {
+            Type frameType = typeof(TFrame);
+            bool containsKey = _frames.ContainsKey(frameType);
+            if (frame == null)
+            {
+                if (containsKey)
+                    _frames.Remove(frameType);
+            } else
+            {
+                if (containsKey)
+                    _frames[frameType] = frame;
+                else
+                    _frames.Add(frameType, frame);
+            }
+        }
+
+        private TFrameList GetMultipleFrames<TFrame, TFrameList>()
             where TFrame : Id3Frame
+            where TFrameList : IList<TFrame>, new()
         {
-            return frames ?? (frames = new Id3SyncFrameList<TFrame>(Frames));
+            if (_frames.TryGetValue(typeof(TFrame), out object frameListObj))
+                return (TFrameList) frameListObj;
+            var framesList = new TFrameList();
+            _frames.Add(typeof(TFrame), framesList);
+            return framesList;
         }
-        #endregion
-
-        #region Static members
-        public static readonly Id3Tag[] Empty = new Id3Tag[0];
-
-        public static Id3Tag Merge(params Id3Tag[] tags)
-        {
-            if (tags.Length == 0)
-                throw new ArgumentNullException(nameof(tags), "Specify 2 or more tags to merge");
-
-            if (tags.Length == 1)
-                return tags[0];
-
-            var tag = new Id3Tag();
-            tag.MergeWith(tags);
-            return tag;
-        }
-        #endregion
     }
 }

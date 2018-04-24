@@ -17,17 +17,15 @@ limitations under the License.
 */
 #endregion
 
+using System.Collections.ObjectModel;
+
 namespace Id3
 {
     public sealed class CommercialUrlFrame : UrlLinkFrame
     {
     }
 
-    public sealed class CommercialUrlFrameList : Id3SyncFrameList<CommercialUrlFrame>
+    public sealed class CommercialUrlFrameList : Collection<CommercialUrlFrame>
     {
-        internal CommercialUrlFrameList(Id3FrameList mainList)
-            : base(mainList)
-        {
-        }
     }
 }
