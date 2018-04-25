@@ -213,6 +213,15 @@ namespace Id3
             return familyHandler?.ReadTag(Stream, out _);
         }
 
+        public Id3Tag GetTag(Id3TagFamily family, out object additionalData)
+        {
+            Id3Handler familyHandler = ExistingHandlers.FirstOrDefault(handler => handler.Family == family);
+            if (familyHandler != null)
+                return familyHandler.ReadTag(Stream, out additionalData);
+            additionalData = null;
+            return null;
+        }
+
         /// <summary>
         ///     Retrieves an ID3 tag of the specified version number.
         /// </summary>
@@ -222,6 +231,15 @@ namespace Id3
         {
             Id3Handler handler = ExistingHandlers.FirstOrDefault(h => h.Version == version);
             return handler?.ReadTag(Stream, out _);
+        }
+
+        public Id3Tag GetTag(Id3Version version, out object additionalData)
+        {
+            Id3Handler handler = ExistingHandlers.FirstOrDefault(h => h.Version == version);
+            if (handler != null)
+                return handler.ReadTag(Stream, out additionalData);
+            additionalData = null;
+            return null;
         }
 
         /// <summary>
