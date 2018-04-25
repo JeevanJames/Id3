@@ -20,26 +20,33 @@ limitations under the License.
 using System;
 using System.Text.RegularExpressions;
 
+using Id3.Resources;
+
 namespace Id3
 {
     public sealed class CopyrightFrame : TextFrame
     {
+        public CopyrightFrame()
+        {
+        }
+
+        public CopyrightFrame(string value) : base(value)
+        {
+        }
+
         public override string ToString()
         {
             return IsAssigned ? $"Copyright © {Value}" : string.Empty;
         }
 
-        internal override string TextValue
+        protected override void ValidateValue(string value)
         {
-            get => base.TextValue;
-            set
-            {
-                if (!CopyrightPrefixPattern.IsMatch(value))
-                    throw new ArgumentException("Copyright string must start with a 4 digit year and a space", nameof(value));
-                base.TextValue = value;
-            }
+            if (!CopyrightPrefixPattern.IsMatch(value))
+                throw new ArgumentException(FrameMessages.Copyright_InvalidFormat, nameof(value));
         }
 
         private static readonly Regex CopyrightPrefixPattern = new Regex(@"^\d{4} ");
+
+        public static implicit operator CopyrightFrame(string value) => new CopyrightFrame(value);
     }
 }

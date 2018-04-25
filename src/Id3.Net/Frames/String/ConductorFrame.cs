@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class ConductorFrame : TextFrame
     {
+        public ConductorFrame()
+        {
+        }
+
+        public ConductorFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator ConductorFrame(string value) => new ConductorFrame(value);
     }
 }

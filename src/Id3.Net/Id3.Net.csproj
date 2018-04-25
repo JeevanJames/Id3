@@ -41,6 +41,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\FrameMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FrameMessages.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\Mp3Messages.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -49,6 +54,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\FrameMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FrameMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Mp3Messages.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Mp3Messages.Designer.cs</LastGenOutput>

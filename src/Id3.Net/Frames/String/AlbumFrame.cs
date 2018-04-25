@@ -29,9 +29,6 @@ namespace Id3
         {
         }
 
-        public static implicit operator AlbumFrame(string value)
-        {
-            return new AlbumFrame {Value = value};
-        }
+        public static implicit operator AlbumFrame(string value) => new AlbumFrame(value);
     }
 }

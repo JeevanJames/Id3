@@ -58,6 +58,8 @@ namespace Id3
 
     public abstract class TextFrameBase<TValue> : TextFrameBase
     {
+        private TValue _value;
+
         protected TextFrameBase()
         {
         }
@@ -71,7 +73,19 @@ namespace Id3
         ///     Natively-typed value of the frame. Derived classes will override the <see cref="TextFrameBase.TextValue" /> to get
         ///     and set this value.
         /// </summary>
-        public TValue Value { get; set; }
+        public TValue Value
+        {
+            get => _value;
+            set
+            {
+                ValidateValue(value);
+                _value = value;
+            }
+        }
+
+        protected virtual void ValidateValue(TValue value)
+        {
+        }
 
         public static implicit operator TValue(TextFrameBase<TValue> frame)
         {

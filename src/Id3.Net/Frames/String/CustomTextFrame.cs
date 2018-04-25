@@ -23,6 +23,15 @@ namespace Id3
 {
     public sealed class CustomTextFrame : TextFrame
     {
+        public CustomTextFrame()
+        {
+        }
+
+        public CustomTextFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator CustomTextFrame(string value) => new CustomTextFrame(value);
     }
 
     public sealed class CustomTextFrameList : Collection<CustomTextFrame>

@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class BandFrame : TextFrame
     {
+        public BandFrame()
+        {
+        }
+
+        public BandFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator BandFrame(string value) => new BandFrame(value);
     }
 }

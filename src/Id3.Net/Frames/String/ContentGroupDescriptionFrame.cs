@@ -21,5 +21,15 @@ namespace Id3
 {
     public sealed class ContentGroupDescriptionFrame : TextFrame
     {
+        public ContentGroupDescriptionFrame()
+        {
+        }
+
+        public ContentGroupDescriptionFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator ContentGroupDescriptionFrame(string value) =>
+            new ContentGroupDescriptionFrame(value);
     }
 }
