@@ -199,7 +199,7 @@ namespace Id3
         /// <returns>A collection of all ID3 tags present in the MP3 data.</returns>
         public IEnumerable<Id3Tag> GetAllTags()
         {
-            return ExistingHandlers.Select(handler => handler.ReadTag(Stream));
+            return ExistingHandlers.Select(handler => handler.ReadTag(Stream, out _));
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace Id3
         public Id3Tag GetTag(Id3TagFamily family)
         {
             Id3Handler familyHandler = ExistingHandlers.FirstOrDefault(handler => handler.Family == family);
-            return familyHandler?.ReadTag(Stream);
+            return familyHandler?.ReadTag(Stream, out _);
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace Id3
         public Id3Tag GetTag(Id3Version version)
         {
             Id3Handler handler = ExistingHandlers.FirstOrDefault(h => h.Version == version);
-            return handler?.ReadTag(Stream);
+            return handler?.ReadTag(Stream, out _);
         }
 
         /// <summary>
@@ -240,30 +240,29 @@ namespace Id3
         #endregion
 
         #region Tag querying methods
-        public bool HasTagOfFamily(Id3TagFamily family)
-        {
-            return ExistingHandlers.Any(handler => handler.Family == family);
-        }
+        public bool HasTagOfFamily(Id3TagFamily family) =>
+            ExistingHandlers.Any(handler => handler.Family == family);
 
-        public bool HasTagOfVersion(Id3Version version)
-        {
-            return ExistingHandlers.Any(h => h.Version == version);
-        }
+        public bool HasTagOfVersion(Id3Version version) =>
+            ExistingHandlers.Any(h => h.Version == version);
 
-        public IEnumerable<Id3Version> AvailableTagVersions
-        {
-            get => ExistingHandlers.Select(h => h.Version);
-        }
+        public IEnumerable<Id3Version> AvailableTagVersions => ExistingHandlers.Select(h => h.Version);
 
         public bool HasTags => ExistingHandlers.Count > 0;
         #endregion
 
         #region Tag writing methods
+        public bool UpdateTag(Id3Tag tag)
+        {
+            return WriteTag(tag, WriteConflictAction.Replace);
+        }
+
         public bool WriteTag(Id3Tag tag, WriteConflictAction conflictAction = WriteConflictAction.NoAction)
         {
-            EnsureWritePermissions(Mp3Messages.NoWritePermissions_CannotWriteTag);
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag));
+
+            EnsureWritePermissions(Mp3Messages.NoWritePermissions_CannotWriteTag);
 
             //If a tag already exists from the same family, but is a different version than the passed tag,
             //delete it if conflictAction is Replace.
@@ -277,7 +276,7 @@ namespace Id3
                         return false;
                     if (conflictAction == WriteConflictAction.Replace)
                     {
-                        Id3Handler handlerCopy = handler;
+                        Id3Handler handlerCopy = handler; //TODO: Why did we need a copy of the handler?
                         handlerCopy.DeleteTag(Stream);
                     }
                 }

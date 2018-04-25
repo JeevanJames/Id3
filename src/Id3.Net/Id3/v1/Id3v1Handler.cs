@@ -57,8 +57,10 @@ namespace Id3.v1
             return magic == "TAG";
         }
 
-        internal override Id3Tag ReadTag(Stream stream)
+        internal override Id3Tag ReadTag(Stream stream, out object additionalData)
         {
+            additionalData = null;
+
             if (!HasTag(stream))
                 return null;
 

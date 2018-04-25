@@ -78,23 +78,22 @@ namespace Id3.v2
             return magic == "ID3" && headerBytes[3] == 3;
         }
 
-        internal override Id3Tag ReadTag(Stream stream)
+        internal override Id3Tag ReadTag(Stream stream, out object additionalData)
         {
             if (!HasTag(stream))
+            {
+                additionalData = null;
                 return null;
+            }
 
-            var tag = new Id3Tag {
-                Version = Id3Version.V23,
-                Family = Id3TagFamily.Version2X,
-                IsSupported = true,
-            };
+            Id3Tag tag = CreateTag();
 
             stream.Seek(4, SeekOrigin.Begin);
             var headerBytes = new byte[6];
             stream.Read(headerBytes, 0, 6);
 
             var headerContainer = new Id3V2Header();
-            tag.AdditionalData = headerContainer;
+            additionalData = headerContainer;
 
             byte flags = headerBytes[1];
             var header = new Id3V2StandardHeader {

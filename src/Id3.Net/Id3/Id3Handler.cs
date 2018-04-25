@@ -88,7 +88,7 @@ namespace Id3
         internal abstract void DeleteTag(Stream stream);
         internal abstract byte[] GetTagBytes(Stream stream);
         internal abstract bool HasTag(Stream stream);
-        internal abstract Id3Tag ReadTag(Stream stream);
+        internal abstract Id3Tag ReadTag(Stream stream, out object additionalData);
         internal abstract bool WriteTag(Stream stream, Id3Tag tag);
         #endregion
 
@@ -128,8 +128,6 @@ namespace Id3
         internal static readonly List<Id3HandlerMetadata> AvailableHandlers = new List<Id3HandlerMetadata>(4) {
             new Id3HandlerMetadata(Id3Version.V23, Id3TagFamily.Version2X, typeof(Id3V23Handler)),
             new Id3HandlerMetadata(Id3Version.V1X, Id3TagFamily.Version1X, typeof(Id3V1Handler)),
-            new Id3HandlerMetadata(Id3Version.V24, Id3TagFamily.Version2X, typeof(Id3V24Handler)),
-            new Id3HandlerMetadata(Id3Version.V22, Id3TagFamily.Version2X, typeof(Id3V22Handler)),
         };
 
         /// <summary>

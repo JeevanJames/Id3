@@ -23,7 +23,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace Id3
@@ -35,17 +34,6 @@ namespace Id3
     /// </summary>
     public sealed class Id3Tag : IEnumerable<Id3Frame>, IComparable<Id3Tag>, IEquatable<Id3Tag>
     {
-        public Id3Tag()
-        {
-            IsSupported = true;
-        }
-
-        [OnDeserializing]
-        private void OnDeserialized(StreamingContext context)
-        {
-            IsSupported = true;
-        }
-
         /// <summary>
         ///     Converts an ID3 tag to another version after resolving the differences between the two versions. The resultant tag
         ///     will have all the frames from the source tag, but those frames not recognized in the new version will be treated as
@@ -90,16 +78,6 @@ namespace Id3
         ///     Version of the ID3 tag
         /// </summary>
         public Id3Version Version { get; internal set; }
-
-        /// <summary>
-        ///     Indicates whether this tag version is currently implemented by the framework.
-        /// </summary>
-        public bool IsSupported { get; internal set; }
-
-        /// <summary>
-        ///     Any additional data from the ID3 tag. This might not be present in all tags and is tag-specific.
-        /// </summary>
-        public object AdditionalData { get; internal set; }
         #endregion
 
         #region Frame operations
