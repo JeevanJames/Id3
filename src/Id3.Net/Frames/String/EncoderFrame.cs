@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class EncoderFrame : TextFrame
     {
+        public EncoderFrame()
+        {
+        }
+
+        public EncoderFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator EncoderFrame(string value) => new EncoderFrame(value);
     }
 }

@@ -24,6 +24,14 @@ namespace Id3
 {
     public abstract class DateTimeFrame : TextFrameBase<DateTime?>
     {
+        protected DateTimeFrame()
+        {
+        }
+
+        protected DateTimeFrame(DateTime value) : base(value)
+        {
+        }
+
         internal sealed override string TextValue
         {
             get => Value?.ToString(DateTimeFormat);

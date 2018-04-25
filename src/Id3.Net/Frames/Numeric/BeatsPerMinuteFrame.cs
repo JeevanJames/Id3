@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class BeatsPerMinuteFrame : NumericFrame
     {
+        public BeatsPerMinuteFrame()
+        {
+        }
+
+        public BeatsPerMinuteFrame(int value) : base(value)
+        {
+        }
+
+        public static implicit operator BeatsPerMinuteFrame(int value) => new BeatsPerMinuteFrame(value);
     }
 }

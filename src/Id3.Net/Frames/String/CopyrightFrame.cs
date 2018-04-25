@@ -41,8 +41,9 @@ namespace Id3
 
         protected override void ValidateValue(string value)
         {
-            if (!CopyrightPrefixPattern.IsMatch(value))
-                throw new ArgumentException(FrameMessages.Copyright_InvalidFormat, nameof(value));
+            //TODO: Validate
+            //if (!CopyrightPrefixPattern.IsMatch(value))
+            //    throw new ArgumentException(FrameMessages.Copyright_InvalidFormat, nameof(value));
         }
 
         private static readonly Regex CopyrightPrefixPattern = new Regex(@"^\d{4} ");

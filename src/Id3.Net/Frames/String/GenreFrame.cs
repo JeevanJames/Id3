@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class GenreFrame : TextFrame
     {
+        public GenreFrame()
+        {
+        }
+
+        public GenreFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator GenreFrame(string value) => new GenreFrame(value);
     }
 }

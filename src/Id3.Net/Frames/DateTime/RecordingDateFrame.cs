@@ -17,10 +17,22 @@ limitations under the License.
 */
 #endregion
 
+using System;
+
 namespace Id3
 {
     public sealed class RecordingDateFrame : DateTimeFrame
     {
+        public RecordingDateFrame()
+        {
+        }
+
+        public RecordingDateFrame(DateTime value) : base(value)
+        {
+        }
+
         protected override string DateTimeFormat => "ddMM";
+
+        public static implicit operator RecordingDateFrame(DateTime value) => new RecordingDateFrame(value);
     }
 }

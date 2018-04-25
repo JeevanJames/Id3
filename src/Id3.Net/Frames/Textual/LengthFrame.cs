@@ -24,6 +24,14 @@ namespace Id3
 {
     public sealed class LengthFrame : TextFrameBase<TimeSpan>
     {
+        public LengthFrame()
+        {
+        }
+
+        public LengthFrame(TimeSpan value) : base(value)
+        {
+        }
+
         internal override string TextValue
         {
             get => Value != TimeSpan.Zero ? Value.TotalMilliseconds.ToString(CultureInfo.InvariantCulture) : string.Empty;
@@ -38,5 +46,7 @@ namespace Id3
                         : TimeSpan.Zero;
             }
         }
+
+        public static implicit operator LengthFrame(TimeSpan value) => new LengthFrame(value);
     }
 }

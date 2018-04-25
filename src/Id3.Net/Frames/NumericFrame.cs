@@ -21,6 +21,14 @@ namespace Id3
 {
     public abstract class NumericFrame : TextFrameBase<int?>
     {
+        protected NumericFrame()
+        {
+        }
+
+        protected NumericFrame(int? value) : base(value)
+        {
+        }
+
         internal sealed override string TextValue
         {
             get => Value?.ToString();

@@ -24,6 +24,14 @@ namespace Id3
 {
     public class FileTypeFrame : TextFrameBase<FileAudioType>
     {
+        public FileTypeFrame()
+        {
+        }
+
+        public FileTypeFrame(FileAudioType value) : base(value)
+        {
+        }
+
         internal override string TextValue
         {
             get
@@ -51,6 +59,8 @@ namespace Id3
             ["VQF"] = FileAudioType.Vqf,
             ["PCM"] = FileAudioType.Pcm
         };
+
+        public static implicit operator FileTypeFrame(FileAudioType value) => new FileTypeFrame(value);
     }
 
     public enum FileAudioType

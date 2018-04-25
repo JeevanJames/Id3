@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class EncodingSettingsFrame : TextFrame
     {
+        public EncodingSettingsFrame()
+        {
+        }
+
+        public EncodingSettingsFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator EncodingSettingsFrame(string value) => new EncodingSettingsFrame(value);
     }
 }

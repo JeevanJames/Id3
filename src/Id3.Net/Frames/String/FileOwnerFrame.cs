@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class FileOwnerFrame : TextFrame
     {
+        public FileOwnerFrame()
+        {
+        }
+
+        public FileOwnerFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator FileOwnerFrame(string value) => new FileOwnerFrame(value);
     }
 }

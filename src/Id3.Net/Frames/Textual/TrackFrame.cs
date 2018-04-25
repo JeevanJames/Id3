@@ -24,6 +24,14 @@ namespace Id3
 {
     public sealed class TrackFrame : TextFrameBase<int>
     {
+        public TrackFrame()
+        {
+        }
+
+        public TrackFrame(int value) : base(value)
+        {
+        }
+
         public int TrackCount { get; set; }
 
         public bool Pad { get; set; }
@@ -68,5 +76,7 @@ namespace Id3
         }
 
         private static readonly Regex TrackPattern = new Regex(@"^(\d+)(?:/(\d+))?$");
+
+        public static implicit operator TrackFrame(int value) => new TrackFrame(value);
     }
 }

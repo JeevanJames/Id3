@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class PublisherFrame : TextFrame
     {
+        public PublisherFrame()
+        {
+        }
+
+        public PublisherFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator PublisherFrame(string value) => new PublisherFrame(value);
     }
 }

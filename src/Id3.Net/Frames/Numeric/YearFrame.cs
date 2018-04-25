@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class YearFrame : NumericFrame
     {
+        public YearFrame()
+        {
+        }
+
+        public YearFrame(int value) : base(value)
+        {
+        }
+
+        public static implicit operator YearFrame(int value) => new YearFrame(value);
     }
 }

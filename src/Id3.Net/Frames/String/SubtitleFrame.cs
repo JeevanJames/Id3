@@ -21,5 +21,14 @@ namespace Id3
 {
     public sealed class SubtitleFrame : TextFrame
     {
+        public SubtitleFrame()
+        {
+        }
+
+        public SubtitleFrame(string value) : base(value)
+        {
+        }
+
+        public static implicit operator SubtitleFrame(string value) => new SubtitleFrame(value);
     }
 }

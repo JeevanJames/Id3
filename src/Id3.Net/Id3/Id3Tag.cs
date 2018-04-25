@@ -139,13 +139,14 @@ namespace Id3
                         if (!frame.IsAssigned)
                             frameList.RemoveAt(i);
                     }
+
                     //If the list is empty, mark the item for removal
                     if (frameList.Count == 0)
                         keysToDelete.Add(kvp.Key);
                 } else
                 {
                     //Get the item value as a frame and mark it for removal if it is unassigned
-                    var frame = (Id3Frame)kvp.Value;
+                    var frame = (Id3Frame) kvp.Value;
                     if (!frame.IsAssigned)
                         keysToDelete.Add(kvp.Key);
                 }
@@ -403,39 +404,33 @@ namespace Id3
         }
         #endregion
 
-        #region IComparable<Id3Tag> and IEquatable<Id3Tag> implementations
+        #region Frame internals
         /// <summary>
-        ///     Compares two tags based on their version details.
+        ///     Collection of frames, keyed by the frame type.
         /// </summary>
-        /// <param name="other">The tag instance to compare against.</param>
-        /// <returns>A signed number that indicates the relative values of this instance and another instance of Id3Tag.</returns>
-        public int CompareTo(Id3Tag other)
-        {
-            if (other == null)
-                return 1;
-            return Version.CompareTo(other.Version);
-        }
-
-        public bool Equals(Id3Tag other)
-        {
-            if (other == null)
-                return false;
-            return Version == other.Version;
-        }
-        #endregion
-
         private readonly Dictionary<Type, object> _frames = new Dictionary<Type, object>(50);
 
-        private static readonly Dictionary<Type, Func<IList>> MultiInstanceFrameTypes = new Dictionary<Type, Func<IList>> {
-            [typeof(ArtistUrlFrame)] = () => new ArtistUrlFrameList(),
-            [typeof(CommentFrame)] = () => new CommentFrameList(),
-            [typeof(CommercialUrlFrame)] = () => new CommercialUrlFrameList(),
-            [typeof(CustomTextFrame)] = () => new CustomTextFrameList(),
-            [typeof(LyricsFrame)] = () => new LyricsFrameList(),
-            [typeof(PictureFrame)] = () => new PictureFrameList(),
-            [typeof(PrivateFrame)] = () => new PrivateFrameList()
-        };
+        /// <summary>
+        ///     List of all multiple instance frame types and factory functions to create instances of their collection classes.
+        /// </summary>
+        private static readonly Dictionary<Type, Func<IList>> MultiInstanceFrameTypes =
+            new Dictionary<Type, Func<IList>> {
+                [typeof(ArtistUrlFrame)] = () => new ArtistUrlFrameList(),
+                [typeof(CommentFrame)] = () => new CommentFrameList(),
+                [typeof(CommercialUrlFrame)] = () => new CommercialUrlFrameList(),
+                [typeof(CustomTextFrame)] = () => new CustomTextFrameList(),
+                [typeof(LyricsFrame)] = () => new LyricsFrameList(),
+                [typeof(PictureFrame)] = () => new PictureFrameList(),
+                [typeof(PrivateFrame)] = () => new PrivateFrameList()
+            };
 
+        /// <summary>
+        ///     Adds an <see cref="Id3Frame" /> instance to the _frames collection. Since this is not a concrete frame type, the
+        ///     method needs to do a bit of work to figure out how to add it to the _frames collection.
+        ///     This method is meant to be called by <see cref="Id3Handler" /> instances when they are reading the ID3 data and
+        ///     populating this object.
+        /// </summary>
+        /// <param name="frame">The <see cref="Id3Frame"/> instance to add.</param>
         internal void AddUntypedFrame(Id3Frame frame)
         {
             Type frameType = frame.GetType();
@@ -454,6 +449,7 @@ namespace Id3
                 list.Add(frame);
             } else
             {
+                //If the frame is a single-instance frame, simply add or update it in the _frames collection.
                 if (containsKey)
                     _frames[frameType] = frame;
                 else
@@ -497,5 +493,27 @@ namespace Id3
             _frames.Add(typeof(TFrame), framesList);
             return framesList;
         }
+        #endregion
+
+        #region IComparable<Id3Tag> and IEquatable<Id3Tag> implementations
+        /// <summary>
+        ///     Compares two tags based on their version details.
+        /// </summary>
+        /// <param name="other">The tag instance to compare against.</param>
+        /// <returns>A signed number that indicates the relative values of this instance and another instance of Id3Tag.</returns>
+        public int CompareTo(Id3Tag other)
+        {
+            if (other == null)
+                return 1;
+            return Version.CompareTo(other.Version);
+        }
+
+        public bool Equals(Id3Tag other)
+        {
+            if (other == null)
+                return false;
+            return Version == other.Version;
+        }
+        #endregion
     }
 }

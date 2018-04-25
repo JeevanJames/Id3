@@ -26,9 +26,9 @@ foreach (string musicFile in musicFiles)
     using (var mp3 = new Mp3(musicFile))
     {
         Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
-        Console.WriteLine("Title: {0}", tag.Title.Value);
-        Console.WriteLine("Artist: {0}", tag.Artists.Value);
-        Console.WriteLine("Album: {0}", tag.Album.Value);
+        Console.WriteLine("Title: {0}", tag.Title);
+        Console.WriteLine("Artist: {0}", tag.Artists);
+        Console.WriteLine("Album: {0}", tag.Album);
     }
 }
 ```
@@ -61,9 +61,9 @@ void SetCopyright(string mp3FilePath)
         Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
         if (!tag.Copyright.IsAssigned)
         {
-            int year = tag.Year.Value.GetValueOrDefault(2000);
+            int year = tag.Year.GetValueOrDefault(2000);
             string artists = tag.Artists.ToString();
-            tag.Copyright.Value = $"{year} {artists}";
+            tag.Copyright = $"{year} {artists}";
             mp3.WriteTag(tag, WriteConflictAction.Replace);
         }
     }

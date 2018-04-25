@@ -17,12 +17,30 @@ limitations under the License.
 */
 #endregion
 
+using System;
 using System.Collections.ObjectModel;
+
+using JetBrains.Annotations;
 
 namespace Id3
 {
     public sealed class LyricsFrame : Id3Frame
     {
+        public LyricsFrame()
+        {
+        }
+
+        public LyricsFrame([NotNull] string lyrics)
+        {
+            Lyrics = lyrics ?? throw new ArgumentNullException(nameof(lyrics));
+        }
+
+        public LyricsFrame([NotNull] string lyrics, [NotNull] string description)
+        {
+            Description = description ?? throw new ArgumentNullException(nameof(description));
+            Lyrics = lyrics ?? throw new ArgumentNullException(nameof(lyrics));
+        }
+
         public override bool Equals(Id3Frame other)
         {
             return other is LyricsFrame lyricsFrame &&
@@ -39,9 +57,15 @@ namespace Id3
         public Id3Language Language { get; set; } = Id3Language.eng;
 
         public string Lyrics { get; set; }
+
+        public static implicit operator LyricsFrame(string lyrics) => new LyricsFrame(lyrics);
     }
 
     public sealed class LyricsFrameList : Collection<LyricsFrame>
     {
+        public void Add(string lyrics, string description)
+        {
+            Add(new LyricsFrame(lyrics, description));
+        }
     }
 }

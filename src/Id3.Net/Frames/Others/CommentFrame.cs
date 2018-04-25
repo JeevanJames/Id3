@@ -21,10 +21,27 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 namespace Id3
 {
     public sealed class CommentFrame : Id3Frame
     {
+        public CommentFrame()
+        {
+        }
+
+        public CommentFrame([NotNull] string comment)
+        {
+            Comment = comment ?? throw new ArgumentNullException(nameof(comment));
+        }
+
+        public CommentFrame([NotNull] string comment, [NotNull] string description)
+        {
+            Comment = comment ?? throw new ArgumentNullException(nameof(comment));
+            Description = description ?? throw new ArgumentNullException(nameof(description));
+        }
+
         public override bool Equals(Id3Frame other)
         {
             return other is CommentFrame comment &&
@@ -46,6 +63,8 @@ namespace Id3
         public override bool IsAssigned => !string.IsNullOrEmpty(Comment);
 
         public Id3Language Language { get; set; } = Id3Language.eng;
+
+        public static implicit operator CommentFrame(string comment) => new CommentFrame(comment);
     }
 
     public sealed class CommentFrameList : Collection<CommentFrame>
