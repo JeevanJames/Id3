@@ -17,7 +17,6 @@ limitations under the License.
 */
 #endregion
 
-using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Id3
@@ -32,9 +31,24 @@ namespace Id3
         {
         }
 
+        public TrackFrame(int value, int trackCount) : base(value)
+        {
+            TrackCount = trackCount;
+        }
+
+        /// <summary>
+        ///     The total number of tracks.<para/>
+        ///     If greater than 0, the ID3 value will be set as &lt;track&gt;/&lt;track count&gt;
+        /// </summary>
         public int TrackCount { get; set; }
 
-        public bool Pad { get; set; }
+        /// <summary>
+        ///     Indicates whether to zero-pad the track and track count values.<para/>
+        ///     If this value is null, then no padding is applied.<para/>
+        ///     If this value is 0 (zero), then the track value is padded based on the length of the track count value.<para/>
+        ///     If this value is greater than 0, it is used to pad the track and track count values.
+        /// </summary>
+        public int? Padding { get; set; }
 
         internal override string TextValue
         {
@@ -42,13 +56,23 @@ namespace Id3
             {
                 if (Value <= 0 && TrackCount <= 0)
                     return null;
-                if (TrackCount <= 0)
-                    return Value.ToString(CultureInfo.InvariantCulture);
-                if (Value <= 0)
-                    return $"0/{TrackCount}";
-                string valueString =
-                    Pad ? Value.ToString().PadLeft(TrackCount.ToString().Length, '0') : Value.ToString();
-                return $"{valueString}/{TrackCount}";
+
+                string track = null, trackCount = null;
+                if (TrackCount > 0)
+                    trackCount = TrackCount.ToString().PadLeft(Padding.GetValueOrDefault(), '0');
+                if (Value > 0)
+                {
+                    track = Value.ToString();
+                    if (Padding.HasValue)
+                        track = track.PadLeft(Padding.Value <= 0 ? (trackCount ?? "").Length : Padding.Value, '0');
+                }
+
+                if (track == null)
+                    return null;
+                string result = track;
+                if (trackCount != null)
+                    result += $"/{trackCount}";
+                return result;
             }
             set
             {
@@ -69,7 +93,6 @@ namespace Id3
                         TrackCount = !string.IsNullOrEmpty(match.Groups[2].Value)
                             ? int.Parse(match.Groups[2].Value)
                             : 0;
-                        Pad = match.Groups[1].Value.StartsWith("0");
                     }
                 }
             }
