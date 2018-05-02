@@ -120,7 +120,7 @@ namespace Id3
             SetupStream(stream, permissions);
         }
 
-        protected void SetupStream(Stream stream, Mp3Permissions permissions)
+        private void SetupStream(Stream stream, Mp3Permissions permissions)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));

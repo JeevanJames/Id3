@@ -77,6 +77,17 @@ namespace Id3
             }
         }
 
+        /// <summary>
+        ///     Deriving classes can override this method to validate the native value being set.
+        ///     <para />
+        ///     If the value is invalid, the method should throw an exception.
+        /// </summary>
+        /// <param name="value">The native value being set.</param>
+        /// <exception cref="Id3Exception">Thrown if the specified native value is invalid.</exception>
+        /// <remarks>
+        ///     Note that in a lot of cases, a native value of null or something that translates to an empty string is considered
+        ///     valid. In such cases, the frame may be unassigned, but the value should still be allowed.
+        /// </remarks>
         protected virtual void ValidateValue(TValue value)
         {
         }
