@@ -19,10 +19,21 @@ limitations under the License.
 
 using System.Collections.ObjectModel;
 
+using JetBrains.Annotations;
+
 namespace Id3
 {
     public sealed class CommercialUrlFrame : UrlLinkFrame
     {
+        public CommercialUrlFrame()
+        {
+        }
+
+        public CommercialUrlFrame([NotNull] string url) : base(url)
+        {
+        }
+
+        public static implicit operator CommercialUrlFrame(string url) => new CommercialUrlFrame(url);
     }
 
     public sealed class CommercialUrlFrameList : Collection<CommercialUrlFrame>

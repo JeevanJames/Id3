@@ -5,7 +5,7 @@
     <RootNamespace>Id3</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>ID3</PackageId>
-    <Version>0.5.0</Version>
+    <Version>0.5.0-beta.1</Version>
     <Authors>Jeevan James</Authors>
     <Product>ID3.NET</Product>
     <Description>ID3.NET is a set of libraries for reading, modifying and writing ID3 and Lyrics3 tags in MP3 audio files.</Description>
@@ -15,7 +15,8 @@
     <RepositoryUrl>https://github.com/JeevanJames/Id3</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>ID3 ID3.NET Lyrics3 MP3 ID3v1 ID3v1.0 ID3v1.1 ID3v2.3 Tag Tags Tagging Audio</PackageTags>
-    <PackageReleaseNotes>Migrated to netstandard20 and .NET 4.x framework.</PackageReleaseNotes>
+    <PackageReleaseNotes>Migrated to netstandard20 and .NET 4.x frameworks</PackageReleaseNotes>
+    <PackageIconUrl>https://github.com/JeevanJames/Id3/raw/master/icon.png</PackageIconUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

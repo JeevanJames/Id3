@@ -38,10 +38,7 @@ namespace Id3
 
         public override bool IsAssigned => Data != null && Data.Length > 0;
 
-        public override string ToString()
-        {
-            return OwnerId ?? base.ToString();
-        }
+        public override string ToString() => OwnerId ?? base.ToString();
     }
 
     public sealed class PrivateFrameList : Collection<PrivateFrame>

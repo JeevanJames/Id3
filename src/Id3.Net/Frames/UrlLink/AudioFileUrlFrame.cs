@@ -17,9 +17,20 @@ limitations under the License.
 */
 #endregion
 
+using JetBrains.Annotations;
+
 namespace Id3
 {
     public sealed class AudioFileUrlFrame : UrlLinkFrame
     {
+        public AudioFileUrlFrame()
+        {
+        }
+
+        public AudioFileUrlFrame([NotNull] string url) : base(url)
+        {
+        }
+
+        public static implicit operator AudioFileUrlFrame(string url) => new AudioFileUrlFrame(url);
     }
 }

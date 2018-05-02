@@ -17,12 +17,31 @@ limitations under the License.
 */
 #endregion
 
+using System;
+
+using JetBrains.Annotations;
+
 namespace Id3
 {
     public sealed class CustomUrlLinkFrame : UrlLinkFrame
     {
+        public CustomUrlLinkFrame()
+        {
+        }
+
+        public CustomUrlLinkFrame([NotNull] string url) : base(url)
+        {
+        }
+
+        public CustomUrlLinkFrame([NotNull] string url, [NotNull] string description) : base(url)
+        {
+            Description = description ?? throw new ArgumentNullException(nameof(description));
+        }
+
         public string Description { get; set; }
 
         public Id3TextEncoding EncodingType { get; set; }
+
+        public static implicit operator CustomUrlLinkFrame(string url) => new CustomUrlLinkFrame(url);
     }
 }

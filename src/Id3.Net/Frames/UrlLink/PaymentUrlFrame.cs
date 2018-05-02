@@ -17,9 +17,20 @@ limitations under the License.
 */
 #endregion
 
+using JetBrains.Annotations;
+
 namespace Id3
 {
     public sealed class PaymentUrlFrame : UrlLinkFrame
     {
+        public PaymentUrlFrame()
+        {
+        }
+
+        public PaymentUrlFrame([NotNull] string url) : base(url)
+        {
+        }
+
+        public static implicit operator PaymentUrlFrame(string url) => new PaymentUrlFrame(url);
     }
 }

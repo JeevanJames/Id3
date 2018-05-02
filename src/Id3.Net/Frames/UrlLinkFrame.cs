@@ -17,10 +17,23 @@ limitations under the License.
 */
 #endregion
 
+using System;
+
+using JetBrains.Annotations;
+
 namespace Id3
 {
     public abstract class UrlLinkFrame : Id3Frame
     {
+        protected UrlLinkFrame()
+        {
+        }
+
+        protected UrlLinkFrame([NotNull] string url)
+        {
+            Url = url ?? throw new ArgumentNullException(nameof(url));
+        }
+
         public override bool Equals(Id3Frame other)
         {
             return base.Equals(other) &&
@@ -36,5 +49,7 @@ namespace Id3
         public sealed override bool IsAssigned => !string.IsNullOrEmpty(Url);
 
         public string Url { get; set; }
+
+        public static implicit operator string(UrlLinkFrame frame) => frame.Url;
     }
 }

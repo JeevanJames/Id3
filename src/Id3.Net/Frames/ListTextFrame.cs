@@ -18,14 +18,14 @@ limitations under the License.
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace Id3
 {
     public abstract class ListTextFrame : TextFrameBase<IList<string>>
     {
-        private const char Separator = '/';
+        private const string Separator = "/";
 
         protected ListTextFrame()
         {
@@ -40,26 +40,23 @@ namespace Id3
 
         public new IList<string> Value { get; private set; }
 
+        public override bool IsAssigned => Value.Any(v => !string.IsNullOrWhiteSpace(v));
+
         internal sealed override string TextValue
         {
-            get
-            {
-                var sb = new StringBuilder();
-                foreach (string value in Value)
-                    sb.Append(value + Separator);
-                if (sb.Length > 0)
-                    sb.Remove(sb.Length - 1, 1);
-                return sb.ToString();
-            }
+            get => string.Join(Separator, Value.Where(v => !string.IsNullOrWhiteSpace(v)));
             set
             {
                 if (string.IsNullOrEmpty(value))
                     Value.Clear();
                 else
                 {
-                    string[] breakup = value.Split(Separator);
+                    string[] breakup = value.Split(Separator[0]);
                     foreach (string s in breakup)
-                        Value.Add(s);
+                    {
+                        if (!string.IsNullOrWhiteSpace(s))
+                            Value.Add(s);
+                    }
                 }
             }
         }

@@ -32,10 +32,7 @@ namespace Id3
             return ByteArrayHelper.AreEqual(Data, unknownFrame.Data);
         }
 
-        public override string ToString()
-        {
-            return Id ?? base.ToString();
-        }
+        public override string ToString() => Id ?? base.ToString();
 
         public string Id { get; set; }
 

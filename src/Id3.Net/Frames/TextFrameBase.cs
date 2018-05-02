@@ -24,7 +24,7 @@ namespace Id3
     /// <summary>
     ///     Represents an ID3 frame that contains textual data
     /// </summary>
-    [DebuggerDisplay("{ToString()}")]
+    [DebuggerDisplay("{" + nameof(ToString) + "()}")]
     public abstract class TextFrameBase : Id3Frame
     {
         public sealed override bool Equals(Id3Frame other)
@@ -34,19 +34,13 @@ namespace Id3
                 text.TextValue == TextValue;
         }
 
-        public sealed override int GetHashCode()
-        {
-            return TextValue.GetHashCode();
-        }
+        public sealed override int GetHashCode() => TextValue.GetHashCode();
 
-        public override string ToString()
-        {
-            return IsAssigned ? TextValue : string.Empty;
-        }
+        public override string ToString() => IsAssigned ? TextValue : string.Empty;
 
         public Id3TextEncoding EncodingType { get; set; }
 
-        public sealed override bool IsAssigned => !string.IsNullOrEmpty(TextValue);
+        public override bool IsAssigned => !string.IsNullOrEmpty(TextValue);
 
         /// <summary>
         ///     Textual representation of the frame value. This is for internal usage only; derived classes should override the

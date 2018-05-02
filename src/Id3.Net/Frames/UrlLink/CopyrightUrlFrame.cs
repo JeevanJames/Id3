@@ -17,9 +17,20 @@ limitations under the License.
 */
 #endregion
 
+using JetBrains.Annotations;
+
 namespace Id3
 {
     public sealed class CopyrightUrlFrame : UrlLinkFrame
     {
+        public CopyrightUrlFrame()
+        {
+        }
+
+        public CopyrightUrlFrame([NotNull] string url) : base(url)
+        {
+        }
+
+        public static implicit operator CopyrightUrlFrame(string url) => new CopyrightUrlFrame(url);
     }
 }

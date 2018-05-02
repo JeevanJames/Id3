@@ -41,7 +41,8 @@ namespace Id3
                     Value = null;
                 else
                 {
-                    if (!DateTime.TryParseExact(value, DateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime dateTime))
+                    if (!DateTime.TryParseExact(value, DateTimeFormat, CultureInfo.InvariantCulture,
+                        DateTimeStyles.AllowWhiteSpaces, out DateTime dateTime))
                         Value = null;
                     else
                         Value = dateTime;
@@ -49,6 +50,9 @@ namespace Id3
             }
         }
 
+        /// <summary>
+        ///     Format of the date/time value as a string.
+        /// </summary>
         protected abstract string DateTimeFormat { get; }
     }
 }
