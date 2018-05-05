@@ -61,6 +61,15 @@ namespace Id3.Files.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One or more null or empty patterns were found..
+        /// </summary>
+        internal static string FoundNullOrEmptyPatterns {
+            get {
+                return ResourceManager.GetString("FoundNullOrEmptyPatterns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid file path.
         /// </summary>
         internal static string InvalidFilePath {
@@ -102,6 +111,15 @@ namespace Id3.Files.Resources {
         internal static string MissingId3v23TagInFile {
             get {
                 return ResourceManager.GetString("MissingId3v23TagInFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No patterns have been specified. Specify at least one pattern..
+        /// </summary>
+        internal static string MissingPatterns {
+            get {
+                return ResourceManager.GetString("MissingPatterns", resourceCulture);
             }
         }
         

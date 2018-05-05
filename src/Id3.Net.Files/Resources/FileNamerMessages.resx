@@ -138,4 +138,10 @@
   <data name="MissingTagProperty" xml:space="preserve">
     <value>A tag property by name '{0}' does not exist.</value>
   </data>
+  <data name="MissingPatterns" xml:space="preserve">
+    <value>No patterns have been specified. Specify at least one pattern.</value>
+  </data>
+  <data name="FoundNullOrEmptyPatterns" xml:space="preserve">
+    <value>One or more null or empty patterns were found.</value>
+  </data>
 </root>

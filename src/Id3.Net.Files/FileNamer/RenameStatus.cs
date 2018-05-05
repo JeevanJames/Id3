@@ -19,11 +19,29 @@ limitations under the License.
 
 namespace Id3.Files
 {
+    /// <summary>
+    ///     Indicates the status of a file rename suggestion.
+    /// </summary>
     public enum RenameStatus
     {
+        /// <summary>
+        ///     The file is already correctly-named.
+        /// </summary>
         CorrectlyNamed,
-        Renamed,
+
+        /// <summary>
+        ///     The file was needs to be renamed.
+        /// </summary>
+        Rename,
+
+        /// <summary>
+        ///     The FileNamer operation is cancelled. Any suggestions processed so far will be returned.
+        /// </summary>
         Cancelled,
-        Error,
+
+        /// <summary>
+        ///     An error occurred while trying to suggest a new name.
+        /// </summary>
+        Error
     }
 }

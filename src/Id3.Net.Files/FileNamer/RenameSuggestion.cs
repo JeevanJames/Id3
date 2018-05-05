@@ -26,37 +26,55 @@ namespace Id3.Files
     /// <summary>
     ///     Represents the result of a rename or a rename suggestion request.
     /// </summary>
-    public abstract class RenameAction
+    public sealed class RenameSuggestion
     {
-        internal RenameAction()
+        internal RenameSuggestion(string directory, string originalName, RenameStatus status)
         {
-            Status = RenameStatus.Renamed;
+            Directory = directory;
+            OriginalName = originalName;
+            Status = status;
+        }
+
+        internal RenameSuggestion(string directory, string originalName, string errorMessage)
+        {
+            Directory = directory;
+            OriginalName = originalName;
+            Status = RenameStatus.Error;
+            ErrorMessage = errorMessage;
+        }
+
+        internal RenameSuggestion(string directory, string originalName, string newName, RenameStatus status)
+        {
+            Directory = directory;
+            OriginalName = originalName;
+            NewName = newName;
+            Status = status;
         }
 
         /// <summary>
         ///     The directory containing the MP3 file.
         /// </summary>
-        public string Directory { get; internal set; }
+        public string Directory { get; }
 
         /// <summary>
         ///     The original name of the MP3 file, with the extension.
         /// </summary>
-        public string OriginalName { get; internal set; }
+        public string OriginalName { get; }
 
         /// <summary>
         ///     The new name of the MP3 file, with the extension.
         /// </summary>
-        public string NewName { get; internal set; }
+        public string NewName { get; }
 
         /// <summary>
-        ///     The status of the rename or rename suggestion.
+        ///     The status of the rename suggestion.
         /// </summary>
-        public RenameStatus Status { get; internal set; }
+        public RenameStatus Status { get; }
 
         /// <summary>
-        ///     In the case of an error (Status is RenameStatus.Error), contains the error message
+        ///     In the case of an error (Status is <see cref="RenameStatus.Error"/>), contains the error message
         /// </summary>
-        public string ErrorMessage { get; internal set; }
+        public string ErrorMessage { get; }
 
         public override string ToString()
         {
@@ -64,7 +82,7 @@ namespace Id3.Files
             {
                 case RenameStatus.CorrectlyNamed:
                     return $"Correctly named: {OriginalName}";
-                case RenameStatus.Renamed:
+                case RenameStatus.Rename:
                     return $"{OriginalName} ==> {NewName}";
                 case RenameStatus.Cancelled:
                     return $"Cancelled: {OriginalName}";
@@ -76,45 +94,20 @@ namespace Id3.Files
         }
     }
 
-    public abstract class RenameActions<T> : Collection<T>
-        where T : RenameAction
+    public sealed class RenameSuggestions : Collection<RenameSuggestion>
     {
-        protected RenameActions(IEnumerable<T> items)
+        internal RenameSuggestions(IEnumerable<RenameSuggestion> items)
         {
-            foreach (T item in items)
+            foreach (RenameSuggestion item in items)
                 Add(item);
         }
 
-        public IEnumerable<T> CorrectlyNamed => this.Where(action => action.Status == RenameStatus.CorrectlyNamed);
+        public IEnumerable<RenameSuggestion> CorrectlyNamed => this.Where(action => action.Status == RenameStatus.CorrectlyNamed);
 
-        public IEnumerable<T> Renamed => this.Where(action => action.Status == RenameStatus.Renamed);
+        public IEnumerable<RenameSuggestion> Renamed => this.Where(action => action.Status == RenameStatus.Rename);
 
-        public IEnumerable<T> Errors => this.Where(action => action.Status == RenameStatus.Error);
+        public IEnumerable<RenameSuggestion> Errors => this.Where(action => action.Status == RenameStatus.Error);
 
-        public IEnumerable<T> Cancelled => this.Where(action => action.Status == RenameStatus.Cancelled);
-    }
-
-    public sealed class RenameResult : RenameAction
-    {
-    }
-
-    public sealed class RenameResults : RenameActions<RenameResult>
-    {
-        public RenameResults(IEnumerable<RenameResult> items)
-            : base(items)
-        {
-        }
-    }
-
-    public sealed class RenameSuggestion : RenameAction
-    {
-    }
-
-    public sealed class RenameSuggestions : RenameActions<RenameSuggestion>
-    {
-        public RenameSuggestions(IEnumerable<RenameSuggestion> items)
-            : base(items)
-        {
-        }
+        public IEnumerable<RenameSuggestion> Cancelled => this.Where(action => action.Status == RenameStatus.Cancelled);
     }
 }
