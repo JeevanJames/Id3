@@ -20,20 +20,20 @@ limitations under the License.
 namespace Id3
 {
     /// <summary>
-    /// Specifies families of ID3 tag versions that are mutually-inclusive.
+    ///     Specifies families of ID3 tag versions that are mutually-inclusive.
     /// </summary>
     public enum Id3TagFamily
     {
         /// <summary>
-        /// Indicates ID3 tags in the v2 range (currently v2.2, v2.3 and v2.4). These tags appear at
-        /// the beginning of the MP3 file.
+        ///     Indicates ID3 tags in the v2 range (currently v2.2, v2.3 and v2.4). These tags appear at
+        ///     the beginning of the MP3 file.
         /// </summary>
         Version2X,
 
         /// <summary>
-        /// Indicates ID3 tags in the v1 range (currently v1.0 and v1.1). These tags appear at the end
-        /// of the MP3 file.
+        ///     Indicates ID3 tags in the v1 range (currently v1.0 and v1.1). These tags appear at the end
+        ///     of the MP3 file.
         /// </summary>
-        Version1X,
+        Version1X
     }
 }

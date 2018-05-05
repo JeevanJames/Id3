@@ -29,6 +29,7 @@ namespace Id3
 {
     /// <summary>
     ///     Represents an ID3 tag.
+    ///     <para />
     ///     This class is agnostic of any ID3 tag version. It contains all the possible properties that can be assigned across
     ///     all ID3 tag versions.
     /// </summary>
@@ -83,7 +84,7 @@ namespace Id3
         #region Frame operations
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable<Id3Frame>) this).GetEnumerator();
+            return ((IEnumerable<Id3Frame>)this).GetEnumerator();
         }
 
         IEnumerator<Id3Frame> IEnumerable<Id3Frame>.GetEnumerator()
@@ -95,7 +96,7 @@ namespace Id3
                     foreach (Id3Frame frame in list)
                         yield return frame;
                 } else
-                    yield return (Id3Frame) kvp.Value;
+                    yield return (Id3Frame)kvp.Value;
             }
         }
 
@@ -113,7 +114,7 @@ namespace Id3
                 {
                     for (int i = frameList.Count - 1; i >= 0; i--)
                     {
-                        var frame = (Id3Frame) frameList[i];
+                        var frame = (Id3Frame)frameList[i];
                         if (!frame.IsAssigned)
                             frameList.RemoveAt(i);
                     }
@@ -124,7 +125,7 @@ namespace Id3
                 } else
                 {
                     //Get the item value as a frame and mark it for removal if it is unassigned
-                    var frame = (Id3Frame) kvp.Value;
+                    var frame = (Id3Frame)kvp.Value;
                     if (!frame.IsAssigned)
                         keysToDelete.Add(kvp.Key);
                 }
@@ -145,15 +146,34 @@ namespace Id3
             return clearedCount;
         }
 
-        public bool Contains<TFrame>(Expression<Func<Id3Tag, TFrame>> frameProperty) where TFrame : Id3Frame
+        public bool Contains<TFrame>(Expression<Func<Id3Tag, TFrame>> frameProperty)
+            where TFrame : Id3Frame
         {
             if (frameProperty == null)
                 throw new ArgumentNullException(nameof(frameProperty));
 
-            var lambda = (LambdaExpression) frameProperty;
-            var memberExpression = (MemberExpression) lambda.Body;
-            var property = (PropertyInfo) memberExpression.Member;
+            var lambda = (LambdaExpression)frameProperty;
+            var memberExpression = (MemberExpression)lambda.Body;
+            var property = (PropertyInfo)memberExpression.Member;
             return this.Any(f => f.GetType() == property.PropertyType && f.IsAssigned);
+        }
+
+        /// <summary>
+        ///     Returns the total number of frames in this tag.
+        /// </summary>
+        /// <param name="onlyAssignedFrames">If true, counts only assigned frames.</param>
+        /// <returns>Total number of frames in the tag.</returns>
+        public int GetCount(bool onlyAssignedFrames = true)
+        {
+            var count = 0;
+            foreach (KeyValuePair<Type, object> kvp in _frames)
+            {
+                if (kvp.Value is IList list)
+                    count += onlyAssignedFrames ? list.Cast<Id3Frame>().Count(frame => frame.IsAssigned) : list.Count;
+                else
+                    count += onlyAssignedFrames ? (((Id3Frame)kvp.Value).IsAssigned ? 1 : 0) : 1;
+            }
+            return count;
         }
 
         /// <summary>
@@ -161,7 +181,8 @@ namespace Id3
         /// </summary>
         /// <typeparam name="TFrame">Type of frame to remove</typeparam>
         /// <returns>True, if matching frames were removed, otherwise false.</returns>
-        public bool Remove<TFrame>() where TFrame : Id3Frame
+        public bool Remove<TFrame>()
+            where TFrame : Id3Frame
         {
             Type frameType = typeof(TFrame);
 
@@ -193,7 +214,7 @@ namespace Id3
             {
                 for (int i = list.Count - 1; i >= 0; i--)
                 {
-                    if (predicate((TFrame) list[i]))
+                    if (predicate((TFrame)list[i]))
                     {
                         list.RemoveAt(i);
                         removalCount++;
@@ -204,7 +225,7 @@ namespace Id3
                     _frames.Remove(frameType);
             } else
             {
-                var frame = (TFrame) frameObj;
+                var frame = (TFrame)frameObj;
                 if (predicate(frame))
                 {
                     _frames.Remove(frameType);
@@ -408,7 +429,7 @@ namespace Id3
         ///     This method is meant to be called by <see cref="Id3Handler" /> instances when they are reading the ID3 data and
         ///     populating this object.
         /// </summary>
-        /// <param name="frame">The <see cref="Id3Frame"/> instance to add.</param>
+        /// <param name="frame">The <see cref="Id3Frame" /> instance to add.</param>
         internal void AddUntypedFrame(Id3Frame frame)
         {
             Type frameType = frame.GetType();
@@ -417,7 +438,7 @@ namespace Id3
             {
                 IList list;
                 if (containsKey)
-                    list = (IList) _frames[frameType];
+                    list = (IList)_frames[frameType];
                 else
                 {
                     list = MultiInstanceFrameTypes[frameType]();
@@ -435,16 +456,18 @@ namespace Id3
             }
         }
 
-        private TFrame GetSingleFrame<TFrame>() where TFrame : Id3Frame, new()
+        private TFrame GetSingleFrame<TFrame>()
+            where TFrame : Id3Frame, new()
         {
             if (_frames.TryGetValue(typeof(TFrame), out object frameObj))
-                return (TFrame) frameObj;
+                return (TFrame)frameObj;
             var frame = new TFrame();
             _frames.Add(typeof(TFrame), frame);
             return frame;
         }
 
-        private void SetSingleFrame<TFrame>(TFrame frame) where TFrame : Id3Frame
+        private void SetSingleFrame<TFrame>(TFrame frame)
+            where TFrame : Id3Frame
         {
             Type frameType = typeof(TFrame);
             bool containsKey = _frames.ContainsKey(frameType);
@@ -466,7 +489,7 @@ namespace Id3
             where TFrameList : IList<TFrame>, new()
         {
             if (_frames.TryGetValue(typeof(TFrame), out object frameListObj))
-                return (TFrameList) frameListObj;
+                return (TFrameList)frameListObj;
             var framesList = new TFrameList();
             _frames.Add(typeof(TFrame), framesList);
             return framesList;

@@ -23,17 +23,24 @@ using System.Linq;
 namespace Id3
 {
     /// <summary>
-    /// Compares two tags for equality.
+    ///     Compares two tags for equality.
     /// </summary>
     public sealed class TagComparer : IEqualityComparer<Id3Tag>
     {
+        public bool CompareOnlyAssignedFrames { get; }
+
+        public TagComparer(bool compareOnlyAssignedFrames = false)
+        {
+            CompareOnlyAssignedFrames = compareOnlyAssignedFrames;
+        }
+
         bool IEqualityComparer<Id3Tag>.Equals(Id3Tag tag1, Id3Tag tag2)
         {
             if (ReferenceEquals(tag1, tag2))
                 return true;
             if (tag1 == null || tag2 == null)
                 return false;
-            if (tag1.Count() != tag2.Count())
+            if (tag1.GetCount(CompareOnlyAssignedFrames) != tag2.GetCount(CompareOnlyAssignedFrames))
                 return false;
 
             //TODO: Compare frames
@@ -41,9 +48,6 @@ namespace Id3
             return true;
         }
 
-        int IEqualityComparer<Id3Tag>.GetHashCode(Id3Tag tag)
-        {
-            return tag.GetHashCode();
-        }
+        int IEqualityComparer<Id3Tag>.GetHashCode(Id3Tag tag) => tag.GetHashCode();
     }
 }

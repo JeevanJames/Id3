@@ -22,8 +22,6 @@ namespace Id3
     public enum Id3Version
     {
         V1X = 1,
-        V22 = 2,
         V23 = 3,
-        V24 = 4
     }
 }
