@@ -108,5 +108,7 @@ namespace Id3.InfoFx
             }
             return true;
         }
+
+        protected static readonly Id3Tag[] Empty = new Id3Tag[0];
     }
 }

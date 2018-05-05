@@ -18,10 +18,12 @@ limitations under the License.
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Id3
 {
+    [DebuggerDisplay("Track {Value} of {TrackCount}")]
     public sealed class TrackFrame : TextFrameBase<int>
     {
         public TrackFrame()
@@ -38,15 +40,20 @@ namespace Id3
         }
 
         /// <summary>
-        ///     The total number of tracks.<para/>
+        ///     The total number of tracks.
+        ///     <para />
         ///     If greater than 0, the ID3 value will be set as &lt;track&gt;/&lt;track count&gt;
         /// </summary>
         public int TrackCount { get; set; }
 
         /// <summary>
-        ///     Indicates whether to zero-pad the track and track count values.<para/>
-        ///     If this value is null, then no padding is applied.<para/>
-        ///     If this value is 0 (zero), then the track value is padded based on the length of the track count value.<para/>
+        ///     Indicates whether to zero-pad the track and track count values. This is useful for some MP3 players that
+        ///     incorrectly sort unpadded values such as 1 and 10.
+        ///     <para />
+        ///     If this value is null, then no padding is applied.
+        ///     <para />
+        ///     If this value is 0 (zero), then the track value is padded based on the length of the track count value.
+        ///     <para />
         ///     If this value is greater than 0, it is used to pad the track and track count values.
         /// </summary>
         public int? Padding { get; set; }

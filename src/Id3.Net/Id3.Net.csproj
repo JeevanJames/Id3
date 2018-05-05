@@ -12,11 +12,12 @@
     <Copyright>Copyright (c) Jeevan James 2005-2018</Copyright>
     <PackageLicenseUrl>https://github.com/JeevanJames/Id3/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/JeevanJames/Id3</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/JeevanJames/Id3</RepositoryUrl>
+    <RepositoryUrl>https://github.com/JeevanJames/Id3.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>ID3 ID3.NET Lyrics3 MP3 ID3v1 ID3v1.0 ID3v1.1 ID3v2.3 Tag Tags Tagging Audio</PackageTags>
     <PackageReleaseNotes>Migrated to netstandard20 and .NET 4.x frameworks</PackageReleaseNotes>
     <PackageIconUrl>https://github.com/JeevanJames/Id3/raw/master/icon.png</PackageIconUrl>
+    <AssemblyName>Id3.Net</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -35,6 +36,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard2.0\Id3.Net.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
