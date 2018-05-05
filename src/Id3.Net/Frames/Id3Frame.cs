@@ -18,12 +18,14 @@ limitations under the License.
 #endregion
 
 using System;
+using System.Diagnostics;
 
 namespace Id3
 {
     /// <summary>
     ///     Represents an ID3 frame. This is an abstract class.
     /// </summary>
+    [DebuggerDisplay("{" + nameof(GetType) + "()}")]
     public abstract class Id3Frame : IEquatable<Id3Frame>
     {
         public virtual bool Equals(Id3Frame other)

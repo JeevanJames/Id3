@@ -17,6 +17,7 @@ limitations under the License.
 */
 #endregion
 
+using System;
 using System.Text.RegularExpressions;
 
 namespace Id3
@@ -80,21 +81,31 @@ namespace Id3
                 {
                     Value = 0;
                     TrackCount = 0;
-                } else
-                {
-                    Match match = TrackPattern.Match(value);
-                    if (!match.Success)
-                    {
-                        Value = 0;
-                        TrackCount = 0;
-                    } else
-                    {
-                        Value = int.Parse(match.Groups[1].Value);
-                        TrackCount = !string.IsNullOrEmpty(match.Groups[2].Value)
-                            ? int.Parse(match.Groups[2].Value)
-                            : 0;
-                    }
+                    return;
                 }
+
+                Match match = TrackPattern.Match(value);
+                if (!match.Success)
+                {
+                    Value = 0;
+                    TrackCount = 0;
+                    return;
+                }
+
+                string trackCount = match.Groups[2].Value;
+                if (string.IsNullOrEmpty(trackCount))
+                    TrackCount = 0;
+                else
+                {
+                    TrackCount = int.Parse(trackCount);
+                    if (trackCount.StartsWith("0"))
+                        Padding = trackCount.Length;
+                }
+
+                string track = match.Groups[1].Value;
+                Value = int.Parse(track);
+                if (track.StartsWith("0"))
+                    Padding = Math.Max(track.Length, trackCount.Length);
             }
         }
 

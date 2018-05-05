@@ -24,7 +24,6 @@ namespace Id3
     /// <summary>
     ///     Represents an ID3 frame that contains textual data
     /// </summary>
-    [DebuggerDisplay("{" + nameof(ToString) + "()}")]
     public abstract class TextFrameBase : Id3Frame
     {
         public sealed override bool Equals(Id3Frame other)
@@ -50,6 +49,7 @@ namespace Id3
         internal abstract string TextValue { get; set; }
     }
 
+    [DebuggerDisplay("{" + nameof(Value) + "}")]
     public abstract class TextFrameBase<TValue> : TextFrameBase
     {
         private TValue _value;
