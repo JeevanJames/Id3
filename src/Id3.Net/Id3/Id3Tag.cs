@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace Id3
@@ -35,6 +36,17 @@ namespace Id3
     /// </summary>
     public sealed class Id3Tag : IEnumerable<Id3Frame>, IComparable<Id3Tag>, IEquatable<Id3Tag>
     {
+        public Id3Tag()
+        {
+            _frames = new Dictionary<Type, object>(50);
+        }
+
+        [OnDeserializing]
+        internal void OnDeserializing(StreamingContext context)
+        {
+            _frames = new Dictionary<Type, object>(50);
+        }
+
         /// <summary>
         ///     Converts an ID3 tag to another version after resolving the differences between the two versions. The resultant tag
         ///     will have all the frames from the source tag, but those frames not recognized in the new version will be treated as
@@ -89,7 +101,7 @@ namespace Id3
 
         IEnumerator<Id3Frame> IEnumerable<Id3Frame>.GetEnumerator()
         {
-            foreach (KeyValuePair<Type, object> kvp in _frames)
+            foreach (KeyValuePair<Type, object> kvp in Frames)
             {
                 if (kvp.Value is IList list)
                 {
@@ -105,10 +117,10 @@ namespace Id3
         /// </summary>
         public void Cleanup()
         {
-            //Build a list of keys from the _frames dictionary to delete
-            var keysToDelete = new List<Type>(_frames.Count);
+            //Build a list of keys from the Frames dictionary to delete
+            var keysToDelete = new List<Type>(Frames.Count);
 
-            Parallel.ForEach(_frames, (kvp, state) => {
+            Parallel.ForEach(Frames, (kvp, state) => {
                 //If the item value is a list, remove any item that is not assigned
                 if (kvp.Value is IList frameList)
                 {
@@ -132,7 +144,7 @@ namespace Id3
             });
 
             foreach (Type keyToDelete in keysToDelete)
-                _frames.Remove(keyToDelete);
+                Frames.Remove(keyToDelete);
         }
 
         /// <summary>
@@ -142,7 +154,7 @@ namespace Id3
         public int Clear()
         {
             int clearedCount = this.Count();
-            _frames.Clear();
+            Frames.Clear();
             return clearedCount;
         }
 
@@ -166,7 +178,7 @@ namespace Id3
         public int GetCount(bool onlyAssignedFrames = true)
         {
             var count = 0;
-            foreach (KeyValuePair<Type, object> kvp in _frames)
+            foreach (KeyValuePair<Type, object> kvp in Frames)
             {
                 if (kvp.Value is IList list)
                     count += onlyAssignedFrames ? list.Cast<Id3Frame>().Count(frame => frame.IsAssigned) : list.Count;
@@ -186,10 +198,10 @@ namespace Id3
         {
             Type frameType = typeof(TFrame);
 
-            if (!_frames.ContainsKey(frameType))
+            if (!Frames.ContainsKey(frameType))
                 return false;
 
-            _frames.Remove(frameType);
+            Frames.Remove(frameType);
             return true;
         }
 
@@ -205,10 +217,10 @@ namespace Id3
         {
             Type frameType = typeof(TFrame);
 
-            if (!_frames.ContainsKey(frameType))
+            if (!Frames.ContainsKey(frameType))
                 return 0;
 
-            object frameObj = _frames[frameType];
+            object frameObj = Frames[frameType];
             var removalCount = 0;
             if (frameObj is IList list)
             {
@@ -222,13 +234,13 @@ namespace Id3
                 }
 
                 if (list.Count == 0)
-                    _frames.Remove(frameType);
+                    Frames.Remove(frameType);
             } else
             {
                 var frame = (TFrame)frameObj;
                 if (predicate(frame))
                 {
-                    _frames.Remove(frameType);
+                    Frames.Remove(frameType);
                     removalCount++;
                 }
             }
@@ -407,7 +419,10 @@ namespace Id3
         /// <summary>
         ///     Collection of frames, keyed by the frame type.
         /// </summary>
-        private readonly Dictionary<Type, object> _frames = new Dictionary<Type, object>(50);
+        private Dictionary<Type, object> _frames;
+
+        private Dictionary<Type, object> Frames =>
+            _frames ?? (_frames = new Dictionary<Type, object>(50));
 
         /// <summary>
         ///     List of all multiple instance frame types and factory functions to create instances of their collection classes.
@@ -424,8 +439,8 @@ namespace Id3
             };
 
         /// <summary>
-        ///     Adds an <see cref="Id3Frame" /> instance to the _frames collection. Since this is not a concrete frame type, the
-        ///     method needs to do a bit of work to figure out how to add it to the _frames collection.
+        ///     Adds an <see cref="Id3Frame" /> instance to the Frames collection. Since this is not a concrete frame type, the
+        ///     method needs to do a bit of work to figure out how to add it to the Frames collection.
         ///     This method is meant to be called by <see cref="Id3Handler" /> instances when they are reading the ID3 data and
         ///     populating this object.
         /// </summary>
@@ -433,36 +448,36 @@ namespace Id3
         internal void AddUntypedFrame(Id3Frame frame)
         {
             Type frameType = frame.GetType();
-            bool containsKey = _frames.ContainsKey(frameType);
+            bool containsKey = Frames.ContainsKey(frameType);
             if (MultiInstanceFrameTypes.ContainsKey(frameType))
             {
                 IList list;
                 if (containsKey)
-                    list = (IList)_frames[frameType];
+                    list = (IList)Frames[frameType];
                 else
                 {
                     list = MultiInstanceFrameTypes[frameType]();
-                    _frames.Add(frameType, list);
+                    Frames.Add(frameType, list);
                 }
 
                 list.Add(frame);
             } else
             {
-                //If the frame is a single-instance frame, simply add or update it in the _frames collection.
+                //If the frame is a single-instance frame, simply add or update it in the Frames collection.
                 if (containsKey)
-                    _frames[frameType] = frame;
+                    Frames[frameType] = frame;
                 else
-                    _frames.Add(frameType, frame);
+                    Frames.Add(frameType, frame);
             }
         }
 
         private TFrame GetSingleFrame<TFrame>()
             where TFrame : Id3Frame, new()
         {
-            if (_frames.TryGetValue(typeof(TFrame), out object frameObj))
+            if (Frames.TryGetValue(typeof(TFrame), out object frameObj))
                 return (TFrame)frameObj;
             var frame = new TFrame();
-            _frames.Add(typeof(TFrame), frame);
+            Frames.Add(typeof(TFrame), frame);
             return frame;
         }
 
@@ -470,17 +485,17 @@ namespace Id3
             where TFrame : Id3Frame
         {
             Type frameType = typeof(TFrame);
-            bool containsKey = _frames.ContainsKey(frameType);
+            bool containsKey = Frames.ContainsKey(frameType);
             if (frame == null)
             {
                 if (containsKey)
-                    _frames.Remove(frameType);
+                    Frames.Remove(frameType);
             } else
             {
                 if (containsKey)
-                    _frames[frameType] = frame;
+                    Frames[frameType] = frame;
                 else
-                    _frames.Add(frameType, frame);
+                    Frames.Add(frameType, frame);
             }
         }
 
@@ -488,10 +503,10 @@ namespace Id3
             where TFrame : Id3Frame
             where TFrameList : IList<TFrame>, new()
         {
-            if (_frames.TryGetValue(typeof(TFrame), out object frameListObj))
+            if (Frames.TryGetValue(typeof(TFrame), out object frameListObj))
                 return (TFrameList)frameListObj;
             var framesList = new TFrameList();
-            _frames.Add(typeof(TFrame), framesList);
+            Frames.Add(typeof(TFrame), framesList);
             return framesList;
         }
         #endregion
