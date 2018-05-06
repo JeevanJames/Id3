@@ -1,6 +1,6 @@
 ﻿#region --- License & Copyright Notice ---
 /*
-Copyright (c) 2005-2012 Jeevan James
+Copyright (c) 2005-2018 Jeevan James
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,7 @@ namespace Id3.Files
 {
     public sealed class FileNameInfoProvider : InfoProvider
     {
+        /// <inheritdoc />
         protected override Id3Tag[] GetTagInfo(Id3Tag tag)
         {
             string filename = Path.GetFileNameWithoutExtension(Inputs.FileName);

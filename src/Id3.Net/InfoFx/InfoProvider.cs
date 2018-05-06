@@ -28,15 +28,9 @@ namespace Id3.InfoFx
     {
         private InfoProviderProperties _properties;
 
-        public Id3Tag[] GetInfo(InfoProviderInputs inputs)
-        {
-            return GetInfo(null, inputs);
-        }
+        public Id3Tag[] GetInfo(InfoProviderInputs inputs) => GetInfo(null, inputs);
 
-        public Id3Tag[] GetInfo(Id3Tag tag)
-        {
-            return GetInfo(tag, InfoProviderInputs.Default);
-        }
+        public Id3Tag[] GetInfo(Id3Tag tag) => GetInfo(tag, InfoProviderInputs.Default);
 
         public Id3Tag[] GetInfo(Id3Tag tag, InfoProviderInputs inputs)
         {
@@ -53,7 +47,7 @@ namespace Id3.InfoFx
             {
                 throw;
             }
-            catch (TargetInvocationException ex)
+            catch (TargetInvocationException ex) when (ex.InnerException != null)
             {
                 throw new InfoProviderException(ex.InnerException.Message, ex.InnerException);
             }

@@ -1,6 +1,6 @@
 ﻿#region --- License & Copyright Notice ---
 /*
-Copyright (c) 2005-2012 Jeevan James
+Copyright (c) 2005-2018 Jeevan James
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,8 +50,7 @@ namespace Id3.Files
         /// <inheritdoc />
         /// <summary>
         ///     Initializes a new instance of the <see cref="T:Id3.Files.FileNamer" /> class with one or more file naming patterns,
-        ///     specified
-        ///     in order of priority.
+        ///     specified in order of priority.
         /// </summary>
         /// <param name="patterns">The file naming patterns to use, in order of priority.</param>
         public FileNamer([NotNull] params string[] patterns) : this((IEnumerable<string>)patterns)
