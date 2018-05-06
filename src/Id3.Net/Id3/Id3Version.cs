@@ -19,7 +19,7 @@ limitations under the License.
 
 namespace Id3
 {
-    public enum Id3Version
+    public enum Id3Version : byte
     {
         V1X = 1,
         V23 = 3,

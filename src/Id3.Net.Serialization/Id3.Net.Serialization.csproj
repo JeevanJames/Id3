@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net40</TargetFrameworks>
+    <RootNamespace>Id3.Serialization</RootNamespace>
+    <PackageId>ID3.Serialization</PackageId>
+    <Version>0.5.0-beta.1</Version>
+    <Authors>Jeevan James</Authors>
+    <Company>Jeevan James</Company>
+    <Product>ID3.NET</Product>
+    <Description>
+      ID3.NET is a set of libraries for reading, modifying and writing ID3 and Lyrics3 tags in MP3 audio files.
+This package provides extensions to serialize ID3.NET objects using the IFormatter-based serialization classes.
+    </Description>
+    <Copyright>Copyright (c) Jeevan James 2005-2018</Copyright>
+    <PackageLicenseUrl>https://github.com/JeevanJames/Id3/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/JeevanJames/Id3</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/JeevanJames/Id3/raw/master/icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/JeevanJames/Id3.git</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>Serialization Surrogates IFormatter ID3 ID3.NET Lyrics3 MP3 ID3v1 ID3v1.0 ID3v1.1 ID3v2.3 Tag Tags Tagging Audio</PackageTags>
+    <PackageReleaseNotes>Migrated to netstandard20 and .NET 4.x frameworks</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <DocumentationFile>bin\Release\netstandard2.0\Id3.Net.Serialization.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <DocumentationFile>bin\Debug\netstandard2.0\Id3.Net.Serialization.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net40|AnyCPU'">
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <DocumentationFile>bin\Release\net40\Id3.Net.Serialization.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net40|AnyCPU'">
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <DocumentationFile>bin\Debug\net40\Id3.Net.Serialization.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Id3.Net\Id3.Net.csproj" />
+  </ItemGroup>
+
+</Project>

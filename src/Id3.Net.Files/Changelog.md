@@ -1,5 +1,7 @@
 ﻿# v0.5.0-beta.1
 
+* __[Breaking]__ Changed namespace for all existing classes from `Id3` to `Id3.Files`.
+
 ## FileNamer
 * __[Breaking]__ Removed the `Rename` methods on `FileNamer`. The class will now only provide suggestions.
 * __[Breaking]__ Added a named parameter `fileMask` to the `GetSuggestions` method, instead of hardcoding the file mask as `*.mp3`.

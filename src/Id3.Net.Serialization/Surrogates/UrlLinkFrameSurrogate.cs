@@ -1,6 +1,6 @@
 ﻿#region --- License & Copyright Notice ---
 /*
-Copyright (c) 2005-2018 Jeevan James
+Copyright (c) 2005-2012 Jeevan James
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,26 +17,22 @@ limitations under the License.
 */
 #endregion
 
-using System;
-using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 
-[assembly: InternalsVisibleTo("Id3.Net.Serialization")]
-
-namespace Id3
+namespace Id3.Serialization.Surrogates
 {
-    public sealed class Id3Exception : Exception
+    internal sealed class UrlLinkFrameSurrogate : Id3FrameSurrogate<UrlLinkFrame>
     {
-        public Id3Exception()
+        protected override void GetFrameData(UrlLinkFrame frame, SerializationInfo info, StreamingContext context)
         {
+            info.AddValue("Url", frame.Url);
         }
 
-        public Id3Exception(string message) : base(message)
+        protected override UrlLinkFrame SetObjectData(UrlLinkFrame frame, SerializationInfo info, StreamingContext context,
+            ISurrogateSelector selector)
         {
-        }
-
-        public Id3Exception(string message, Exception innerException)
-            : base(message, innerException)
-        {
+            frame.Url = info.GetString("Url");
+            return frame;
         }
     }
 }

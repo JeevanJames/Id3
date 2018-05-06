@@ -22,7 +22,7 @@ namespace Id3
     /// <summary>
     ///     Specifies families of ID3 tag versions that are mutually-inclusive.
     /// </summary>
-    public enum Id3TagFamily
+    public enum Id3TagFamily : byte
     {
         /// <summary>
         ///     Indicates ID3 tags in the v2 range (currently v2.2, v2.3 and v2.4). These tags appear at

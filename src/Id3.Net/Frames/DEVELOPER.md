@@ -7,3 +7,11 @@ The Frames folder contains:
 * Abstract base classes for the various categories of frames:
     * `TextFrameBase<TValue>` for frames that store textual data.
     * 
+
+## When adding new frame types
+The following areas need to be updated:
+* `Id3.Net`
+    * Add a property for it in the `Id3Tag` class
+    * Handle it in all available ID3 handlers.
+* `Id3.Net.Serialization`: Add a serialization surrogate for the frame (or reuse an existing one) and register it in the `SerializationExtensions.IncludeId3SerializationSupport` method.
+* `Id3.Net.Files`: Check whether the new frame can be used as a placeholder in a file naming pattern for the `FileNamer` class. If so, add it to the `FileNamer._allowedNames` static field.
