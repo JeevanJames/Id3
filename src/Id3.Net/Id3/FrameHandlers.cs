@@ -29,6 +29,13 @@ namespace Id3
     /// </summary>
     internal sealed class FrameHandler
     {
+        /// <summary>
+        ///     Initializes an instance of the <see cref="FrameHandler"/> class.
+        /// </summary>
+        /// <param name="frameId">The ID of the frame.</param>
+        /// <param name="type">Type of the <see cref="Id3Frame"/>.</param>
+        /// <param name="encoder">Delegate to encode a <see cref="Id3Frame"/> into a byte array.</param>
+        /// <param name="decoder">Delegate to decode a byte array into a <see cref="Id3Frame"/>.</param>
         internal FrameHandler(string frameId, Type type, Func<Id3Frame, byte[]> encoder, Func<byte[], Id3Frame> decoder)
         {
             FrameId = frameId;
@@ -37,31 +44,56 @@ namespace Id3
             Decoder = decoder;
         }
 
+        /// <summary>
+        ///     The ID of the frame.
+        /// </summary>
         internal string FrameId { get; }
 
+        /// <summary>
+        ///     Type of the <see cref="Id3Frame"/>.
+        /// </summary>
         internal Type Type { get; }
 
+        /// <summary>
+        ///     Delegate to encode a <see cref="Id3Frame"/> into a byte array.
+        /// </summary>
         internal Func<Id3Frame, byte[]> Encoder { get; }
 
+        /// <summary>
+        ///     Delegate to decode a byte array into a <see cref="Id3Frame"/>.
+        /// </summary>
         internal Func<byte[], Id3Frame> Decoder { get; }
     }
 
     internal sealed class FrameHandlers : Collection<FrameHandler>
     {
+        /// <summary>
+        ///     Shortcut method to add a <see cref="FrameHandler"/> instance to the collection.
+        /// </summary>
+        /// <typeparam name="TFrame">The type of the <see cref="Id3Frame"/></typeparam>
+        /// <param name="frameId">The ID of the frame.</param>
+        /// <param name="encoder">Delegate to encode a <see cref="Id3Frame"/> into a byte array.</param>
+        /// <param name="decoder">Delegate to decode a byte array into a <see cref="Id3Frame"/>.</param>
         internal void Add<TFrame>(string frameId, Func<Id3Frame, byte[]> encoder, Func<byte[], Id3Frame> decoder)
             where TFrame : Id3Frame
         {
             Add(new FrameHandler(frameId, typeof(TFrame), encoder, decoder));
         }
 
-        internal FrameHandler this[string frameId]
-        {
-            get { return this.FirstOrDefault(mapping => mapping.FrameId == frameId); }
-        }
+        /// <summary>
+        ///     Returns a <see cref="FrameHandler"/> based on the specified <paramref name="frameId"/>.
+        /// </summary>
+        /// <param name="frameId">The ID of the frame.</param>
+        /// <returns>A <see cref="FrameHandler"/> instance that matches the specified <paramref name="frameId"/>.</returns>
+        internal FrameHandler this[string frameId] =>
+            this.FirstOrDefault(mapping => mapping.FrameId == frameId);
 
-        internal FrameHandler this[Type type]
-        {
-            get { return this.FirstOrDefault(mapping => mapping.Type == type); }
-        }
+        /// <summary>
+        ///     Returns a <see cref="FrameHandler"/> based on the specified frame type.
+        /// </summary>
+        /// <param name="type">The type of the frame.</param>
+        /// <returns>A <see cref="FrameHandler"/> instance that matches the specified <paramref name="type"/>.</returns>
+        internal FrameHandler this[Type type] =>
+            this.FirstOrDefault(mapping => mapping.Type == type);
     }
 }

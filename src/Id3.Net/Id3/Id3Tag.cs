@@ -62,7 +62,7 @@ namespace Id3
                 return this;
 
             //Get the ID3 tag handlers for the destination and create a empty tag
-            Id3Handler destinationHandler = Id3Handler.GetHandler(version);
+            var destinationHandler = Id3Handler.GetHandler(version);
             Id3Tag destinationTag = destinationHandler.CreateTag();
 
             foreach (Id3Frame sourceFrame in this)
@@ -72,7 +72,8 @@ namespace Id3
                     string frameId = unknownFrame.Id;
                     Id3Frame destinationFrame = destinationHandler.GetFrameFromFrameId(frameId);
                     destinationTag.AddUntypedFrame(destinationFrame);
-                } else
+                }
+                else
                     destinationTag.AddUntypedFrame(sourceFrame);
             }
 
@@ -107,7 +108,8 @@ namespace Id3
                 {
                     foreach (Id3Frame frame in list)
                         yield return frame;
-                } else
+                }
+                else
                     yield return (Id3Frame)kvp.Value;
             }
         }
@@ -120,7 +122,8 @@ namespace Id3
             //Build a list of keys from the Frames dictionary to delete
             var keysToDelete = new List<Type>(Frames.Count);
 
-            Parallel.ForEach(Frames, (kvp, state) => {
+            Parallel.ForEach(Frames, (kvp, state) =>
+            {
                 //If the item value is a list, remove any item that is not assigned
                 if (kvp.Value is IList frameList)
                 {
@@ -134,7 +137,8 @@ namespace Id3
                     //If the list is empty, mark the item for removal
                     if (frameList.Count == 0)
                         keysToDelete.Add(kvp.Key);
-                } else
+                }
+                else
                 {
                     //Get the item value as a frame and mark it for removal if it is unassigned
                     var frame = (Id3Frame)kvp.Value;
@@ -177,7 +181,7 @@ namespace Id3
         /// <returns>Total number of frames in the tag.</returns>
         public int GetCount(bool onlyAssignedFrames = true)
         {
-            var count = 0;
+            int count = 0;
             foreach (KeyValuePair<Type, object> kvp in Frames)
             {
                 if (kvp.Value is IList list)
@@ -221,7 +225,7 @@ namespace Id3
                 return 0;
 
             object frameObj = Frames[frameType];
-            var removalCount = 0;
+            int removalCount = 0;
             if (frameObj is IList list)
             {
                 for (int i = list.Count - 1; i >= 0; i--)
@@ -235,7 +239,8 @@ namespace Id3
 
                 if (list.Count == 0)
                     Frames.Remove(frameType);
-            } else
+            }
+            else
             {
                 var frame = (TFrame)frameObj;
                 if (predicate(frame))
@@ -428,7 +433,8 @@ namespace Id3
         ///     List of all multiple instance frame types and factory functions to create instances of their collection classes.
         /// </summary>
         private static readonly Dictionary<Type, Func<IList>> MultiInstanceFrameTypes =
-            new Dictionary<Type, Func<IList>> {
+            new Dictionary<Type, Func<IList>>
+            {
                 [typeof(ArtistUrlFrame)] = () => new ArtistUrlFrameList(),
                 [typeof(CommentFrame)] = () => new CommentFrameList(),
                 [typeof(CommercialUrlFrame)] = () => new CommercialUrlFrameList(),
@@ -439,9 +445,9 @@ namespace Id3
             };
 
         /// <summary>
-        ///     Adds an <see cref="Id3Frame" /> instance to the Frames collection. Since this is not a concrete frame type, the
+        ///     Adds an <see cref="Id3Frame"/> instance to the Frames collection. Since this is not a concrete frame type, the
         ///     method needs to do a bit of work to figure out how to add it to the Frames collection.
-        ///     This method is meant to be called by <see cref="Id3Handler" /> instances when they are reading the ID3 data and
+        ///     This method is meant to be called by <see cref="Id3Handler"/> instances when they are reading the ID3 data and
         ///     populating this object.
         /// </summary>
         /// <param name="frame">The <see cref="Id3Frame" /> instance to add.</param>
@@ -461,7 +467,8 @@ namespace Id3
                 }
 
                 list.Add(frame);
-            } else
+            }
+            else
             {
                 //If the frame is a single-instance frame, simply add or update it in the Frames collection.
                 if (containsKey)
@@ -490,7 +497,8 @@ namespace Id3
             {
                 if (containsKey)
                     Frames.Remove(frameType);
-            } else
+            }
+            else
             {
                 if (containsKey)
                     Frames[frameType] = frame;

@@ -40,7 +40,7 @@ namespace Id3.v1
                 return null;
 
             stream.Seek(-128, SeekOrigin.End);
-            var tagBytes = new byte[128];
+            byte[] tagBytes = new byte[128];
             stream.Read(tagBytes, 0, 128);
             return tagBytes;
         }
@@ -51,7 +51,7 @@ namespace Id3.v1
                 return false;
 
             stream.Seek(-128, SeekOrigin.End);
-            var magicBytes = new byte[3];
+            byte[] magicBytes = new byte[3];
             stream.Read(magicBytes, 0, 3);
             string magic = TextEncodingHelper.GetDefaultString(magicBytes, 0, 3);
             return magic == "TAG";
@@ -65,7 +65,7 @@ namespace Id3.v1
                 return null;
 
             stream.Seek(-125, SeekOrigin.End);
-            var tagBytes = new byte[125];
+            byte[] tagBytes = new byte[125];
             stream.Read(tagBytes, 0, 125);
 
             Id3Tag tag = CreateTag();
@@ -79,14 +79,16 @@ namespace Id3.v1
             {
                 comment = ReadTagString(tagBytes, 94, 28);
                 tag.Track.Value = tagBytes[123];
-            } else
+            }
+            else
             {
                 comment = ReadTagString(tagBytes, 94, 30);
                 tag.Track.Value = -1;
             }
             if (!string.IsNullOrEmpty(comment))
             {
-                var commentFrame = new CommentFrame {
+                var commentFrame = new CommentFrame
+                {
                     Comment = comment
                 };
                 tag.Comments.Add(commentFrame);
@@ -99,7 +101,7 @@ namespace Id3.v1
         {
             Encoding encoding = TextEncodingHelper.GetDefaultEncoding();
 
-            var bytes = new byte[128];
+            byte[] bytes = new byte[128];
             encoding.GetBytes("TAG").CopyTo(bytes, 0);
 
             byte[] itemBytes;
