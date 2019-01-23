@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using Id3.Frames;
 using Id3.v1;
 using Id3.v2;
 

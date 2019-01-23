@@ -21,7 +21,7 @@ using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-namespace Id3
+namespace Id3.Frames
 {
     [DebuggerDisplay("Track {Value} of {TrackCount}")]
     public sealed class TrackFrame : TextFrameBase<int>

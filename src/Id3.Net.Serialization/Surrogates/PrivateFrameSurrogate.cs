@@ -19,6 +19,7 @@ limitations under the License.
 
 using System;
 using System.Runtime.Serialization;
+using Id3.Frames;
 
 namespace Id3.Serialization.Surrogates
 {

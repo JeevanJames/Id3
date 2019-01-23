@@ -20,6 +20,7 @@ limitations under the License.
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Id3.Frames;
 
 namespace Id3
 {

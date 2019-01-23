@@ -20,6 +20,7 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Id3.Frames;
 
 namespace Id3.v2
 {

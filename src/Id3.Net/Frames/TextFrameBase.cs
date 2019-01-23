@@ -19,7 +19,7 @@ limitations under the License.
 
 using System.Diagnostics;
 
-namespace Id3
+namespace Id3.Frames
 {
     /// <summary>
     ///     Represents an ID3 frame that contains textual data

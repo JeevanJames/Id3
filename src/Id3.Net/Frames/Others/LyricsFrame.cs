@@ -19,10 +19,9 @@ limitations under the License.
 
 using System;
 using System.Collections.ObjectModel;
-
 using JetBrains.Annotations;
 
-namespace Id3
+namespace Id3.Frames
 {
     public sealed class LyricsFrame : Id3Frame
     {

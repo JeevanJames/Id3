@@ -21,7 +21,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Id3
+namespace Id3.Frames
 {
     public sealed class PrivateFrame : Id3Frame
     {

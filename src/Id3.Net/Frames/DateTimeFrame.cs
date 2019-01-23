@@ -20,7 +20,7 @@ limitations under the License.
 using System;
 using System.Globalization;
 
-namespace Id3
+namespace Id3.Frames
 {
     public abstract class DateTimeFrame : TextFrameBase<DateTime?>
     {

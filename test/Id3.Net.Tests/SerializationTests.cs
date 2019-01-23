@@ -20,7 +20,7 @@ limitations under the License.
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using Id3.Frames;
 using Id3.Serialization;
 
 using Xunit;

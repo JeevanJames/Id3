@@ -20,10 +20,9 @@ limitations under the License.
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-
 using JetBrains.Annotations;
 
-namespace Id3
+namespace Id3.Frames
 {
     public sealed class CommentFrame : Id3Frame
     {

@@ -19,7 +19,7 @@ limitations under the License.
 
 using System;
 
-namespace Id3
+namespace Id3.Frames
 {
     public sealed class RecordingDateFrame : DateTimeFrame
     {

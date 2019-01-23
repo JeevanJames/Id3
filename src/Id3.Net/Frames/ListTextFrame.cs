@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Id3
+namespace Id3.Frames
 {
     public abstract class ListTextFrame : TextFrameBase<IList<string>>
     {

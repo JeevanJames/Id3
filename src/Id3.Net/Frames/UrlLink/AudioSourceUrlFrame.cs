@@ -19,7 +19,7 @@ limitations under the License.
 
 using JetBrains.Annotations;
 
-namespace Id3
+namespace Id3.Frames
 {
     public sealed class AudioSourceUrlFrame : UrlLinkFrame
     {

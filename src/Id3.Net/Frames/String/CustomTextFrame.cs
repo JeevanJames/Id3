@@ -19,7 +19,7 @@ limitations under the License.
 
 using System.Collections.ObjectModel;
 
-namespace Id3
+namespace Id3.Frames
 {
     public sealed class CustomTextFrame : TextFrame
     {

@@ -18,10 +18,9 @@ limitations under the License.
 #endregion
 
 using System.Collections.ObjectModel;
-
 using JetBrains.Annotations;
 
-namespace Id3
+namespace Id3.Frames
 {
     public sealed class ArtistUrlFrame : UrlLinkFrame
     {

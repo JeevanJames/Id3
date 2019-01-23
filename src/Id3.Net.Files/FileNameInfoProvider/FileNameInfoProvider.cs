@@ -19,7 +19,7 @@ limitations under the License.
 
 using System;
 using System.IO;
-
+using Id3.Frames;
 using Id3.InfoFx;
 
 namespace Id3.Files

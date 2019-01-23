@@ -19,6 +19,7 @@ limitations under the License.
 
 using System;
 using System.Collections.ObjectModel;
+using Id3.Frames;
 
 namespace Id3.InfoFx
 {

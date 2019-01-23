@@ -25,7 +25,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 
 using Id3.Files.Resources;
-
+using Id3.Frames;
 using JetBrains.Annotations;
 
 namespace Id3.Files

@@ -20,7 +20,7 @@ limitations under the License.
 using System.Collections.ObjectModel;
 using System.IO;
 
-namespace Id3
+namespace Id3.Frames
 {
     public sealed class PictureFrame : Id3Frame
     {

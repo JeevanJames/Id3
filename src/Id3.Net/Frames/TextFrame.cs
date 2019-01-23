@@ -17,7 +17,7 @@ limitations under the License.
 */
 #endregion
 
-namespace Id3
+namespace Id3.Frames
 {
     public abstract class TextFrame : TextFrameBase<string>
     {

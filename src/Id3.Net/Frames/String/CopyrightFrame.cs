@@ -19,10 +19,9 @@ limitations under the License.
 
 using System;
 using System.Text.RegularExpressions;
-
 using Id3.Resources;
 
-namespace Id3
+namespace Id3.Frames
 {
     public sealed class CopyrightFrame : TextFrame
     {

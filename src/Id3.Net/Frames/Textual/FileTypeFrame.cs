@@ -20,7 +20,7 @@ limitations under the License.
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Id3
+namespace Id3.Frames
 {
     public class FileTypeFrame : TextFrameBase<FileAudioType>
     {
