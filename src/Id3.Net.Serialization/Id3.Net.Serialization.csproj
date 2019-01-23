@@ -20,6 +20,7 @@ This package provides extensions to serialize ID3.NET objects using the IFormatt
     <RepositoryType>Git</RepositoryType>
     <PackageTags>Serialization Surrogates IFormatter ID3 ID3.NET Lyrics3 MP3 ID3v1 ID3v1.0 ID3v1.1 ID3v2.3 Tag Tags Tagging Audio</PackageTags>
     <PackageReleaseNotes>Migrated to netstandard20 and .NET 4.x frameworks</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">

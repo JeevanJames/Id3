@@ -1,0 +1,25 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+configuration: Release
+environment:
+  CODECOV_TOKEN: 4930e13c-d6c4-4370-a8dc-70c38a3e7aae
+before_build:
+- pwsh: >-
+    dotnet restore
+
+    choco install codecov
+build:
+  verbosity: minimal
+test_script:
+- pwsh: >-
+    dotnet test --blame ./src/Id3.Net.Tests/Id3.Net.Tests.csproj /p:CollectCoverage=true /p:Exclude=\"[xunit.*]*\" /p:CoverletOutputFormat=opencover
+
+    codecov -f "./src/Id3.Net.Tests/coverage.opencover.xml"
+artifacts:
+- path: '**/*.nupkg'
+  name: NuGet
+deploy:
+- provider: NuGet
+  api_key:
+    secure: 1EsewYvmcY1mezJgxG8QGZmrikfpIrr6AiyMuwckiPer+VobTN7xjjMvIN9h0sFd
+  artifact: /.*\.nupkg/

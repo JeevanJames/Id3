@@ -8,7 +8,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Id3.Net.Tests", "Id3.Net.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Id3.Net.Files", "Id3.Net.Files\Id3.Net.Files.csproj", "{BC9BE840-D56B-41AB-A2C8-4B46175CEF0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Id3.Net.Serialization", "Id3.Net.Serialization\Id3.Net.Serialization.csproj", "{415620D0-99D0-45E6-894E-C12E18C36B33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Id3.Net.Serialization", "Id3.Net.Serialization\Id3.Net.Serialization.csproj", "{415620D0-99D0-45E6-894E-C12E18C36B33}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{83DB2DA3-CC47-4E43-928E-A481D07ECBAA}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
+		..\appveyor.yml = ..\appveyor.yml
+		..\icon.png = ..\icon.png
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
