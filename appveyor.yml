@@ -12,9 +12,9 @@ build:
   verbosity: minimal
 test_script:
 - pwsh: >-
-    dotnet test --blame ./src/Id3.Net.Tests/Id3.Net.Tests.csproj /p:CollectCoverage=true /p:Exclude=\"[xunit.*]*\" /p:CoverletOutputFormat=opencover
+    dotnet test --blame ./test/Id3.Net.Tests/Id3.Net.Tests.csproj /p:CollectCoverage=true /p:Exclude=\"[xunit.*]*\" /p:CoverletOutputFormat=opencover
 
-    codecov -f "./src/Id3.Net.Tests/coverage.opencover.xml"
+    codecov -f "./test/Id3.Net.Tests/coverage.opencover.xml"
 artifacts:
 - path: '**/*.nupkg'
   name: NuGet
