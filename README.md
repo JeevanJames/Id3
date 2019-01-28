@@ -1,4 +1,6 @@
 # ID3.NET
+[![Build status](https://img.shields.io/appveyor/ci/JeevanJames/Id3.svg)](https://ci.appveyor.com/project/JeevanJames/id3/branch/master) [![Test status](https://img.shields.io/appveyor/tests/JeevanJames/id3.svg)](https://ci.appveyor.com/project/JeevanJames/id3/branch/master) [![codecov](https://codecov.io/gh/JeevanJames/Id3/branch/master/graph/badge.svg)](https://codecov.io/gh/JeevanJames/Id3) [![NuGet Version](http://img.shields.io/nuget/v/Id3.svg?style=flat)](https://www.nuget.org/packages/Id3/) [![NuGet Downloads](https://img.shields.io/nuget/dt/Id3.svg)](https://www.nuget.org/packages/Id3/)
+
 ID3.NET is a set of libraries for reading, modifying and writing ID3 and Lyrics3 tags in MP3 audio files.
 The core library supports netstandard20 and the full .NET 4.x frameworks.
 
