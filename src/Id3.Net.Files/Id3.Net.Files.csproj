@@ -54,6 +54,7 @@ This package provides utilities for file handling.</Description>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Id3.Net.InfoFx\Id3.Net.InfoFx.csproj" />
     <ProjectReference Include="..\Id3.Net\Id3.Net.csproj" />
   </ItemGroup>
 

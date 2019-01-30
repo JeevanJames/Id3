@@ -42,7 +42,7 @@ namespace Id3.InfoFx
         }
 
         /// <inheritdoc/>
-        protected InfoProviderException(SerializationInfo info, StreamingContext context) : base(info, context)
+        public InfoProviderException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }
