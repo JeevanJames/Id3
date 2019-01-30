@@ -19,28 +19,35 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
 namespace Id3.InfoFx
 {
+    /// <summary>
+    ///     Represents the base class for info providers.
+    /// </summary>
     public abstract class InfoProvider
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private InfoProviderProperties _properties;
 
-        public Id3Tag[] GetInfo(InfoProviderInputs inputs) => GetInfo(null, inputs);
-
-        public Id3Tag[] GetInfo(Id3Tag tag) => GetInfo(tag, InfoProviderInputs.Default);
-
-        public Id3Tag[] GetInfo(Id3Tag tag, InfoProviderInputs inputs)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="inputs"></param>
+        /// <returns></returns>
+        /// <exception cref="InfoProviderException">Thrown on any unhandled error.</exception>
+        public Id3Tag[] GetInfo(InfoProviderInputs inputs)
         {
             try
             {
-                Inputs = inputs ?? InfoProviderInputs.Default;
-                if (!MeetsInputCriteria(tag))
-                    throw new InfoProviderException("Required inputs do not exist in the tag parameter");
+                Inputs = inputs ?? new InfoProviderInputs();
+                if (!MeetsInputCriteria())
+                    throw new InfoProviderException("Required inputs do not meet the criteria of the info provider.");
 
-                Id3Tag[] result = GetTagInfo(tag);
+                Id3Tag[] result = GetTagInfo();
                 return result;
             }
             catch (InfoProviderException)
@@ -57,11 +64,11 @@ namespace Id3.InfoFx
             }
         }
 
-        public InfoProviderException TryGetInfo(Id3Tag tag, out Id3Tag[] resultTags)
+        public InfoProviderException TryGetInfo(InfoProviderInputs inputs, out Id3Tag[] resultTags)
         {
             try
             {
-                resultTags = GetInfo(tag);
+                resultTags = GetInfo(inputs);
                 return null;
             }
             catch (InfoProviderException ex)
@@ -71,31 +78,60 @@ namespace Id3.InfoFx
             }
         }
 
-        public bool MeetsInputCriteria(Id3Tag tag)
-        {
-            if (!Properties.CanOmitTag && tag == null)
-                return false;
-            if (Properties.RequiresFilename && string.IsNullOrEmpty(Inputs.FileName))
-                return false;
-            if (!Properties.CanOmitTag && !FramesMeetCriteria(tag, Properties.RequiredInputs))
-                return false;
-            return true;
-        }
-
-        public InfoProviderProperties Properties =>
+        protected InfoProviderProperties Properties =>
             _properties ?? (_properties = GetProperties());
 
-        protected abstract Id3Tag[] GetTagInfo(Id3Tag tag);
+        /// <summary>
+        ///     When overridden in a derived class, gets the tag details.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Id3Tag[] GetTagInfo();
 
+        /// <summary>
+        ///     When overridden in a derived class, gets the properties of the info provider.
+        /// </summary>
+        /// <returns>A <see cref="InfoProviderProperties"/> instance.</returns>
         protected abstract InfoProviderProperties GetProperties();
 
         protected InfoProviderInputs Inputs { get; private set; }
 
+        /// <summary>
+        ///     Indicates whether the inputs meets the criteria for the info provider.
+        /// </summary>
+        /// <returns><c>true</c> if the inputs meet the criteria.</returns>
+        private bool MeetsInputCriteria()
+        {
+            // If the tag is required, but is not specified.
+            if (!Properties.CanOmitTag && Inputs.Tag == null)
+                return false;
+
+            // If a file name is required, but not specified.
+            if (Properties.RequiresFilename && string.IsNullOrWhiteSpace(Inputs.FileName))
+                return false;
+
+            // If a MP3 stream is required, but not specified.
+            if (Properties.RequiresStream && Inputs.Mp3Stream == null)
+                return false;
+
+            // If the tag is required, but does not contain the required frames.
+            if (!Properties.CanOmitTag && !FramesMeetCriteria(Inputs.Tag, Properties.RequiredInputs))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        ///     Indicates whether the specified ID3 <paramref name="tag"/> has the specified frames.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <param name="frameTypes">The ID3 frame types that the tag must contain.</param>
+        /// <returns><c>true</c> if the tag has all the specified frames.</returns>
         private static bool FramesMeetCriteria(Id3Tag tag, IEnumerable<Type> frameTypes)
         {
             foreach (Type frameType in frameTypes)
             {
                 Type frameTypeCopy = frameType;
+                // Frame must be assigned in order to be considered.
                 bool frameExists = tag.Any(frame => frame.GetType() == frameTypeCopy && frame.IsAssigned);
                 if (!frameExists)
                     return false;

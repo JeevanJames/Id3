@@ -27,7 +27,7 @@ namespace Id3.Files
     public sealed class FileNameInfoProvider : InfoProvider
     {
         /// <inheritdoc />
-        protected override Id3Tag[] GetTagInfo(Id3Tag tag)
+        protected override Id3Tag[] GetTagInfo()
         {
             string filename = Path.GetFileNameWithoutExtension(Inputs.FileName);
             if (filename == null)
@@ -39,13 +39,13 @@ namespace Id3.Files
 
             var result = new Id3Tag();
             result.Artists.Value.Add(breakup[0].Trim());
-            result.Title.Value = breakup[1].Trim();
+            result.Title = breakup[1].Trim();
             return new[] { result };
         }
 
         protected override InfoProviderProperties GetProperties()
         {
-            var properties = new InfoProviderProperties("File name", null) {
+            var properties = new InfoProviderProperties("File name") {
                 CanOmitTag = true,
                 RequiresFilename = true
             };

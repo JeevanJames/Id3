@@ -18,24 +18,37 @@ limitations under the License.
 #endregion
 
 using System.Collections.Generic;
+using System.IO;
 
 namespace Id3.InfoFx
 {
+    /// <summary>
+    ///     The inputs to the info provider.
+    ///     <para/>
+    ///     Depending on the specific info provider, none or more of the input properties specified in this class will
+    ///     be needed. Read the info provider's documentation for more details or use the info provider's
+    ///     <see cref="InfoProvider.Properties"/> property to understand the required inputs.
+    /// </summary>
     public sealed class InfoProviderInputs
     {
+        /// <summary>
+        ///     An <see cref="Id3Tag"/> instance that acts as an input.
+        /// </summary>
+        public Id3Tag Tag { get; set; }
+
+        /// <summary>
+        ///     The file name that acts as an input.
+        /// </summary>
         public string FileName { get; set; }
 
-        public int MatchingTolerance { get; set; }
+        /// <summary>
+        ///     The MP3 stream data that acts as an input.
+        /// </summary>
+        public Stream Mp3Stream { get; set; }
 
+        /// <summary>
+        ///     Additional properties that may be needed by certain info providers.
+        /// </summary>
         public IDictionary<string, string> Properties { get; } = new Dictionary<string, string>();
-
-        public static InfoProviderInputs Create(string filename)
-        {
-            return new InfoProviderInputs {
-                FileName = filename
-            };
-        }
-
-        public static InfoProviderInputs Default => new InfoProviderInputs();
     }
 }

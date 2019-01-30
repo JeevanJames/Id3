@@ -18,17 +18,31 @@ limitations under the License.
 #endregion
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Id3.InfoFx
 {
+    [Serializable]
     public sealed class InfoProviderException : Exception
     {
+        /// <inheritdoc/>
+        public InfoProviderException()
+        {
+        }
+
+        /// <inheritdoc/>
         public InfoProviderException(string message) : base(message)
         {
         }
 
+        /// <inheritdoc/>
         public InfoProviderException(string message, Exception innerException)
             : base(message, innerException)
+        {
+        }
+
+        /// <inheritdoc/>
+        protected InfoProviderException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

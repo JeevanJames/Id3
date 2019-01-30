@@ -19,10 +19,14 @@ limitations under the License.
 
 using System;
 using System.Collections.ObjectModel;
+
 using Id3.Frames;
 
 namespace Id3.InfoFx
 {
+    /// <summary>
+    ///     Collection of ID3 frame types.
+    /// </summary>
     public sealed class FrameTypes : Collection<Type>
     {
         public void Add<T>() where T : Id3Frame

@@ -21,14 +21,26 @@ using System;
 
 namespace Id3.InfoFx
 {
+    /// <summary>
+    ///     Attribute used to specify the <see cref="InfoProvider"/> classes in the assembly.
+    ///     <para/>
+    ///     Useful as a discovery mechanism for info providers.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public sealed class InfoProviderAttribute : Attribute
     {
         public InfoProviderAttribute(Type providerType)
         {
+            if (providerType == null)
+                throw new ArgumentNullException(nameof(providerType));
+            if (!providerType.IsSubclassOf(typeof(InfoProvider)))
+                throw new ArgumentException($"Specified type does not derive from {typeof(InfoProvider)}.", nameof(providerType));
             ProviderType = providerType;
         }
 
+        /// <summary>
+        ///     The type of the info provider.
+        /// </summary>
         public Type ProviderType { get; }
     }
 }
