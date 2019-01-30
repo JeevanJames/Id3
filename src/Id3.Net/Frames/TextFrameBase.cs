@@ -28,23 +28,25 @@ namespace Id3.Frames
     {
         public sealed override bool Equals(Id3Frame other)
         {
-            return base.Equals(other) &&
-                other is TextFrameBase text &&
+            return other is TextFrameBase text &&
                 text.TextValue == TextValue;
         }
 
-        public sealed override int GetHashCode() => TextValue.GetHashCode();
+        public sealed override int GetHashCode() =>
+            TextValue.GetHashCode();
 
-        public override string ToString() => IsAssigned ? TextValue : string.Empty;
+        public override string ToString() =>
+            IsAssigned ? TextValue : string.Empty;
 
         public Id3TextEncoding EncodingType { get; set; }
 
-        public override bool IsAssigned => !string.IsNullOrEmpty(TextValue);
+        public override bool IsAssigned =>
+            !string.IsNullOrEmpty(TextValue);
 
         /// <summary>
-        ///     Textual representation of the frame value. This is for internal usage only; derived classes should override the
-        ///     getters and setters to get and set the natively-typed value in the <see cref="TextFrameBase{TValue}.Value" />
-        ///     property.
+        ///     Textual representation of the frame value. This is for internal usage only; derived classes should override
+        ///     the getters and setters to get and set the natively-typed value in the
+        ///     <see cref="TextFrameBase{TValue}.Value" /> property.
         /// </summary>
         internal abstract string TextValue { get; set; }
     }

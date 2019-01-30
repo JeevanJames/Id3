@@ -23,6 +23,8 @@ using System.Runtime.Serialization;
 
 namespace Id3.Frames
 {
+    //TODO: Instead of deriving from TextFrameBase<T> and having a Value property of type IList<string>,
+    //have the ListTextFrame class implement IList<string> and get rid of the Value property.
     public abstract class ListTextFrame : TextFrameBase<IList<string>>
     {
         private const string Separator = "/";
