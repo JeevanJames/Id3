@@ -102,19 +102,22 @@ namespace Id3.InfoFx
         private bool MeetsInputCriteria()
         {
             // If the tag is required, but is not specified.
-            if (!Properties.CanOmitTag && Inputs.Tag == null)
+            bool requiresTag = (Properties.Requirements & InfoProviderRequirements.Tag) == InfoProviderRequirements.Tag;
+            if (requiresTag && Inputs.Tag == null)
                 return false;
 
             // If a file name is required, but not specified.
-            if (Properties.RequiresFilename && string.IsNullOrWhiteSpace(Inputs.FileName))
+            bool requiresFileName = (Properties.Requirements & InfoProviderRequirements.MediaFileName) == InfoProviderRequirements.MediaFileName;
+            if (requiresFileName && string.IsNullOrWhiteSpace(Inputs.FileName))
                 return false;
 
             // If a MP3 stream is required, but not specified.
-            if (Properties.RequiresStream && Inputs.Mp3Stream == null)
+            bool requiresStream = (Properties.Requirements & InfoProviderRequirements.MediaStream) == InfoProviderRequirements.MediaStream;
+            if (requiresStream && Inputs.Mp3Stream == null)
                 return false;
 
             // If the tag is required, but does not contain the required frames.
-            if (!Properties.CanOmitTag && !FramesMeetCriteria(Inputs.Tag, Properties.RequiredInputs))
+            if (requiresTag && !FramesMeetCriteria(Inputs.Tag, Properties.RequiredInputs))
                 return false;
 
             return true;

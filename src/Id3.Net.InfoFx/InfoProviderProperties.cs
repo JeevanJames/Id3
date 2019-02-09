@@ -26,6 +26,13 @@ namespace Id3.InfoFx
     /// </summary>
     public sealed class InfoProviderProperties
     {
+        /// <summary>
+        ///     Initializes an instance of the <see cref="InfoProviderProperties"/> class with a descriptive
+        ///     <paramref name="name"/> and optional <paramref name="url"/> and <paramref name="registrationUrl"/>.
+        /// </summary>
+        /// <param name="name">A descriptive name of the info provider.</param>
+        /// <param name="url"></param>
+        /// <param name="registrationUrl"></param>
         public InfoProviderProperties(string name, string url = null, string registrationUrl = null)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -51,12 +58,12 @@ namespace Id3.InfoFx
         public string RegistrationUrl { get; }
 
         /// <summary>
-        ///     Types of ID3 frames that are required for the info provider.
+        ///     Types of ID3 frames that are required as inputs for the info provider.
         /// </summary>
         public FrameTypes RequiredInputs { get; } = new FrameTypes();
 
         /// <summary>
-        ///     Types of ID3 frames that can be used but are not required for the info provider.
+        ///     Types of ID3 frames that can be used but are not required as inputs for the info provider.
         /// </summary>
         public FrameTypes OptionalInputs { get; } = new FrameTypes();
 
@@ -65,19 +72,14 @@ namespace Id3.InfoFx
         /// </summary>
         public FrameTypes AvailableOutputs { get; } = new FrameTypes();
 
-        /// <summary>
-        ///     Indicates whether the info provider requires the tag instance to work.
-        /// </summary>
-        public bool CanOmitTag { get; set; }
+        public InfoProviderRequirements Requirements { get; set; } = InfoProviderRequirements.Tag;
+    }
 
-        /// <summary>
-        ///     Indicates whether the info provider needs a MP3 file name to work.
-        /// </summary>
-        public bool RequiresFilename { get; set; }
-
-        /// <summary>
-        ///     Indicates whether the info provider needs a MP3 stream to work.
-        /// </summary>
-        public bool RequiresStream { get; set; }
+    [Flags]
+    public enum InfoProviderRequirements
+    {
+        Tag = 0x1,
+        MediaFileName = 0x2,
+        MediaStream = 0x4
     }
 }

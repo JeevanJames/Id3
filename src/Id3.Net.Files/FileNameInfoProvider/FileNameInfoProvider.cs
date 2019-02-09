@@ -46,8 +46,7 @@ namespace Id3.Files
         protected override InfoProviderProperties GetProperties()
         {
             var properties = new InfoProviderProperties("File name") {
-                CanOmitTag = true,
-                RequiresFilename = true
+                Requirements = InfoProviderRequirements.MediaFileName
             };
             properties.AvailableOutputs.Add<ArtistsFrame>();
             properties.AvailableOutputs.Add<TitleFrame>();

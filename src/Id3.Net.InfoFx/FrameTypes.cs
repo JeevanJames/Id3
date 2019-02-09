@@ -29,17 +29,39 @@ namespace Id3.InfoFx
     /// </summary>
     public sealed class FrameTypes : Collection<Type>
     {
-        public void Add<T>() where T : Id3Frame
+        /// <summary>
+        ///     Adds a frame type to the collection, based on the generic argument parameter.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="Id3Frame"/> to add.</typeparam>
+        /// <returns>A reference to this <see cref="FrameTypes"/>, allowing for chaining calls.</returns>
+        public FrameTypes Add<T>() where T : Id3Frame
         {
-            Add(typeof(T));
+            base.Add(typeof(T));
+            return this;
         }
 
-        public void AddMultiple(params Type[] types)
+        /// <summary>
+        ///     Adds one or more <see cref="Id3Frame"/> types to the collection.
+        /// </summary>
+        /// <param name="types">The <see cref="Id3Frame"/> types to add.</param>
+        /// <returns>A reference to this <see cref="FrameTypes"/>, allowing for chaining calls.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="types"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">
+        ///     Thrown if any type in <paramref name="types"/> is <c>null</c> or does not derive from <see cref="Id3Frame"/>.
+        /// </exception>
+        public FrameTypes Add(params Type[] types)
         {
             if (types == null)
                 throw new ArgumentNullException(nameof(types));
             foreach (Type type in types)
-                Add(type);
+            {
+                if (type == null)
+                    throw new ArgumentException($"Cannot specify null frame types", nameof(types));
+                if (!type.IsSubclassOf(typeof(Id3Frame)))
+                    throw new ArgumentException($"The type '{type.FullName}' is not a Id3Frame type.", nameof(types));
+                base.Add(type);
+            }
+            return this;
         }
     }
 }

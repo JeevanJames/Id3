@@ -9,6 +9,24 @@
                 Collection of ID3 frame types.
             </summary>
         </member>
+        <member name="M:Id3.InfoFx.FrameTypes.Add``1">
+            <summary>
+                Adds a frame type to the collection, based on the generic argument parameter.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:Id3.Frames.Id3Frame"/> to add.</typeparam>
+            <returns>A reference to this <see cref="T:Id3.InfoFx.FrameTypes"/>, allowing for chaining calls.</returns>
+        </member>
+        <member name="M:Id3.InfoFx.FrameTypes.Add(System.Type[])">
+            <summary>
+                Adds one or more <see cref="T:Id3.Frames.Id3Frame"/> types to the collection.
+            </summary>
+            <param name="types">The <see cref="T:Id3.Frames.Id3Frame"/> types to add.</param>
+            <returns>A reference to this <see cref="T:Id3.InfoFx.FrameTypes"/>, allowing for chaining calls.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="types"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown if any type in <paramref name="types"/> is <c>null</c> or does not derive from <see cref="T:Id3.Frames.Id3Frame"/>.
+            </exception>
+        </member>
         <member name="T:Id3.InfoFx.InfoProvider">
             <summary>
                 Represents the base class for info providers.
@@ -106,6 +124,15 @@
                 Details of an info provider.
             </summary>
         </member>
+        <member name="M:Id3.InfoFx.InfoProviderProperties.#ctor(System.String,System.String,System.String)">
+            <summary>
+                Initializes an instance of the <see cref="T:Id3.InfoFx.InfoProviderProperties"/> class with a descriptive
+                <paramref name="name"/> and optional <paramref name="url"/> and <paramref name="registrationUrl"/>.
+            </summary>
+            <param name="name">A descriptive name of the info provider.</param>
+            <param name="url"></param>
+            <param name="registrationUrl"></param>
+        </member>
         <member name="P:Id3.InfoFx.InfoProviderProperties.Name">
             <summary>
                 Descriptive name for the info provider.
@@ -123,32 +150,17 @@
         </member>
         <member name="P:Id3.InfoFx.InfoProviderProperties.RequiredInputs">
             <summary>
-                Types of ID3 frames that are required for the info provider.
+                Types of ID3 frames that are required as inputs for the info provider.
             </summary>
         </member>
         <member name="P:Id3.InfoFx.InfoProviderProperties.OptionalInputs">
             <summary>
-                Types of ID3 frames that can be used but are not required for the info provider.
+                Types of ID3 frames that can be used but are not required as inputs for the info provider.
             </summary>
         </member>
         <member name="P:Id3.InfoFx.InfoProviderProperties.AvailableOutputs">
             <summary>
                 Types of ID3 frames that are output by the info provider.
-            </summary>
-        </member>
-        <member name="P:Id3.InfoFx.InfoProviderProperties.CanOmitTag">
-            <summary>
-                Indicates whether the info provider requires the tag instance to work.
-            </summary>
-        </member>
-        <member name="P:Id3.InfoFx.InfoProviderProperties.RequiresFilename">
-            <summary>
-                Indicates whether the info provider needs a MP3 file name to work.
-            </summary>
-        </member>
-        <member name="P:Id3.InfoFx.InfoProviderProperties.RequiresStream">
-            <summary>
-                Indicates whether the info provider needs a MP3 stream to work.
             </summary>
         </member>
     </members>
