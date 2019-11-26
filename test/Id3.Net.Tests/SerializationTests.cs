@@ -17,12 +17,11 @@ limitations under the License.
 */
 #endregion
 
+using Id3.Frames;
+using Id3.Serialization;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using Id3.Frames;
-using Id3.Serialization;
-
 using Xunit;
 
 namespace Id3.Net.Tests
@@ -32,7 +31,8 @@ namespace Id3.Net.Tests
         [Fact]
         public void Serialize_deserialize_test()
         {
-            var tag = new Id3Tag {
+            var tag = new Id3Tag
+            {
                 Title = "There Will Never Be Another Tonight",
                 Album = "Waking up the neighbors",
                 Track = new TrackFrame(9, 15),
