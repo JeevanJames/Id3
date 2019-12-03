@@ -39,7 +39,8 @@ namespace Id3.Net.Tests
                 Year = 1991,
                 Genre = "Hard Rock",
                 Publisher = "A&M",
-                RecordingDate = new DateTime(1991, 03, 01)
+                RecordingDate = new DateTime(1991, 03, 01),
+                Popularimeter = new PopularimeterFrame(Rating.FourStars)
             };
             tag.Artists.Value.Add("Bryan Adams");
             tag.Composers.Value.Add("Bryan Adams");
@@ -67,6 +68,7 @@ namespace Id3.Net.Tests
             Assert.Equal(tag.Genre.Value, clonedTag.Genre.Value);
             Assert.Equal(tag.Publisher.Value, clonedTag.Publisher.Value);
             Assert.Equal(tag.RecordingDate.Value, clonedTag.RecordingDate.Value);
+            Assert.Equal(tag.Popularimeter.Rating, clonedTag.Popularimeter.Rating);
 
             Assert.Equal(tag.Artists.Value.Count, clonedTag.Artists.Value.Count);
             for (var i = 0; i < tag.Artists.Value.Count; i++)

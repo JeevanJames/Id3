@@ -17,6 +17,7 @@ limitations under the License.
 */
 #endregion
 
+using Id3.Frames;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,7 +26,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Id3.Frames;
 
 namespace Id3
 {
@@ -417,6 +417,17 @@ namespace Id3
         public YearFrame Year
         {
             get => GetSingleFrame<YearFrame>();
+            set => SetSingleFrame(value);
+        }
+
+        public PopularimeterFrame Popularimeter
+        {
+            //todo revisit
+            //http://id3.org/id3v2.4.0-frames
+            //4.17.   Popularimeter
+            //There may be more than one "POPM" frame in each tag, but only one with the same
+            //email address.
+            get => GetSingleFrame<PopularimeterFrame>();
             set => SetSingleFrame(value);
         }
         #endregion
