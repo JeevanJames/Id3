@@ -144,29 +144,29 @@ namespace Id3.Net.Tests
             Assert.Equal((long)int.MaxValue + 1, actualTag.Popularimeter.PlayCounter);
         }
 
-        //todo temp integrtion test
-        [Fact]
-        public void TodoTempVerifyActualFile()
-        {
-            //arrange
-            var path = @"C:\_Temp\rating test\01~K.A.N. - Rating.mp3";
-            var mp3 = new Mp3(path, Mp3Permissions.ReadWrite);
-            var tag = mp3.GetTag(Id3TagFamily.Version2X);
+        ////todo temp integrtion test
+        //[Fact]
+        //public void TodoTempVerifyActualFile()
+        //{
+        //    //arrange
+        //    var path = @"C:\_Temp\rating test\01~K.A.N. - Rating.mp3";
+        //    var mp3 = new Mp3(path, Mp3Permissions.ReadWrite);
+        //    var tag = mp3.GetTag(Id3TagFamily.Version2X);
 
-            //act 
-            var email = tag.Popularimeter.Email;
-            var playCount = tag.Popularimeter.PlayCounter;
-            tag.Popularimeter.Rating = Rating.FiveStars;
-            mp3.WriteTag(tag, Id3Version.V23);
-            mp3.Dispose();
+        //    //act 
+        //    var email = tag.Popularimeter.Email;
+        //    var playCount = tag.Popularimeter.PlayCounter;
+        //    tag.Popularimeter.Rating = Rating.FiveStars;
+        //    mp3.WriteTag(tag, Id3Version.V23);
+        //    mp3.Dispose();
 
-            //assert
-            var mp3Actual = new Mp3(path, Mp3Permissions.Read);
-            var tagActual = mp3Actual.GetTag(Id3TagFamily.Version2X);
-            Assert.Equal(Rating.FiveStars, tagActual.Popularimeter.Rating);
-            Assert.Equal(playCount, tagActual.Popularimeter.PlayCounter);
-            Assert.Equal(email, tag.Popularimeter.Email);
-        }
+        //    //assert
+        //    var mp3Actual = new Mp3(path, Mp3Permissions.Read);
+        //    var tagActual = mp3Actual.GetTag(Id3TagFamily.Version2X);
+        //    Assert.Equal(Rating.FiveStars, tagActual.Popularimeter.Rating);
+        //    Assert.Equal(playCount, tagActual.Popularimeter.PlayCounter);
+        //    Assert.Equal(email, tag.Popularimeter.Email);
+        //}
 
         //[Fact]
         //public void ReadABunchOfMp3sAndSeeIfItFails()
