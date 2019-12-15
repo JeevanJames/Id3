@@ -11,7 +11,7 @@
     <Description>ID3.NET is a set of libraries for reading, modifying and writing ID3 and Lyrics3 tags in MP3 audio files.
 This package provides utilities for file handling.</Description>
     <Copyright>Copyright (c) Jeevan James 2005-2018</Copyright>
-    <PackageLicenseUrl>https://github.com/JeevanJames/Id3/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/JeevanJames/Id3</PackageProjectUrl>
     <PackageIconUrl>https://github.com/JeevanJames/Id3/raw/master/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/JeevanJames/Id3.git</RepositoryUrl>
