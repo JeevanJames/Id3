@@ -17,12 +17,11 @@ limitations under the License.
 */
 #endregion
 
+using Id3.Frames;
+using Id3.Serialization;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using Id3.Frames;
-using Id3.Serialization;
-
 using Xunit;
 
 namespace Id3.Net.Tests
@@ -32,14 +31,16 @@ namespace Id3.Net.Tests
         [Fact]
         public void Serialize_deserialize_test()
         {
-            var tag = new Id3Tag {
+            var tag = new Id3Tag
+            {
                 Title = "There Will Never Be Another Tonight",
                 Album = "Waking up the neighbors",
                 Track = new TrackFrame(9, 15),
                 Year = 1991,
                 Genre = "Hard Rock",
                 Publisher = "A&M",
-                RecordingDate = new DateTime(1991, 03, 01)
+                RecordingDate = new DateTime(1991, 03, 01),
+                Popularimeter = new PopularimeterFrame(Rating.FourStars)
             };
             tag.Artists.Value.Add("Bryan Adams");
             tag.Composers.Value.Add("Bryan Adams");
@@ -66,7 +67,11 @@ namespace Id3.Net.Tests
             Assert.Equal(tag.Year.Value, clonedTag.Year.Value);
             Assert.Equal(tag.Genre.Value, clonedTag.Genre.Value);
             Assert.Equal(tag.Publisher.Value, clonedTag.Publisher.Value);
-            Assert.Equal(tag.RecordingDate.Value, clonedTag.RecordingDate.Value);
+
+            //https://github.com/JeevanJames/Id3/pull/27#issuecomment-565815805
+            //TDAT is only day and month
+            Assert.Equal(tag.RecordingDate.Value.Value.Month, clonedTag.RecordingDate.Value.Value.Month);
+            Assert.Equal(tag.RecordingDate.Value.Value.Day, clonedTag.RecordingDate.Value.Value.Day);
 
             Assert.Equal(tag.Artists.Value.Count, clonedTag.Artists.Value.Count);
             for (var i = 0; i < tag.Artists.Value.Count; i++)

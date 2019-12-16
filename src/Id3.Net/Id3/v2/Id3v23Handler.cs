@@ -17,11 +17,11 @@ limitations under the License.
 */
 #endregion
 
+using Id3.Frames;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Id3.Frames;
 
 namespace Id3.v2
 {
@@ -229,7 +229,7 @@ namespace Id3.v2
             mappings.Add<PictureFrame>("APIC", EncodePicture, DecodePicture);
             //mappings.Add<PlayCounterFrame>("PCNT", null, null);
             //mappings.Add<PlaylistDelayFrame>("TDLY", null, null);
-            //mappings.Add<PopularimeterFrame>("POPM", null, null);
+            mappings.Add<PopularimeterFrame>("POPM", EncodePopularimeter, DecodePopularimeter);
             //mappings.Add<PositionSynchronizationFrame>("POSS", null, null);
             mappings.Add<PrivateFrame>("PRIV", EncodePrivate, DecodePrivate);
             mappings.Add<PublisherFrame>("TPUB", EncodeText<PublisherFrame>, DecodeText<PublisherFrame>);
