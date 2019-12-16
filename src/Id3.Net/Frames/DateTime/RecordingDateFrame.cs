@@ -31,7 +31,7 @@ namespace Id3.Frames
         {
         }
 
-        protected override string DateTimeFormat => "yyyy-MM-dd";
+        protected override string DateTimeFormat => "ddMM";
 
         public static implicit operator RecordingDateFrame(DateTime value) => new RecordingDateFrame(value);
     }
