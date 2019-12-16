@@ -67,8 +67,11 @@ namespace Id3.Net.Tests
             Assert.Equal(tag.Year.Value, clonedTag.Year.Value);
             Assert.Equal(tag.Genre.Value, clonedTag.Genre.Value);
             Assert.Equal(tag.Publisher.Value, clonedTag.Publisher.Value);
-            Assert.Equal(tag.RecordingDate.Value, clonedTag.RecordingDate.Value);
-            Assert.Equal(tag.Popularimeter.Rating, clonedTag.Popularimeter.Rating);
+
+            //https://github.com/JeevanJames/Id3/pull/27#issuecomment-565815805
+            //TDAT is only day and month
+            Assert.Equal(tag.RecordingDate.Value.Value.Month, clonedTag.RecordingDate.Value.Value.Month);
+            Assert.Equal(tag.RecordingDate.Value.Value.Day, clonedTag.RecordingDate.Value.Value.Day);
 
             Assert.Equal(tag.Artists.Value.Count, clonedTag.Artists.Value.Count);
             for (var i = 0; i < tag.Artists.Value.Count; i++)
