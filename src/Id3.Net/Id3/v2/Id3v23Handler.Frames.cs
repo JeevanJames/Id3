@@ -252,10 +252,17 @@ namespace Id3.v2
             var frame = new PrivateFrame();
             byte[] splitterSequence = TextEncodingHelper.GetSplitterBytes(Id3TextEncoding.Iso8859_1);
             byte[] ownerIdBytes = ByteArrayHelper.GetBytesUptoSequence(data, 0, splitterSequence);
-            frame.OwnerId =
-                TextEncodingHelper.GetString(ownerIdBytes, 0, ownerIdBytes.Length, Id3TextEncoding.Iso8859_1);
-            frame.Data = new byte[data.Length - ownerIdBytes.Length - splitterSequence.Length];
-            Array.Copy(data, ownerIdBytes.Length + splitterSequence.Length, frame.Data, 0, frame.Data.Length);
+            if(ownerIdBytes != null)
+            {
+                frame.OwnerId =
+                    TextEncodingHelper.GetString(ownerIdBytes, 0, ownerIdBytes.Length, Id3TextEncoding.Iso8859_1);
+                frame.Data = new byte[data.Length - ownerIdBytes.Length - splitterSequence.Length];
+                Array.Copy(data, ownerIdBytes.Length + splitterSequence.Length, frame.Data, 0, frame.Data.Length);
+            }
+            else
+            {
+                frame.Data = new byte[0];
+            }
             return frame;
         }
 
