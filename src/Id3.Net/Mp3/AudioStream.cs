@@ -57,7 +57,7 @@ namespace Id3
 
             int modeIndex = ModeIndex;
             if (VersionIndex == 3)
-                position += modeIndex == 3 ? 17 : 19;
+                position += modeIndex == 3 ? 17 : 32;
             else
                 position += modeIndex == 3 ? 9 : 17;
 
