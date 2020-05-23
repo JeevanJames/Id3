@@ -1,5 +1,5 @@
 version: 1.0.{build}
-image: Visual Studio 2017
+image: Visual Studio 2019
 configuration: Release
 environment:
   CODECOV_TOKEN: 4930e13c-d6c4-4370-a8dc-70c38a3e7aae
