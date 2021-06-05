@@ -25,24 +25,22 @@ namespace Id3.InfoFx
     [Serializable]
     public sealed class InfoProviderException : Exception
     {
-        /// <inheritdoc/>
         public InfoProviderException()
         {
         }
 
-        /// <inheritdoc/>
-        public InfoProviderException(string message) : base(message)
+        public InfoProviderException(string message)
+            : base(message)
         {
         }
 
-        /// <inheritdoc/>
         public InfoProviderException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
 
-        /// <inheritdoc/>
-        public InfoProviderException(SerializationInfo info, StreamingContext context) : base(info, context)
+        private InfoProviderException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

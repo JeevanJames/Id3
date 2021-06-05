@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Id3.Files</name>
+    </assembly>
+    <members>
+        <member name="M:Id3.Files.FileNameInfoProvider.GetTagInfo">
+            <inheritdoc />
+        </member>
+        <member name="T:Id3.Files.FileNamer">
+            <summary>
+                Provides naming suggestions for MP3 files based on the ID3 metadata.
+            </summary>
+        </member>
+        <member name="M:Id3.Files.FileNamer.#ctor(System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:Id3.Files.FileNamer"/> class with a single file
+                naming pattern.
+            </summary>
+            <param name="pattern">The file naming pattern to use.</param>
+        </member>
+        <member name="M:Id3.Files.FileNamer.#ctor(System.String[])">
+            <summary>
+                Initializes a new instance of the <see cref="T:Id3.Files.FileNamer"/> class with one or more file
+                naming patterns, specified in order of priority.
+            </summary>
+            <param name="patterns">The file naming patterns to use, in order of priority.</param>
+        </member>
+        <member name="M:Id3.Files.FileNamer.#ctor(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                Initializes a new instance of the <see cref="T:Id3.Files.FileNamer" /> class with one or more file
+                naming patterns, specified in order of priority.
+            </summary>
+            <param name="patterns">The file naming patterns to use, in order of priority.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if the specified patterns parameter is null.</exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown if no patterns are specified or if there is a null or empty pattern.
+            </exception>
+        </member>
+        <member name="M:Id3.Files.FileNamer.ValidatePatterns(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                Ensures that all placeholders in the pattern refer to existing tag frame properties.
+                Then it attempts to mapping dictionary between the frame name and the corresponding
+                frame property, so that multiple renames can be done fast.
+            </summary>
+            <param name="patterns">The pattern to validate.</param>
+            <exception cref="T:System.ArgumentException">Thrown if any pattern contains invalid placeholders.</exception>
+        </member>
+        <member name="M:Id3.Files.FileNamer.GetSuggestions(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                Gets naming suggestions for the MP3 files at the specified file paths.
+            </summary>
+            <param name="filePaths">File paths of the MP3 files.</param>
+            <returns>Collection of renaming suggestions for the specified files.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="filePaths"/> is <c>null</c>.</exception>
+        </member>
+        <member name="M:Id3.Files.FileNamer.GetSuggestions(System.String,System.String,System.IO.SearchOption)">
+            <summary>
+                Gets naming suggestions for the MP3 files in the specified directory.
+            </summary>
+            <param name="directory">The directory where the MP3 files are located.</param>
+            <param name="fileMask">File mask to use when searching for the files. Defaults tp *.mp3.</param>
+            <param name="searchOption">
+                Indicates whether to search just the specified directory or recursively search through its
+                subdirectories as well.
+            </param>
+            <returns>
+                Collection of renaming suggestions for the matching files found in the specified directory.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="directory"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentException">Thrown if the specified directory does not exist.</exception>
+        </member>
+        <member name="E:Id3.Files.FileNamer.ResolveMissingData">
+            <summary>
+                Raised whenever the required frame data is missing for a MP3 file.
+            </summary>
+        </member>
+        <member name="E:Id3.Files.FileNamer.Renaming">
+            <summary>
+                Raised before a file name is about to be suggested for an MP3 file. Provides the ability to override the suggested
+                name operation or to cancel it.
+            </summary>
+        </member>
+        <member name="F:Id3.Files.FileNamer._mapping">
+            <summary>
+                Mappings of <see cref="T:Id3.Id3Tag" /> property names to their <see cref="T:System.Reflection.PropertyInfo" /> data for all allowed frame
+                properties that can be used as placeholders in the file naming patterns.
+                <para />
+                Allows for quick lookups of the property data.
+            </summary>
+        </member>
+        <member name="F:Id3.Files.FileNamer._allowedFrames">
+            <summary>
+                List of <see cref="T:Id3.Id3Tag" /> frame properties that can be used as placeholders in the file naming patterns.
+                <para />
+                Typically, these would be textual frames that have single line values of reasonable length.
+            </summary>
+        </member>
+        <member name="T:Id3.Files.RenameStatus">
+            <summary>
+                Indicates the status of a file rename suggestion.
+            </summary>
+        </member>
+        <member name="F:Id3.Files.RenameStatus.CorrectlyNamed">
+            <summary>
+                The file is already correctly-named.
+            </summary>
+        </member>
+        <member name="F:Id3.Files.RenameStatus.Rename">
+            <summary>
+                The file was needs to be renamed.
+            </summary>
+        </member>
+        <member name="F:Id3.Files.RenameStatus.Cancelled">
+            <summary>
+                The FileNamer operation is cancelled. Any suggestions processed so far will be returned.
+            </summary>
+        </member>
+        <member name="F:Id3.Files.RenameStatus.Error">
+            <summary>
+                An error occurred while trying to suggest a new name.
+            </summary>
+        </member>
+        <member name="T:Id3.Files.RenameSuggestion">
+            <summary>
+                Represents the result of a rename or a rename suggestion request.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.RenameSuggestion.Directory">
+            <summary>
+                Gets the directory containing the MP3 file.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.RenameSuggestion.OriginalName">
+            <summary>
+                Gets the original name of the MP3 file, with the extension.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.RenameSuggestion.NewName">
+            <summary>
+                Gets the new name of the MP3 file, with the extension.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.RenameSuggestion.Status">
+            <summary>
+                Gets the status of the rename suggestion.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.RenameSuggestion.ErrorMessage">
+            <summary>
+                Gets in the case of an error (Status is <see cref="F:Id3.Files.RenameStatus.Error"/>), contains
+                the error message.
+            </summary>
+        </member>
+        <member name="T:Id3.Files.Resources.FileNamerMessages">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.FoundNullOrEmptyPatterns">
+            <summary>
+              Looks up a localized string similar to One or more null or empty patterns were found..
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.InvalidFilePath">
+            <summary>
+              Looks up a localized string similar to Invalid file path.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.MissingDataForFrame">
+            <summary>
+              Looks up a localized string similar to Missing data for &apos;{0}&apos;.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.MissingDirectory">
+            <summary>
+              Looks up a localized string similar to Directory &apos;{0}&apos; does not exist.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.MissingFile">
+            <summary>
+              Looks up a localized string similar to File does not exist.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.MissingId3v23TagInFile">
+            <summary>
+              Looks up a localized string similar to File does not contain a ID3v2.3 tag.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.MissingPatterns">
+            <summary>
+              Looks up a localized string similar to No patterns have been specified. Specify at least one pattern..
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.MissingPlaceholdersInPattern">
+            <summary>
+              Looks up a localized string similar to The naming pattern &apos;{0}&apos; does not contain any placeholders.
+            </summary>
+        </member>
+        <member name="P:Id3.Files.Resources.FileNamerMessages.MissingTagProperty">
+            <summary>
+              Looks up a localized string similar to A tag property by name &apos;{0}&apos; does not exist..
+            </summary>
+        </member>
+    </members>
+</doc>

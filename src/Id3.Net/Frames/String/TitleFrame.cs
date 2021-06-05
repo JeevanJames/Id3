@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public TitleFrame(string value) : base(value)
+        public TitleFrame(string value)
+            : base(value)
         {
         }
 

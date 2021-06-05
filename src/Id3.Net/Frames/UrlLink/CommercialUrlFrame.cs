@@ -28,7 +28,8 @@ namespace Id3.Frames
         {
         }
 
-        public CommercialUrlFrame([NotNull] string url) : base(url)
+        public CommercialUrlFrame([NotNull] string url)
+            : base(url)
         {
         }
 

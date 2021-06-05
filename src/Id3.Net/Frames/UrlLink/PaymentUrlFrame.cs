@@ -27,10 +27,14 @@ namespace Id3.Frames
         {
         }
 
-        public PaymentUrlFrame([NotNull] string url) : base(url)
+        public PaymentUrlFrame([NotNull] string url)
+            : base(url)
         {
         }
 
-        public static implicit operator PaymentUrlFrame(string url) => new PaymentUrlFrame(url);
+        public static implicit operator PaymentUrlFrame(string url)
+        {
+            return new(url);
+        }
     }
 }

@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public EncodingSettingsFrame(string value) : base(value)
+        public EncodingSettingsFrame(string value)
+            : base(value)
         {
         }
 

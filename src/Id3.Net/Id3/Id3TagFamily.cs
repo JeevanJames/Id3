@@ -34,6 +34,6 @@ namespace Id3
         ///     Indicates ID3 tags in the v1 range (currently v1.0 and v1.1). These tags appear at the end
         ///     of the MP3 file.
         /// </summary>
-        Version1X
+        Version1X,
     }
 }

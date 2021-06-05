@@ -1,4 +1,4 @@
-#region --- License & Copyright Notice ---
+﻿#region --- License & Copyright Notice ---
 /*
 Copyright (c) 2005-2019 Jeevan James
 All rights reserved.

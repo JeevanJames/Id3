@@ -34,7 +34,7 @@ namespace Id3.Frames
         }
 
         /// <summary>
-        ///     Gets a value that indicates whether the frame has data and is valid
+        ///     Gets a value indicating whether the frame has data and is valid.
         /// </summary>
         public abstract bool IsAssigned { get; }
 

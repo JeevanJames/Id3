@@ -28,7 +28,8 @@ namespace Id3.Frames
         {
         }
 
-        public ArtistUrlFrame([NotNull] string url) : base(url)
+        public ArtistUrlFrame([NotNull] string url)
+            : base(url)
         {
         }
 

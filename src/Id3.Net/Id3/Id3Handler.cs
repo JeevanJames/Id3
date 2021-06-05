@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using Id3.Frames;
 using Id3.v1;
 using Id3.v2;
@@ -44,11 +45,7 @@ namespace Id3
         /// <returns>The basic ID3 tag.</returns>
         internal Id3Tag CreateTag()
         {
-            var tag = new Id3Tag {
-                Version = Version,
-                Family = Family
-            };
-            return tag;
+            return new() { Version = Version, Family = Family };
         }
 
         /// <summary>
@@ -56,16 +53,14 @@ namespace Id3
         ///     If there is a registered frame handler for the frame ID, it is used to instantiate the frame object. If not, an
         ///     UnknownFrame instance is created.
         /// </summary>
-        /// <param name="frameId">The frame ID</param>
+        /// <param name="frameId">The frame ID.</param>
         /// <returns>An instance of the frame.</returns>
         internal Id3Frame GetFrameFromFrameId(string frameId)
         {
             FrameHandler handler = FrameHandlers[frameId];
             if (handler != null)
-                return (Id3Frame) Activator.CreateInstance(handler.Type);
-            return new UnknownFrame {
-                Id = frameId
-            };
+                return (Id3Frame)Activator.CreateInstance(handler.Type);
+            return new UnknownFrame { Id = frameId };
         }
 
         /// <summary>
@@ -85,16 +80,25 @@ namespace Id3
         }
 
         #region Stream-manipulation overrides for the handler
+
         internal abstract void DeleteTag(Stream stream);
+
         internal abstract byte[] GetTagBytes(Stream stream);
+
         internal abstract bool HasTag(Stream stream);
+
         internal abstract Id3Tag ReadTag(Stream stream, out object additionalData);
+
         internal abstract bool WriteTag(Stream stream, Id3Tag tag);
+
         #endregion
 
         #region ID3 tag properties for the handler
+
         internal abstract Id3TagFamily Family { get; }
+
         internal abstract Id3Version Version { get; }
+
         #endregion
 
         /// <summary>
@@ -108,8 +112,9 @@ namespace Id3
         protected abstract void BuildFrameHandlers(FrameHandlers mappings);
 
         /// <summary>
-        ///     Specifies the details of each frame supported by the handler, including information on how to encode and decode
-        ///     them. This structure is built by derived handlers by overridding the BuildFrameHandlers method.
+        ///     Gets the details of each frame supported by the handler, including information on how
+        ///     to encode and decode them. This structure is built by derived handlers by overriding
+        ///     the BuildFrameHandlers method.
         /// </summary>
         protected FrameHandlers FrameHandlers
         {
@@ -125,7 +130,8 @@ namespace Id3
             }
         }
 
-        internal static readonly List<Id3HandlerMetadata> AvailableHandlers = new List<Id3HandlerMetadata>(4) {
+        internal static readonly List<Id3HandlerMetadata> AvailableHandlers = new(4)
+        {
             new Id3HandlerMetadata(Id3Version.V23, Id3TagFamily.Version2X, typeof(Id3V23Handler)),
             new Id3HandlerMetadata(Id3Version.V1X, Id3TagFamily.Version1X, typeof(Id3V1Handler)),
         };
@@ -133,7 +139,7 @@ namespace Id3
         /// <summary>
         ///     Returns the ID3 tag handler for the specified tag version.
         /// </summary>
-        /// <param name="version">Version of ID3 tag</param>
+        /// <param name="version">Version of ID3 tag.</param>
         /// <returns>The tag handler for the specified version or null if it is not in the collection.</returns>
         [NotNull]
         internal static Id3Handler GetHandler(Id3Version version)
@@ -160,7 +166,6 @@ namespace Id3
 
         internal Type Type { get; }
 
-        internal Id3Handler Instance =>
-            _instance ?? (_instance = (Id3Handler) Activator.CreateInstance(Type));
+        internal Id3Handler Instance => _instance ??= (Id3Handler)Activator.CreateInstance(Type);
     }
 }

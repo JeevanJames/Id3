@@ -28,7 +28,8 @@ namespace Id3.Frames
         {
         }
 
-        public FileTypeFrame(FileAudioType value) : base(value)
+        public FileTypeFrame(FileAudioType value)
+            : base(value)
         {
         }
 
@@ -36,20 +37,25 @@ namespace Id3.Frames
         {
             get
             {
-                KeyValuePair<string, FileAudioType> mappingEntry = FileAudioTypeMapping.FirstOrDefault(kvp => kvp.Value == Value);
+                KeyValuePair<string, FileAudioType> mappingEntry = FileAudioTypeMapping
+                    .FirstOrDefault(kvp => kvp.Value == Value);
                 return mappingEntry.Key ?? "MPG";
             }
+
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
                     Value = FileAudioType.Mpeg;
                 else
+                {
                     Value = FileAudioTypeMapping.TryGetValue(value, out FileAudioType audioType)
                         ? audioType : FileAudioType.Mpeg;
+                }
             }
         }
 
-        private static readonly Dictionary<string, FileAudioType> FileAudioTypeMapping = new Dictionary<string, FileAudioType>(8) {
+        private static readonly Dictionary<string, FileAudioType> FileAudioTypeMapping = new(8)
+        {
             ["MPG"] = FileAudioType.Mpeg,
             ["MPG/1"] = FileAudioType.Mpeg_1_2_Layer1,
             ["MPG/2"] = FileAudioType.Mpeg_1_2_Layer2,
@@ -57,10 +63,13 @@ namespace Id3.Frames
             ["MPG/2.5"] = FileAudioType.Mpeg_2_5,
             ["MPG/AAC"] = FileAudioType.Mpeg_Aac,
             ["VQF"] = FileAudioType.Vqf,
-            ["PCM"] = FileAudioType.Pcm
+            ["PCM"] = FileAudioType.Pcm,
         };
 
-        public static implicit operator FileTypeFrame(FileAudioType value) => new FileTypeFrame(value);
+        public static implicit operator FileTypeFrame(FileAudioType value)
+        {
+            return new(value);
+        }
     }
 
     public enum FileAudioType

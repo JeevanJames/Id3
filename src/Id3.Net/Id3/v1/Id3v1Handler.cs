@@ -20,6 +20,7 @@ limitations under the License.
 using System;
 using System.IO;
 using System.Text;
+
 using Id3.Frames;
 
 namespace Id3.v1
@@ -86,14 +87,9 @@ namespace Id3.v1
                 comment = ReadTagString(tagBytes, 94, 30);
                 tag.Track.Value = -1;
             }
+
             if (!string.IsNullOrEmpty(comment))
-            {
-                var commentFrame = new CommentFrame
-                {
-                    Comment = comment
-                };
-                tag.Comments.Add(commentFrame);
-            }
+                tag.Comments.Add(new CommentFrame { Comment = comment });
 
             return tag;
         }
@@ -111,27 +107,32 @@ namespace Id3.v1
                 itemBytes = encoding.GetBytes(tag.Title.Value);
                 Array.Copy(itemBytes, 0, bytes, 3, Math.Min(30, itemBytes.Length));
             }
+
             if (!string.IsNullOrEmpty(tag.Artists.TextValue))
             {
                 itemBytes = encoding.GetBytes(tag.Artists.TextValue);
                 Array.Copy(itemBytes, 0, bytes, 33, Math.Min(30, itemBytes.Length));
             }
+
             if (!string.IsNullOrEmpty(tag.Album.Value))
             {
                 itemBytes = encoding.GetBytes(tag.Album.Value);
                 Array.Copy(itemBytes, 0, bytes, 63, Math.Min(30, itemBytes.Length));
             }
+
             if (!string.IsNullOrEmpty(tag.Year.TextValue))
             {
                 itemBytes = encoding.GetBytes(tag.Year.TextValue);
                 Array.Copy(itemBytes, 0, bytes, 93, Math.Min(4, itemBytes.Length));
             }
+
             if (tag.Comments.Count > 0)
             {
                 itemBytes = encoding.GetBytes(tag.Comments[0].Comment);
                 int maxCommentLength = tag.Track.Value == -1 ? 30 : 28;
                 Array.Copy(itemBytes, 0, bytes, 97, Math.Min(maxCommentLength, itemBytes.Length));
             }
+
             if (tag.Track.Value >= 0)
                 bytes[126] = (byte)tag.Track.Value;
 
@@ -139,6 +140,7 @@ namespace Id3.v1
                 stream.Seek(-128, SeekOrigin.End);
             else
                 stream.Seek(0, SeekOrigin.End);
+
             stream.Write(bytes, 0, bytes.Length);
 
             return true;

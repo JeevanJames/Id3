@@ -58,14 +58,12 @@ namespace Id3.Serialization
                 typeof(GenreFrame),
                 typeof(PublisherFrame),
                 typeof(SubtitleFrame),
-                typeof(TitleFrame)
-            );
+                typeof(TitleFrame));
 
             //NumericFrame-derived classes
             selector.AddFrameSurrogates<TextFrameSurrogate>(
                 typeof(BeatsPerMinuteFrame),
-                typeof(YearFrame)
-            );
+                typeof(YearFrame));
 
             //DateTimeFrame-derived classes
             selector.AddFrameSurrogates<TextFrameSurrogate>(typeof(RecordingDateFrame));
@@ -74,15 +72,13 @@ namespace Id3.Serialization
             selector.AddFrameSurrogates<TextFrameSurrogate>(
                 typeof(ArtistsFrame),
                 typeof(ComposersFrame),
-                typeof(LyricistsFrame)
-            );
+                typeof(LyricistsFrame));
 
             //Other TextFrameBase<>-derived classes
             selector.AddFrameSurrogates<TextFrameSurrogate>(
                 typeof(FileTypeFrame),
                 typeof(LengthFrame),
-                typeof(TrackFrame)
-            );
+                typeof(TrackFrame));
 
             //UrlLinkFrame-derived classes
             selector.AddFrameSurrogates<UrlLinkFrameSurrogate>(
@@ -92,8 +88,7 @@ namespace Id3.Serialization
                 typeof(CommercialUrlFrame),
                 typeof(CopyrightUrlFrame),
                 typeof(CustomUrlLinkFrame),
-                typeof(PaymentUrlFrame)
-            );
+                typeof(PaymentUrlFrame));
 
             //All other frames
             selector.AddFrameSurrogate<CommentFrame, CommentFrameSurrogate>();

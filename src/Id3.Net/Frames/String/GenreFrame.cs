@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public GenreFrame(string value) : base(value)
+        public GenreFrame(string value)
+            : base(value)
         {
         }
 

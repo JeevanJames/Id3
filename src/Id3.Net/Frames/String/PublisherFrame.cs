@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public PublisherFrame(string value) : base(value)
+        public PublisherFrame(string value)
+            : base(value)
         {
         }
 

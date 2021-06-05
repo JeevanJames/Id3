@@ -29,6 +29,7 @@ namespace Id3
                 size += bytes[byteIdx] << shift;
                 shift += 8;
             }
+
             return size;
         }
 
@@ -40,6 +41,7 @@ namespace Id3
                 size += bytes[byteIdx] << shift;
                 shift += 7;
             }
+
             return size;
         }
 

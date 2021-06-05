@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public FileOwnerFrame(string value) : base(value)
+        public FileOwnerFrame(string value)
+            : base(value)
         {
         }
 

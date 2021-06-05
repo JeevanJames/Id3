@@ -29,7 +29,8 @@ namespace Id3.Frames
         {
         }
 
-        public CopyrightFrame(string value) : base(value)
+        public CopyrightFrame(string value)
+            : base(value)
         {
         }
 

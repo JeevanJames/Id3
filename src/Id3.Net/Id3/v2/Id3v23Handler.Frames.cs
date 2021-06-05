@@ -20,6 +20,7 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Text;
+
 using Id3.Frames;
 
 namespace Id3.v2
@@ -35,13 +36,14 @@ namespace Id3.v2
             string value;
             if (encodingByte == 0 || encodingByte == 1)
             {
-                frame.EncodingType = (Id3TextEncoding) encodingByte;
+                frame.EncodingType = (Id3TextEncoding)encodingByte;
                 Encoding encoding = TextEncodingHelper.GetEncoding(frame.EncodingType);
                 value = encoding.GetString(data, 1, data.Length - 1);
                 if (value.Length > 0 && frame.EncodingType == Id3TextEncoding.Unicode &&
                     (value[0] == '\xFFFE' || value[0] == '\xFEFF'))
                     value = value.Remove(0, 1);
-            } else
+            }
+            else
             {
                 frame.EncodingType = Id3TextEncoding.Iso8859_1;
                 Encoding encoding = TextEncodingHelper.GetEncoding(frame.EncodingType);
@@ -56,12 +58,12 @@ namespace Id3.v2
         private static byte[] EncodeText<TFrame>(Id3Frame id3Frame)
             where TFrame : TextFrameBase
         {
-            var frame = (TFrame) id3Frame;
+            var frame = (TFrame)id3Frame;
             Encoding encoding = TextEncodingHelper.GetEncoding(frame.EncodingType);
             byte[] preamble = encoding.GetPreamble();
             byte[] textBytes = encoding.GetBytes(frame.TextValue);
             var data = new byte[1 + preamble.Length + textBytes.Length];
-            data[0] = (byte) frame.EncodingType;
+            data[0] = (byte)frame.EncodingType;
             preamble.CopyTo(data, 1);
             textBytes.CopyTo(data, preamble.Length + 1);
             return data;
@@ -70,33 +72,34 @@ namespace Id3.v2
         private static TFrame DecodeUrlLink<TFrame>(byte[] data)
             where TFrame : UrlLinkFrame, new()
         {
-            var frame = new TFrame {Url = TextEncodingHelper.GetDefaultString(data, 0, data.Length)};
+            var frame = new TFrame { Url = TextEncodingHelper.GetDefaultString(data, 0, data.Length) };
             return frame;
         }
 
         private static byte[] EncodeUrlLink<TFrame>(Id3Frame id3Frame)
             where TFrame : UrlLinkFrame
         {
-            var frame = (TFrame) id3Frame;
+            var frame = (TFrame)id3Frame;
             return frame.Url != null ? TextEncodingHelper.GetDefaultEncoding().GetBytes(frame.Url) : new byte[0];
         }
 
         private static Id3Frame DecodeComment(byte[] data)
         {
-            var frame = new CommentFrame {EncodingType = (Id3TextEncoding) data[0]};
+            var frame = new CommentFrame { EncodingType = (Id3TextEncoding)data[0] };
 
             string language = TextEncodingHelper.GetDefaultEncoding().GetString(data, 1, 3).ToLowerInvariant();
             if (!Enum.IsDefined(typeof(Id3Language), language))
                 frame.Language = Id3Language.eng;
             else
-                frame.Language = (Id3Language) Enum.Parse(typeof(Id3Language), language, true);
+                frame.Language = (Id3Language)Enum.Parse(typeof(Id3Language), language, true);
 
             string[] splitStrings = TextEncodingHelper.GetSplitStrings(data, 4, data.Length - 4, frame.EncodingType);
             if (splitStrings.Length > 1)
             {
                 frame.Description = splitStrings[0];
                 frame.Comment = splitStrings[1];
-            } else if (splitStrings.Length == 1)
+            }
+            else if (splitStrings.Length == 1)
                 frame.Comment = splitStrings[0];
 
             return frame;
@@ -104,10 +107,11 @@ namespace Id3.v2
 
         private static byte[] EncodeComment(Id3Frame id3Frame)
         {
-            var frame = (CommentFrame) id3Frame;
+            var frame = (CommentFrame)id3Frame;
 
-            var bytes = new List<byte> {
-                (byte) frame.EncodingType
+            var bytes = new List<byte>
+            {
+                (byte)frame.EncodingType,
             };
 
             bytes.AddRange(TextEncodingHelper.GetDefaultEncoding().GetBytes(frame.Language.ToString()));
@@ -126,7 +130,7 @@ namespace Id3.v2
 
         private static Id3Frame DecodeCustomUrlLink(byte[] data)
         {
-            var frame = new CustomUrlLinkFrame {EncodingType = (Id3TextEncoding) data[0]};
+            var frame = new CustomUrlLinkFrame { EncodingType = (Id3TextEncoding)data[0] };
 
             byte[][] splitBytes = ByteArrayHelper.SplitBySequence(data, 1, data.Length - 1,
                 TextEncodingHelper.GetSplitterBytes(frame.EncodingType));
@@ -136,7 +140,8 @@ namespace Id3.v2
                 frame.Description =
                     TextEncodingHelper.GetString(splitBytes[0], 0, splitBytes[0].Length, frame.EncodingType);
                 url = TextEncodingHelper.GetDefaultString(splitBytes[1], 0, splitBytes[1].Length);
-            } else if (splitBytes.Length == 1)
+            }
+            else if (splitBytes.Length == 1)
                 url = TextEncodingHelper.GetDefaultString(splitBytes[0], 0, splitBytes[0].Length);
 
             frame.Url = url;
@@ -146,10 +151,11 @@ namespace Id3.v2
 
         private static byte[] EncodeCustomUrlLink(Id3Frame id3Frame)
         {
-            var frame = (CustomUrlLinkFrame) id3Frame;
+            var frame = (CustomUrlLinkFrame)id3Frame;
 
-            var bytes = new List<byte> {
-                (byte) frame.EncodingType
+            var bytes = new List<byte>
+            {
+                (byte)frame.EncodingType,
             };
 
             Encoding encoding = TextEncodingHelper.GetEncoding(frame.EncodingType);
@@ -165,20 +171,21 @@ namespace Id3.v2
 
         private static Id3Frame DecodeLyrics(byte[] data)
         {
-            var frame = new LyricsFrame {EncodingType = (Id3TextEncoding) data[0]};
+            var frame = new LyricsFrame { EncodingType = (Id3TextEncoding)data[0] };
 
             string language = TextEncodingHelper.GetDefaultEncoding().GetString(data, 1, 3).ToLowerInvariant();
             if (!Enum.IsDefined(typeof(Id3Language), language))
                 frame.Language = Id3Language.eng;
             else
-                frame.Language = (Id3Language) Enum.Parse(typeof(Id3Language), language, true);
+                frame.Language = (Id3Language)Enum.Parse(typeof(Id3Language), language, true);
 
             string[] splitStrings = TextEncodingHelper.GetSplitStrings(data, 4, data.Length - 4, frame.EncodingType);
             if (splitStrings.Length > 1)
             {
                 frame.Description = splitStrings[0];
                 frame.Lyrics = splitStrings[1];
-            } else if (splitStrings.Length == 1)
+            }
+            else if (splitStrings.Length == 1)
                 frame.Lyrics = splitStrings[0];
 
             return frame;
@@ -191,9 +198,9 @@ namespace Id3.v2
 
         private static Id3Frame DecodePicture(byte[] data)
         {
-            var frame = new PictureFrame {EncodingType = (Id3TextEncoding) data[0]};
+            var frame = new PictureFrame { EncodingType = (Id3TextEncoding)data[0] };
 
-            byte[] mimeType = ByteArrayHelper.GetBytesUptoSequence(data, 1, new byte[] {0x00});
+            byte[] mimeType = ByteArrayHelper.GetBytesUptoSequence(data, 1, new byte[] { 0x00 });
             if (mimeType == null)
             {
                 frame.MimeType = "image/";
@@ -203,7 +210,7 @@ namespace Id3.v2
             frame.MimeType = TextEncodingHelper.GetDefaultString(mimeType, 0, mimeType.Length);
 
             int currentPos = mimeType.Length + 2;
-            frame.PictureType = (PictureType) data[currentPos];
+            frame.PictureType = (PictureType)data[currentPos];
 
             currentPos++;
             byte[] description = ByteArrayHelper.GetBytesUptoSequence(data, currentPos,
@@ -221,10 +228,11 @@ namespace Id3.v2
 
         private static byte[] EncodePicture(Id3Frame id3Frame)
         {
-            var frame = (PictureFrame) id3Frame;
+            var frame = (PictureFrame)id3Frame;
 
-            var bytes = new List<byte> {
-                (byte) frame.EncodingType
+            var bytes = new List<byte>
+            {
+                (byte)frame.EncodingType,
             };
 
             Encoding defaultEncoding = TextEncodingHelper.GetDefaultEncoding();
@@ -233,7 +241,7 @@ namespace Id3.v2
                 : defaultEncoding.GetBytes("image/"));
 
             bytes.Add(0);
-            bytes.Add((byte) frame.PictureType);
+            bytes.Add((byte)frame.PictureType);
 
             Encoding descriptionEncoding = TextEncodingHelper.GetEncoding(frame.EncodingType);
             bytes.AddRange(descriptionEncoding.GetPreamble());
@@ -261,7 +269,7 @@ namespace Id3.v2
 
         private static byte[] EncodePrivate(Id3Frame id3Frame)
         {
-            var frame = (PrivateFrame) id3Frame;
+            var frame = (PrivateFrame)id3Frame;
 
             var bytes = new List<byte>();
             bytes.AddRange(TextEncodingHelper.GetEncoding(Id3TextEncoding.Iso8859_1).GetBytes(frame.OwnerId));

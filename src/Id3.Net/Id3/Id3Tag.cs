@@ -35,7 +35,9 @@ namespace Id3
     ///     This class is agnostic of any ID3 tag version. It contains all the possible properties that can be assigned across
     ///     all ID3 tag versions.
     /// </summary>
+#pragma warning disable S1210 // "Equals" and the comparison operators should be overridden when implementing "IComparable"
     public sealed class Id3Tag : IEnumerable<Id3Frame>, IComparable<Id3Tag>, IEquatable<Id3Tag>
+#pragma warning restore S1210 // "Equals" and the comparison operators should be overridden when implementing "IComparable"
     {
         public Id3Tag()
         {
@@ -82,15 +84,16 @@ namespace Id3
         }
 
         #region Metadata properties
+
         //TODO: Since Id3Tag is supposed to be version-agnostic, should it contain these properties?
 
         /// <summary>
-        ///     Version family of the ID3 tag - 1.x or 2.x
+        ///     Gets the version family of the ID3 tag - 1.x or 2.x.
         /// </summary>
         public Id3TagFamily Family { get; internal set; }
 
         /// <summary>
-        ///     Version of the ID3 tag
+        ///     Gets the version of the ID3 tag.
         /// </summary>
         public Id3Version Version { get; internal set; }
         #endregion
@@ -123,7 +126,7 @@ namespace Id3
             //Build a list of keys from the Frames dictionary to delete
             var keysToDelete = new List<Type>(Frames.Count);
 
-            Parallel.ForEach(Frames, (kvp, state) =>
+            Parallel.ForEach(Frames, (kvp, _) =>
             {
                 //If the item value is a list, remove any item that is not assigned
                 if (kvp.Value is IList frameList)
@@ -187,16 +190,19 @@ namespace Id3
             {
                 if (kvp.Value is IList list)
                     count += onlyAssignedFrames ? list.Cast<Id3Frame>().Count(frame => frame.IsAssigned) : list.Count;
+                else if (onlyAssignedFrames)
+                    count += ((Id3Frame)kvp.Value).IsAssigned ? 1 : 0;
                 else
-                    count += onlyAssignedFrames ? (((Id3Frame)kvp.Value).IsAssigned ? 1 : 0) : 1;
+                    count++;
             }
+
             return count;
         }
 
         /// <summary>
         ///     Removes any frames of the specified type from the tag.
         /// </summary>
-        /// <typeparam name="TFrame">Type of frame to remove</typeparam>
+        /// <typeparam name="TFrame">Type of frame to remove.</typeparam>
         /// <returns>True, if matching frames were removed, otherwise false.</returns>
         public bool Remove<TFrame>()
             where TFrame : Id3Frame
@@ -211,11 +217,11 @@ namespace Id3
         }
 
         /// <summary>
-        ///     Removes all frames of a specific type from the tag. A predicate can be optionally specified to control the frames
-        ///     that are removed.
+        ///     Removes all frames of a specific type from the tag. A predicate can be optionally specified
+        ///     to control the frames that are removed.
         /// </summary>
         /// <typeparam name="TFrame">Type of frame to remove.</typeparam>
-        /// <param name="predicate">Optional predicate to control the frames that are removed</param>
+        /// <param name="predicate">Optional predicate to control the frames that are removed.</param>
         /// <returns>The number of frames removed.</returns>
         public int RemoveWhere<TFrame>(Func<TFrame, bool> predicate)
             where TFrame : Id3Frame
@@ -422,13 +428,13 @@ namespace Id3
         #endregion
 
         #region Frame internals
+
         /// <summary>
         ///     Collection of frames, keyed by the frame type.
         /// </summary>
         private Dictionary<Type, object> _frames;
 
-        private Dictionary<Type, object> Frames =>
-            _frames ?? (_frames = new Dictionary<Type, object>(50));
+        private Dictionary<Type, object> Frames => _frames ??= new Dictionary<Type, object>(50);
 
         /// <summary>
         ///     List of all multiple instance frame types and factory functions to create instances of their collection classes.
@@ -442,7 +448,7 @@ namespace Id3
                 [typeof(CustomTextFrame)] = () => new CustomTextFrameList(),
                 [typeof(LyricsFrame)] = () => new LyricsFrameList(),
                 [typeof(PictureFrame)] = () => new PictureFrameList(),
-                [typeof(PrivateFrame)] = () => new PrivateFrameList()
+                [typeof(PrivateFrame)] = () => new PrivateFrameList(),
             };
 
         /// <summary>
@@ -499,13 +505,10 @@ namespace Id3
                 if (containsKey)
                     Frames.Remove(frameType);
             }
+            else if (containsKey)
+                Frames[frameType] = frame;
             else
-            {
-                if (containsKey)
-                    Frames[frameType] = frame;
-                else
-                    Frames.Add(frameType, frame);
-            }
+                Frames.Add(frameType, frame);
         }
 
         private TFrameList GetMultipleFrames<TFrame, TFrameList>()
@@ -521,6 +524,7 @@ namespace Id3
         #endregion
 
         #region IComparable<Id3Tag> and IEquatable<Id3Tag> implementations
+
         /// <summary>
         ///     Compares two tags based on their version details.
         /// </summary>
@@ -539,6 +543,7 @@ namespace Id3
                 return false;
             return Version == other.Version;
         }
+
         #endregion
     }
 }

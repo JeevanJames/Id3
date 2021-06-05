@@ -46,7 +46,8 @@ namespace Id3.v2
                 stream.Write(buffer, 0, bytesRead);
                 readPos += bytesRead;
                 writePos += bytesRead;
-            } while (bytesRead == BufferSize);
+            }
+            while (bytesRead == BufferSize);
 
             stream.SetLength(stream.Length - tagSize);
             stream.Flush();
@@ -97,11 +98,12 @@ namespace Id3.v2
             additionalData = headerContainer;
 
             byte flags = headerBytes[1];
-            var header = new Id3V2StandardHeader {
+            var header = new Id3V2StandardHeader
+            {
                 Revision = headerBytes[0],
                 Unsyncronization = (flags & 0x80) > 0,
                 ExtendedHeader = (flags & 0x40) > 0,
-                Experimental = (flags & 0x20) > 0
+                Experimental = (flags & 0x20) > 0,
             };
             headerContainer.Header = header;
 
@@ -115,15 +117,17 @@ namespace Id3.v2
                 SyncSafeNumber.DecodeSafe(tagData, currentPos, 4);
                 currentPos += 4;
 
-                var extendedHeader = new Id3V2ExtendedHeader {
-                    PaddingSize = SyncSafeNumber.DecodeNormal(tagData, currentPos + 2, 4)
+                var extendedHeader = new Id3V2ExtendedHeader
+                {
+                    PaddingSize = SyncSafeNumber.DecodeNormal(tagData, currentPos + 2, 4),
                 };
 
                 if ((tagData[currentPos] & 0x80) > 0)
                 {
                     extendedHeader.Crc32 = SyncSafeNumber.DecodeNormal(tagData, currentPos + 6, 4);
                     currentPos += 10;
-                } else
+                }
+                else
                     currentPos += 6;
 
                 headerContainer.ExtendedHeader = extendedHeader;
@@ -137,7 +141,9 @@ namespace Id3.v2
                 int frameSize = SyncSafeNumber.DecodeNormal(tagData, currentPos, 4);
                 currentPos += 4;
 
+#pragma warning disable S1481 // Unused local variables should be removed
                 var frameFlags = (ushort)((tagData[currentPos] << 0x08) + tagData[currentPos + 1]);
+#pragma warning restore S1481 // Unused local variables should be removed
                 currentPos += 2;
 
                 var frameData = new byte[frameSize];
@@ -165,7 +171,8 @@ namespace Id3.v2
                 int currentTagSize = GetTagSize(stream);
                 if (requiredTagSize > currentTagSize)
                     MakeSpaceForTag(stream, currentTagSize, requiredTagSize);
-            } else
+            }
+            else
                 MakeSpaceForTag(stream, 0, requiredTagSize);
 
             stream.Seek(0, SeekOrigin.Begin);
@@ -177,6 +184,7 @@ namespace Id3.v2
 
         internal override Id3Version Version => Id3Version.V23;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1515:Single-line comment should be preceded by blank line", Justification = "TBD")]
         protected override void BuildFrameHandlers(FrameHandlers mappings)
         {
             mappings.Add<AlbumFrame>("TALB", EncodeText<AlbumFrame>, DecodeText<AlbumFrame>);
@@ -270,9 +278,10 @@ namespace Id3.v2
                 byte[] frameBytes = mapping.Encoder(frame);
                 bytes.AddRange(Encoding.ASCII.GetBytes(GetFrameIdFromFrame(frame)));
                 bytes.AddRange(SyncSafeNumber.EncodeNormal(frameBytes.Length));
-                bytes.AddRange(new byte[] {0, 0});
+                bytes.AddRange(new byte[] { 0, 0 });
                 bytes.AddRange(frameBytes);
             }
+
             int framesSize = bytes.Count - 6;
             bytes.InsertRange(6, SyncSafeNumber.EncodeSafe(framesSize));
             return bytes.ToArray();

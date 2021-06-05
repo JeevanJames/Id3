@@ -22,6 +22,6 @@ namespace Id3
     public enum WriteConflictAction
     {
         NoAction,
-        Replace
+        Replace,
     }
 }

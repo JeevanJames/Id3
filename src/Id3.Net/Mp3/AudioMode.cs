@@ -24,6 +24,6 @@ namespace Id3
         Stereo,
         JointStereo,
         DualChannel,
-        SingleChannel
+        SingleChannel,
     }
 }

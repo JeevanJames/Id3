@@ -19,23 +19,31 @@ limitations under the License.
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 
-[assembly: InternalsVisibleTo("Id3.Net.Serialization")]
+[assembly: InternalsVisibleTo("Id3.Serialization")]
 
 namespace Id3
 {
+    [Serializable]
     public sealed class Id3Exception : Exception
     {
         public Id3Exception()
         {
         }
 
-        public Id3Exception(string message) : base(message)
+        public Id3Exception(string message)
+            : base(message)
         {
         }
 
         public Id3Exception(string message, Exception innerException)
             : base(message, innerException)
+        {
+        }
+
+        private Id3Exception(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

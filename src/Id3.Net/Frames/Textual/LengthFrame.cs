@@ -28,7 +28,8 @@ namespace Id3.Frames
         {
         }
 
-        public LengthFrame(TimeSpan value) : base(value)
+        public LengthFrame(TimeSpan value)
+            : base(value)
         {
         }
 
@@ -40,13 +41,18 @@ namespace Id3.Frames
                 if (string.IsNullOrWhiteSpace(value))
                     Value = TimeSpan.Zero;
                 else
+                {
                     Value = double.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture,
                         out double length)
                         ? TimeSpan.FromMilliseconds(length)
                         : TimeSpan.Zero;
+                }
             }
         }
 
-        public static implicit operator LengthFrame(TimeSpan value) => new LengthFrame(value);
+        public static implicit operator LengthFrame(TimeSpan value)
+        {
+            return new(value);
+        }
     }
 }

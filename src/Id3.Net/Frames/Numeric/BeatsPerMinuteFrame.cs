@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public BeatsPerMinuteFrame(int value) : base(value)
+        public BeatsPerMinuteFrame(int value)
+            : base(value)
         {
         }
 

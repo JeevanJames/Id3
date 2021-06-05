@@ -33,12 +33,6 @@ namespace Id3.InfoFx
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private InfoProviderProperties _properties;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="inputs"></param>
-        /// <returns></returns>
-        /// <exception cref="InfoProviderException">Thrown on any unhandled error.</exception>
         public Id3Tag[] GetInfo(InfoProviderInputs inputs)
         {
             try
@@ -47,8 +41,7 @@ namespace Id3.InfoFx
                 if (!MeetsInputCriteria())
                     throw new InfoProviderException("Required inputs do not meet the criteria of the info provider.");
 
-                Id3Tag[] result = GetTagInfo();
-                return result;
+                return GetTagInfo();
             }
             catch (InfoProviderException)
             {
@@ -78,13 +71,12 @@ namespace Id3.InfoFx
             }
         }
 
-        protected InfoProviderProperties Properties =>
-            _properties ?? (_properties = GetProperties());
+        protected InfoProviderProperties Properties => _properties ??= GetProperties();
 
         /// <summary>
         ///     When overridden in a derived class, gets the tag details.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The tag details.</returns>
         protected abstract Id3Tag[] GetTagInfo();
 
         /// <summary>
@@ -134,14 +126,20 @@ namespace Id3.InfoFx
             foreach (Type frameType in frameTypes)
             {
                 Type frameTypeCopy = frameType;
+
                 // Frame must be assigned in order to be considered.
                 bool frameExists = tag.Any(frame => frame.GetType() == frameTypeCopy && frame.IsAssigned);
                 if (!frameExists)
                     return false;
             }
+
             return true;
         }
 
+#if NETSTANDARD
+        protected static readonly Id3Tag[] Empty = Array.Empty<Id3Tag>();
+#else
         protected static readonly Id3Tag[] Empty = new Id3Tag[0];
+#endif
     }
 }

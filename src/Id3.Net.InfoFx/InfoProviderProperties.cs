@@ -27,50 +27,55 @@ namespace Id3.InfoFx
     public sealed class InfoProviderProperties
     {
         /// <summary>
-        ///     Initializes an instance of the <see cref="InfoProviderProperties"/> class with a descriptive
-        ///     <paramref name="name"/> and optional <paramref name="url"/> and <paramref name="registrationUrl"/>.
+        ///     Initializes a new instance of the <see cref="InfoProviderProperties"/> class with a
+        ///     descriptive <paramref name="name"/> and optional <paramref name="url"/> and
+        ///     <paramref name="registrationUrl"/>.
         /// </summary>
         /// <param name="name">A descriptive name of the info provider.</param>
-        /// <param name="url"></param>
-        /// <param name="registrationUrl"></param>
+        /// <param name="url">A URL containing details of the info provider.</param>
+        /// <param name="registrationUrl">
+        ///     An optional URL that can be used to register with the info provider, if needed.
+        /// </param>
         public InfoProviderProperties(string name, string url = null, string registrationUrl = null)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Provider must have a name.", nameof(name));
+                throw new ArgumentException(@"Provider must have a name.", nameof(name));
             Name = name;
             Url = url;
             RegistrationUrl = registrationUrl;
         }
 
         /// <summary>
-        ///     Descriptive name for the info provider.
+        ///     Gets the descriptive name for the info provider.
         /// </summary>
         public string Name { get; }
 
         /// <summary>
-        ///     URL containing details of the info provider. Could be a home page.
+        ///     Gets the URL containing details of the info provider. Could be a home page.
         /// </summary>
         public string Url { get; }
 
         /// <summary>
-        ///     URL to a registration page, if the info provider service needs credentials to be used.
+        ///     Gets the URL to a registration page, if the info provider service needs credentials
+        ///     to be used.
         /// </summary>
         public string RegistrationUrl { get; }
 
         /// <summary>
-        ///     Types of ID3 frames that are required as inputs for the info provider.
+        ///     Gets the types of ID3 frames that are required as inputs for the info provider.
         /// </summary>
-        public FrameTypes RequiredInputs { get; } = new FrameTypes();
+        public FrameTypes RequiredInputs { get; } = new();
 
         /// <summary>
-        ///     Types of ID3 frames that can be used but are not required as inputs for the info provider.
+        ///     Gets the types of ID3 frames that can be used but are not required as inputs for the
+        ///     info provider.
         /// </summary>
-        public FrameTypes OptionalInputs { get; } = new FrameTypes();
+        public FrameTypes OptionalInputs { get; } = new();
 
         /// <summary>
-        ///     Types of ID3 frames that are output by the info provider.
+        ///     Gets the types of ID3 frames that are output by the info provider.
         /// </summary>
-        public FrameTypes AvailableOutputs { get; } = new FrameTypes();
+        public FrameTypes AvailableOutputs { get; } = new();
 
         public InfoProviderRequirements Requirements { get; set; } = InfoProviderRequirements.Tag;
     }
@@ -80,6 +85,6 @@ namespace Id3.InfoFx
     {
         Tag = 0x1,
         MediaFileName = 0x2,
-        MediaStream = 0x4
+        MediaStream = 0x4,
     }
 }

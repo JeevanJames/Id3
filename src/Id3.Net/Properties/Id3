@@ -1,0 +1,442 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Id3</name>
+    </assembly>
+    <members>
+        <member name="P:Id3.Frames.DateTimeFrame.DateTimeFormat">
+            <summary>
+                Gets the format of the date/time value as a string.
+            </summary>
+        </member>
+        <member name="T:Id3.Frames.Id3Frame">
+            <summary>
+                Represents an ID3 frame. This is an abstract class.
+            </summary>
+        </member>
+        <member name="P:Id3.Frames.Id3Frame.IsAssigned">
+            <summary>
+                Gets a value indicating whether the frame has data and is valid.
+            </summary>
+        </member>
+        <member name="T:Id3.Frames.TextFrameBase">
+            <summary>
+                Represents an ID3 frame that contains textual data.
+            </summary>
+        </member>
+        <member name="P:Id3.Frames.TextFrameBase.TextValue">
+            <summary>
+                Gets or sets the textual representation of the frame value. This is for internal usage
+                only; derived classes should override the getters and setters to get and set the natively-typed
+                value in the <see cref="P:Id3.Frames.TextFrameBase`1.Value" /> property.
+            </summary>
+        </member>
+        <member name="P:Id3.Frames.TextFrameBase`1.Value">
+            <summary>
+                Gets or sets the natively-typed value of the frame. Derived classes will override the
+                <see cref="P:Id3.Frames.TextFrameBase.TextValue" /> to get and set this value.
+            </summary>
+        </member>
+        <member name="M:Id3.Frames.TextFrameBase`1.ValidateValue(`0)">
+            <summary>
+                Deriving classes can override this method to validate the native value being set.
+                <para />
+                If the value is invalid, the method should throw an exception.
+            </summary>
+            <param name="value">The native value being set.</param>
+            <exception cref="T:Id3.Id3Exception">Thrown if the specified native value is invalid.</exception>
+            <remarks>
+                Note that in a lot of cases, a native value of null or something that translates to an empty string is considered
+                valid. In such cases, the frame may be unassigned, but the value should still be allowed.
+            </remarks>
+        </member>
+        <member name="P:Id3.Frames.TrackFrame.TrackCount">
+            <summary>
+                Gets or sets the total number of tracks.
+                <para />
+                If greater than 0, the ID3 value will be set as &lt;track&gt;/&lt;track count&gt;.
+            </summary>
+        </member>
+        <member name="P:Id3.Frames.TrackFrame.Padding">
+            <summary>
+                Gets or sets a value indicating whether to zero-pad the track and track count values.
+                This is useful for some MP3 players that incorrectly sort unpadded values such as 1
+                and 10.
+                <para />
+                If this value is null, then no padding is applied.
+                <para />
+                If this value is 0 (zero), then the track value is padded based on the length of the
+                track count value.
+                <para />
+                If this value is greater than 0, it is used to pad the track and track count values.
+            </summary>
+        </member>
+        <member name="T:Id3.FrameHandler">
+            <summary>
+                Represents the details of a frame and how it can be encoded or decoded.
+                Handlers use this information to process frames.
+            </summary>
+        </member>
+        <member name="M:Id3.FrameHandler.#ctor(System.String,System.Type,System.Func{Id3.Frames.Id3Frame,System.Byte[]},System.Func{System.Byte[],Id3.Frames.Id3Frame})">
+            <summary>
+                Initializes a new instance of the <see cref="T:Id3.FrameHandler"/> class.
+            </summary>
+            <param name="frameId">The ID of the frame.</param>
+            <param name="type">Type of the <see cref="T:Id3.Frames.Id3Frame"/>.</param>
+            <param name="encoder">Delegate to encode a <see cref="T:Id3.Frames.Id3Frame"/> into a byte array.</param>
+            <param name="decoder">Delegate to decode a byte array into a <see cref="T:Id3.Frames.Id3Frame"/>.</param>
+        </member>
+        <member name="P:Id3.FrameHandler.FrameId">
+            <summary>
+                Gets the ID of the frame.
+            </summary>
+        </member>
+        <member name="P:Id3.FrameHandler.Type">
+            <summary>
+                Gets the type of the <see cref="T:Id3.Frames.Id3Frame"/>.
+            </summary>
+        </member>
+        <member name="P:Id3.FrameHandler.Encoder">
+            <summary>
+                Gets the delegate to encode a <see cref="T:Id3.Frames.Id3Frame"/> into a byte array.
+            </summary>
+        </member>
+        <member name="P:Id3.FrameHandler.Decoder">
+            <summary>
+                Gets the delegate to decode a byte array into a <see cref="T:Id3.Frames.Id3Frame"/>.
+            </summary>
+        </member>
+        <member name="M:Id3.FrameHandlers.Add``1(System.String,System.Func{Id3.Frames.Id3Frame,System.Byte[]},System.Func{System.Byte[],Id3.Frames.Id3Frame})">
+            <summary>
+                Shortcut method to add a <see cref="T:Id3.FrameHandler"/> instance to the collection.
+            </summary>
+            <typeparam name="TFrame">The type of the <see cref="T:Id3.Frames.Id3Frame"/>.</typeparam>
+            <param name="frameId">The ID of the frame.</param>
+            <param name="encoder">Delegate to encode a <see cref="T:Id3.Frames.Id3Frame"/> into a byte array.</param>
+            <param name="decoder">Delegate to decode a byte array into a <see cref="T:Id3.Frames.Id3Frame"/>.</param>
+        </member>
+        <member name="P:Id3.FrameHandlers.Item(System.String)">
+            <summary>
+                Returns a <see cref="T:Id3.FrameHandler"/> based on the specified <paramref name="frameId"/>.
+            </summary>
+            <param name="frameId">The ID of the frame.</param>
+            <returns>A <see cref="T:Id3.FrameHandler"/> instance that matches the specified <paramref name="frameId"/>.</returns>
+        </member>
+        <member name="P:Id3.FrameHandlers.Item(System.Type)">
+            <summary>
+                Returns a <see cref="T:Id3.FrameHandler"/> based on the specified frame type.
+            </summary>
+            <param name="type">The type of the frame.</param>
+            <returns>A <see cref="T:Id3.FrameHandler"/> instance that matches the specified <paramref name="type"/>.</returns>
+        </member>
+        <member name="T:Id3.Id3Handler">
+            <summary>
+                Represents an ID3 handler, which can manipulate ID3 tags in an MP3 file stream.
+                ID3 handlers specify how to serialize/deserialize frames and write/read/delete tags from an MP3 file.
+                There is a derived class for each version of ID3 supported by this framework.
+            </summary>
+        </member>
+        <member name="M:Id3.Id3Handler.CreateTag">
+            <summary>
+                Creates a basic tag corresponding to the version of the handler.
+            </summary>
+            <returns>The basic ID3 tag.</returns>
+        </member>
+        <member name="M:Id3.Id3Handler.GetFrameFromFrameId(System.String)">
+            <summary>
+                Creates a frame instance from the specified frame ID.
+                If there is a registered frame handler for the frame ID, it is used to instantiate the frame object. If not, an
+                UnknownFrame instance is created.
+            </summary>
+            <param name="frameId">The frame ID.</param>
+            <returns>An instance of the frame.</returns>
+        </member>
+        <member name="M:Id3.Id3Handler.GetFrameIdFromFrame(Id3.Frames.Id3Frame)">
+            <summary>
+                Retrieves the frame ID from the specified frame instance.
+            </summary>
+            <param name="frame">The frame instance.</param>
+            <returns>The frame ID, or null if there is no frame handler for the specified frame instance.</returns>
+        </member>
+        <member name="M:Id3.Id3Handler.BuildFrameHandlers(Id3.FrameHandlers)">
+            <summary>
+                Override this in each derived handler to specify the valid frame types for the handler and the frame IDs to which
+                they correspond.
+            </summary>
+            <param name="mappings">
+                The frame handlers mapping structure. Derived classes should call the Add method for each frame
+                handler they want to register with this class.
+            </param>
+        </member>
+        <member name="P:Id3.Id3Handler.FrameHandlers">
+            <summary>
+                Gets the details of each frame supported by the handler, including information on how
+                to encode and decode them. This structure is built by derived handlers by overriding
+                the BuildFrameHandlers method.
+            </summary>
+        </member>
+        <member name="M:Id3.Id3Handler.GetHandler(Id3.Id3Version)">
+            <summary>
+                Returns the ID3 tag handler for the specified tag version.
+            </summary>
+            <param name="version">Version of ID3 tag.</param>
+            <returns>The tag handler for the specified version or null if it is not in the collection.</returns>
+        </member>
+        <member name="T:Id3.Id3Tag">
+            <summary>
+                Represents an ID3 tag.
+                <para />
+                This class is agnostic of any ID3 tag version. It contains all the possible properties that can be assigned across
+                all ID3 tag versions.
+            </summary>
+        </member>
+        <member name="M:Id3.Id3Tag.ConvertTo(Id3.Id3Version)">
+            <summary>
+                Converts an ID3 tag to another version after resolving the differences between the two versions. The resultant tag
+                will have all the frames from the source tag, but those frames not recognized in the new version will be treated as
+                UnknownFrame objects.
+                Similarly, frames recognized in the output tag version, but not in the source version are converted accordingly.
+            </summary>
+            <param name="version">Version of the tag to convert to.</param>
+            <returns>The converted tag of the specified version, or null if there were any errors.</returns>
+        </member>
+        <member name="P:Id3.Id3Tag.Family">
+            <summary>
+                Gets the version family of the ID3 tag - 1.x or 2.x.
+            </summary>
+        </member>
+        <member name="P:Id3.Id3Tag.Version">
+            <summary>
+                Gets the version of the ID3 tag.
+            </summary>
+        </member>
+        <member name="M:Id3.Id3Tag.Cleanup">
+            <summary>
+                Removes all unassigned frames from the tag.
+            </summary>
+        </member>
+        <member name="M:Id3.Id3Tag.Clear">
+            <summary>
+                Removes all frames from the tag.
+            </summary>
+            <returns>The number of frames removed.</returns>
+        </member>
+        <member name="M:Id3.Id3Tag.GetCount(System.Boolean)">
+            <summary>
+                Returns the total number of frames in this tag.
+            </summary>
+            <param name="onlyAssignedFrames">If true, counts only assigned frames.</param>
+            <returns>Total number of frames in the tag.</returns>
+        </member>
+        <member name="M:Id3.Id3Tag.Remove``1">
+            <summary>
+                Removes any frames of the specified type from the tag.
+            </summary>
+            <typeparam name="TFrame">Type of frame to remove.</typeparam>
+            <returns>True, if matching frames were removed, otherwise false.</returns>
+        </member>
+        <member name="M:Id3.Id3Tag.RemoveWhere``1(System.Func{``0,System.Boolean})">
+            <summary>
+                Removes all frames of a specific type from the tag. A predicate can be optionally specified
+                to control the frames that are removed.
+            </summary>
+            <typeparam name="TFrame">Type of frame to remove.</typeparam>
+            <param name="predicate">Optional predicate to control the frames that are removed.</param>
+            <returns>The number of frames removed.</returns>
+        </member>
+        <member name="F:Id3.Id3Tag._frames">
+            <summary>
+                Collection of frames, keyed by the frame type.
+            </summary>
+        </member>
+        <member name="F:Id3.Id3Tag.MultiInstanceFrameTypes">
+            <summary>
+                List of all multiple instance frame types and factory functions to create instances of their collection classes.
+            </summary>
+        </member>
+        <member name="M:Id3.Id3Tag.AddUntypedFrame(Id3.Frames.Id3Frame)">
+            <summary>
+                Adds an <see cref="T:Id3.Frames.Id3Frame"/> instance to the Frames collection. Since this is not a concrete frame type, the
+                method needs to do a bit of work to figure out how to add it to the Frames collection.
+                This method is meant to be called by <see cref="T:Id3.Id3Handler"/> instances when they are reading the ID3 data and
+                populating this object.
+            </summary>
+            <param name="frame">The <see cref="T:Id3.Frames.Id3Frame" /> instance to add.</param>
+        </member>
+        <member name="M:Id3.Id3Tag.CompareTo(Id3.Id3Tag)">
+            <summary>
+                Compares two tags based on their version details.
+            </summary>
+            <param name="other">The tag instance to compare against.</param>
+            <returns>A signed number that indicates the relative values of this instance and another instance of Id3Tag.</returns>
+        </member>
+        <member name="T:Id3.Id3TagFamily">
+            <summary>
+                Specifies families of ID3 tag versions that are mutually-inclusive.
+            </summary>
+        </member>
+        <member name="F:Id3.Id3TagFamily.Version2X">
+            <summary>
+                Indicates ID3 tags in the v2 range (currently v2.2, v2.3 and v2.4). These tags appear at
+                the beginning of the MP3 file.
+            </summary>
+        </member>
+        <member name="F:Id3.Id3TagFamily.Version1X">
+            <summary>
+                Indicates ID3 tags in the v1 range (currently v1.0 and v1.1). These tags appear at the end
+                of the MP3 file.
+            </summary>
+        </member>
+        <member name="T:Id3.TagComparer">
+            <summary>
+                Compares two tags for equality.
+            </summary>
+        </member>
+        <member name="T:Id3.v2.Id3V2Handler">
+            <inheritdoc />
+        </member>
+        <member name="T:Id3.Mp3">
+            <inheritdoc />
+            <summary>
+                Represents a stream of MP3 data. Use this class to load MP3 data, manipulate the tags and save
+                the data back to the stream.
+            </summary>
+        </member>
+        <member name="M:Id3.Mp3.#ctor(System.IO.Stream,Id3.Mp3Permissions)">
+            <summary>
+                Initializes a new instance of the <see cref="T:Id3.Mp3"/> class by passing in a Stream object
+                containing the MP3 data.
+            </summary>
+            <param name="stream">The Stream object containing the MP3 data.</param>
+            <param name="permissions">
+                The permissions applicable to the MP3 data. Defaults to read-only access.
+            </param>
+        </member>
+        <member name="M:Id3.Mp3.#ctor(System.Byte[],Id3.Mp3Permissions)">
+            <summary>
+                Initializes a new instance of the <see cref="T:Id3.Mp3"/> class by passing in the MP3 data
+                as a byte array.
+            </summary>
+            <param name="byteStream">The byte array representing the MP3 data.</param>
+            <param name="permissions">
+                The permissions applicable to the MP3 data. Defaults to read-only access.
+            </param>
+        </member>
+        <member name="M:Id3.Mp3.DeleteTag(Id3.Id3Version)">
+            <summary>
+                Deletes the ID3 tag of the specified version from the MP3 data.
+            </summary>
+            <param name="version">The tag version.</param>
+        </member>
+        <member name="M:Id3.Mp3.DeleteTag(Id3.Id3TagFamily)">
+            <summary>
+                Deletes the ID3 tag of the specified tag family type from the MP3 data.
+            </summary>
+            <param name="family">The ID3 tag family type.</param>
+        </member>
+        <member name="M:Id3.Mp3.DeleteAllTags">
+            <summary>
+                Deletes all ID3 tags from the MP3 data.
+            </summary>
+        </member>
+        <member name="M:Id3.Mp3.GetAllTags">
+            <summary>
+                Returns a collection of all ID3 tags present in the MP3 data.
+            </summary>
+            <returns>A collection of all ID3 tags present in the MP3 data.</returns>
+        </member>
+        <member name="M:Id3.Mp3.GetTag(Id3.Id3TagFamily)">
+            <summary>
+                Retrieves an ID3 tag of the specified tag family type - version 2.x or version 1.x.
+            </summary>
+            <param name="family">The ID3 tag family type required.</param>
+            <returns>The ID3 tag of the specified tag family type, or null if it doesn't exist.</returns>
+        </member>
+        <member name="M:Id3.Mp3.GetTag(Id3.Id3Version)">
+            <summary>
+                Retrieves an ID3 tag of the specified version number.
+            </summary>
+            <param name="version">The tag version number.</param>
+            <returns>The ID3 tag of the specified version number, or null if it doesn't exist.</returns>
+        </member>
+        <member name="M:Id3.Mp3.GetTagBytes(Id3.Id3Version)">
+            <summary>
+                Retrieves the specified tag data as a byte array. This method does not attempt to read
+                the tag data, it simply reads the header and if present the tag bytes are read directly
+                from the stream. This means that typical exceptions that get thrown in a tag read will
+                not occur in this method.
+            </summary>
+            <param name="version">The tag version number.</param>
+            <returns>A byte array of the tag data.</returns>
+        </member>
+        <member name="T:Id3.Resources.FrameMessages">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Id3.Resources.FrameMessages.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Id3.Resources.FrameMessages.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Id3.Resources.FrameMessages.Copyright_InvalidFormat">
+            <summary>
+              Looks up a localized string similar to Copyright string must start with a 4 digit year and a space.
+            </summary>
+        </member>
+        <member name="T:Id3.Resources.Mp3Messages">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Id3.Resources.Mp3Messages.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Id3.Resources.Mp3Messages.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Id3.Resources.Mp3Messages.AudioStreamMissing">
+            <summary>
+              Looks up a localized string similar to Audio stream not found in this MP3 file.
+            </summary>
+        </member>
+        <member name="P:Id3.Resources.Mp3Messages.MajorTagVersionMissing">
+            <summary>
+              Looks up a localized string similar to The tag should specify a major version number.
+            </summary>
+        </member>
+        <member name="P:Id3.Resources.Mp3Messages.NoWritePermissions_CannotDeleteTag">
+             <summary>
+               Looks up a localized string similar to Cannot delete the tag; MP3 stream does not have write permissions.
+            You will need to create the {0} instance with write permissions..
+             </summary>
+        </member>
+        <member name="P:Id3.Resources.Mp3Messages.NoWritePermissions_CannotWriteTag">
+             <summary>
+               Looks up a localized string similar to Cannot write the tag; MP3 stream does not have write permissions.
+            You will need to create the {0} instance with write permissions..
+             </summary>
+        </member>
+        <member name="P:Id3.Resources.Mp3Messages.StreamNotReadableOrSeekable">
+            <summary>
+              Looks up a localized string similar to The MP3 stream should be readable and seekable.
+            </summary>
+        </member>
+        <member name="P:Id3.Resources.Mp3Messages.StreamNotWritable">
+            <summary>
+              Looks up a localized string similar to The MP3 stream should be writable.
+            </summary>
+        </member>
+    </members>
+</doc>

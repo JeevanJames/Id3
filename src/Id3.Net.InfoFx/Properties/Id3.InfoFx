@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Id3.InfoFx</name>
+    </assembly>
+    <members>
+        <member name="T:Id3.InfoFx.FrameTypes">
+            <summary>
+                Collection of ID3 frame types.
+            </summary>
+        </member>
+        <member name="M:Id3.InfoFx.FrameTypes.Add``1">
+            <summary>
+                Adds a frame type to the collection, based on the generic argument parameter.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:Id3.Frames.Id3Frame"/> to add.</typeparam>
+            <returns>A reference to this <see cref="T:Id3.InfoFx.FrameTypes"/>, allowing for chaining calls.</returns>
+        </member>
+        <member name="M:Id3.InfoFx.FrameTypes.Add(System.Type[])">
+            <summary>
+                Adds one or more <see cref="T:Id3.Frames.Id3Frame"/> types to the collection.
+            </summary>
+            <param name="types">The <see cref="T:Id3.Frames.Id3Frame"/> types to add.</param>
+            <returns>A reference to this <see cref="T:Id3.InfoFx.FrameTypes"/>, allowing for chaining calls.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="types"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown if any type in <paramref name="types"/> is <c>null</c> or does not derive from <see cref="T:Id3.Frames.Id3Frame"/>.
+            </exception>
+        </member>
+        <member name="T:Id3.InfoFx.InfoProvider">
+            <summary>
+                Represents the base class for info providers.
+            </summary>
+        </member>
+        <member name="M:Id3.InfoFx.InfoProvider.GetTagInfo">
+            <summary>
+                When overridden in a derived class, gets the tag details.
+            </summary>
+            <returns>The tag details.</returns>
+        </member>
+        <member name="M:Id3.InfoFx.InfoProvider.GetProperties">
+            <summary>
+                When overridden in a derived class, gets the properties of the info provider.
+            </summary>
+            <returns>A <see cref="T:Id3.InfoFx.InfoProviderProperties"/> instance.</returns>
+        </member>
+        <member name="M:Id3.InfoFx.InfoProvider.MeetsInputCriteria">
+            <summary>
+                Indicates whether the inputs meets the criteria for the info provider.
+            </summary>
+            <returns><c>true</c> if the inputs meet the criteria.</returns>
+        </member>
+        <member name="M:Id3.InfoFx.InfoProvider.FramesMeetCriteria(Id3.Id3Tag,System.Collections.Generic.IEnumerable{System.Type})">
+            <summary>
+                Indicates whether the specified ID3 <paramref name="tag"/> has the specified frames.
+            </summary>
+            <param name="tag">The tag to check.</param>
+            <param name="frameTypes">The ID3 frame types that the tag must contain.</param>
+            <returns><c>true</c> if the tag has all the specified frames.</returns>
+        </member>
+        <member name="T:Id3.InfoFx.InfoProviderAttribute">
+            <summary>
+                Attribute used to specify the <see cref="T:Id3.InfoFx.InfoProvider"/> classes in the assembly.
+                <para/>
+                Useful as a discovery mechanism for info providers.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderAttribute.ProviderType">
+            <summary>
+                Gets the type of the info provider.
+            </summary>
+        </member>
+        <member name="T:Id3.InfoFx.InfoProviderInputs">
+            <summary>
+                The inputs to the info provider.
+                <para/>
+                Depending on the specific info provider, none or more of the input properties specified
+                in this class will be needed. Read the info provider's documentation for more details or
+                use the info provider's <see cref="P:Id3.InfoFx.InfoProvider.Properties"/> property to understand the
+                required inputs.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderInputs.Tag">
+            <summary>
+                Gets or sets an <see cref="T:Id3.Id3Tag"/> instance that acts as an input.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderInputs.FileName">
+            <summary>
+                Gets or sets the file name that acts as an input.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderInputs.Mp3Stream">
+            <summary>
+                Gets or sets the MP3 stream data that acts as an input.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderInputs.Properties">
+            <summary>
+                Gets additional properties that may be needed by certain info providers.
+            </summary>
+        </member>
+        <member name="T:Id3.InfoFx.InfoProviderProperties">
+            <summary>
+                Details of an info provider.
+            </summary>
+        </member>
+        <member name="M:Id3.InfoFx.InfoProviderProperties.#ctor(System.String,System.String,System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:Id3.InfoFx.InfoProviderProperties"/> class with a
+                descriptive <paramref name="name"/> and optional <paramref name="url"/> and
+                <paramref name="registrationUrl"/>.
+            </summary>
+            <param name="name">A descriptive name of the info provider.</param>
+            <param name="url">A URL containing details of the info provider.</param>
+            <param name="registrationUrl">
+                An optional URL that can be used to register with the info provider, if needed.
+            </param>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderProperties.Name">
+            <summary>
+                Gets the descriptive name for the info provider.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderProperties.Url">
+            <summary>
+                Gets the URL containing details of the info provider. Could be a home page.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderProperties.RegistrationUrl">
+            <summary>
+                Gets the URL to a registration page, if the info provider service needs credentials
+                to be used.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderProperties.RequiredInputs">
+            <summary>
+                Gets the types of ID3 frames that are required as inputs for the info provider.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderProperties.OptionalInputs">
+            <summary>
+                Gets the types of ID3 frames that can be used but are not required as inputs for the
+                info provider.
+            </summary>
+        </member>
+        <member name="P:Id3.InfoFx.InfoProviderProperties.AvailableOutputs">
+            <summary>
+                Gets the types of ID3 frames that are output by the info provider.
+            </summary>
+        </member>
+    </members>
+</doc>

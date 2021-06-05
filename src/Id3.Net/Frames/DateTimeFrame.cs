@@ -28,7 +28,8 @@ namespace Id3.Frames
         {
         }
 
-        protected DateTimeFrame(DateTime value) : base(value)
+        protected DateTimeFrame(DateTime value)
+            : base(value)
         {
         }
 
@@ -51,7 +52,7 @@ namespace Id3.Frames
         }
 
         /// <summary>
-        ///     Format of the date/time value as a string.
+        ///     Gets the format of the date/time value as a string.
         /// </summary>
         protected abstract string DateTimeFormat { get; }
     }

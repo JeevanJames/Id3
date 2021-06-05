@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        protected TextFrame(string value) : base(value)
+        protected TextFrame(string value)
+            : base(value)
         {
         }
 

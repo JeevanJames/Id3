@@ -33,7 +33,6 @@ namespace Id3
     /// </summary>
     public class Mp3 : IDisposable
     {
-        #region Fields and properties
         //MP3 file stream-related
         private Mp3Permissions _permissions;
 
@@ -46,10 +45,8 @@ namespace Id3
         private Stream Stream { get; set; }
 
         protected bool StreamOwned { get; set; }
-        #endregion
 
-        #region Construction & destruction
-        //For derived ctors
+        // For derived ctors
         protected Mp3()
         {
         }
@@ -80,19 +77,21 @@ namespace Id3
             StreamOwned = true;
         }
 
-        private static readonly Dictionary<Mp3Permissions, FileAccess> PermissionsToFileAccessMapping =
-            new Dictionary<Mp3Permissions, FileAccess>(3) {
-                {Mp3Permissions.Read, FileAccess.Read},
-                {Mp3Permissions.Write, FileAccess.Write},
-                {Mp3Permissions.ReadWrite, FileAccess.ReadWrite}
-            };
+        private static readonly Dictionary<Mp3Permissions, FileAccess> PermissionsToFileAccessMapping = new(3)
+        {
+            [Mp3Permissions.Read] = FileAccess.Read,
+            [Mp3Permissions.Write] = FileAccess.Write,
+            [Mp3Permissions.ReadWrite] = FileAccess.ReadWrite,
+        };
 
         /// <summary>
-        ///     Creates an instance of the Mp3 class by passing in a Stream object containing the
-        ///     MP3 data.
+        ///     Initializes a new instance of the <see cref="Mp3"/> class by passing in a Stream object
+        ///     containing the MP3 data.
         /// </summary>
         /// <param name="stream">The Stream object containing the MP3 data.</param>
-        /// <param name="permissions">The permissions applicable to the MP3 data. Defaults to read-only access.</param>
+        /// <param name="permissions">
+        ///     The permissions applicable to the MP3 data. Defaults to read-only access.
+        /// </param>
         public Mp3(Stream stream, Mp3Permissions permissions = Mp3Permissions.Read)
         {
             SetupStream(stream, permissions);
@@ -102,10 +101,13 @@ namespace Id3
         }
 
         /// <summary>
-        ///     Creates an instance of the Mp3 class by passing in the MP3 data as a byte array.
+        ///     Initializes a new instance of the <see cref="Mp3"/> class by passing in the MP3 data
+        ///     as a byte array.
         /// </summary>
         /// <param name="byteStream">The byte array representing the MP3 data.</param>
-        /// <param name="permissions">The permissions applicable to the MP3 data. Defaults to read-only access.</param>
+        /// <param name="permissions">
+        ///     The permissions applicable to the MP3 data. Defaults to read-only access.
+        /// </param>
         public Mp3(byte[] byteStream, Mp3Permissions permissions = Mp3Permissions.Read)
         {
             if (byteStream == null)
@@ -138,10 +140,15 @@ namespace Id3
 
         public void Dispose()
         {
-            if (StreamOwned)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && StreamOwned)
                 Stream?.Dispose();
         }
-        #endregion
 
         private void EnsureWritePermissions(string errorMessage)
         {
@@ -150,15 +157,16 @@ namespace Id3
         }
 
         #region Tag deleting methods
+
         /// <summary>
         ///     Deletes the ID3 tag of the specified version from the MP3 data.
         /// </summary>
-        /// <param name="version">The tag version</param>
+        /// <param name="version">The tag version.</param>
         public void DeleteTag(Id3Version version)
         {
             EnsureWritePermissions(Mp3Messages.NoWritePermissions_CannotDeleteTag);
             Id3Handler handler = ExistingHandlers.FirstOrDefault(h => h.Version == version);
-            if (handler != null)
+            if (handler is not null)
             {
                 handler.DeleteTag(Stream);
                 InvalidateExistingHandlers();
@@ -193,6 +201,7 @@ namespace Id3
         #endregion
 
         #region Tag retrieval methods
+
         /// <summary>
         ///     Returns a collection of all ID3 tags present in the MP3 data.
         /// </summary>
@@ -243,30 +252,37 @@ namespace Id3
         }
 
         /// <summary>
-        ///     Retrieves the specified tag data as a byte array. This method does not attempt to read the tag data, it simply
-        ///     reads the header and if present the tag bytes are read directly from the stream. This means that typical exceptions
-        ///     that get thrown in a tag read will not occur in this method.
+        ///     Retrieves the specified tag data as a byte array. This method does not attempt to read
+        ///     the tag data, it simply reads the header and if present the tag bytes are read directly
+        ///     from the stream. This means that typical exceptions that get thrown in a tag read will
+        ///     not occur in this method.
         /// </summary>
         /// <param name="version">The tag version number.</param>
         /// <returns>A byte array of the tag data.</returns>
         public byte[] GetTagBytes(Id3Version version)
         {
             Id3Handler handler = ExistingHandlers.FirstOrDefault(h => h.Version == version);
-            byte[] tagBytes = handler?.GetTagBytes(Stream);
-            return tagBytes;
+            return handler?.GetTagBytes(Stream);
         }
+
         #endregion
 
         #region Tag querying methods
-        public bool HasTagOfFamily(Id3TagFamily family) =>
-            ExistingHandlers.Any(handler => handler.Family == family);
 
-        public bool HasTagOfVersion(Id3Version version) =>
-            ExistingHandlers.Any(h => h.Version == version);
+        public bool HasTagOfFamily(Id3TagFamily family)
+        {
+            return ExistingHandlers.Any(handler => handler.Family == family);
+        }
+
+        public bool HasTagOfVersion(Id3Version version)
+        {
+            return ExistingHandlers.Any(h => h.Version == version);
+        }
 
         public IEnumerable<Id3Version> AvailableTagVersions => ExistingHandlers.Select(h => h.Version);
 
         public bool HasTags => ExistingHandlers.Count > 0;
+
         #endregion
 
         #region Tag writing methods
@@ -301,7 +317,7 @@ namespace Id3
             }
 
             //Write the tag to the file. The handler will know how to overwrite itself.
-            Id3Handler writeHandler = Id3Handler.GetHandler(tag.Version);
+            var writeHandler = Id3Handler.GetHandler(tag.Version);
             bool writeSuccessful = writeHandler.WriteTag(Stream, tag);
             if (writeSuccessful)
                 InvalidateExistingHandlers();
@@ -331,7 +347,7 @@ namespace Id3
             long audioStreamLength = Stream.Length - (startBytes?.Length ?? 0) - (endBytes?.Length ?? 0);
             var audioStream = new byte[audioStreamLength];
             Stream.Seek(startBytes?.Length ?? 0, SeekOrigin.Begin);
-            Stream.Read(audioStream, 0, (int) audioStreamLength);
+            Stream.Read(audioStream, 0, (int)audioStreamLength);
             return audioStream;
         }
 
@@ -339,11 +355,13 @@ namespace Id3
         {
             get
             {
-                if (_audioProperties == null)
+                if (_audioProperties is null)
                 {
                     byte[] audioStream = GetAudioStream();
                     if (audioStream == null || audioStream.Length == 0)
+#pragma warning disable S2372 // Exceptions should not be thrown from property getters
                         throw new Id3Exception(Mp3Messages.AudioStreamMissing);
+#pragma warning restore S2372 // Exceptions should not be thrown from property getters
                     _audioProperties = new AudioStream(audioStream).Calculate();
                 }
 

@@ -52,45 +52,41 @@ namespace Id3.Files
         }
 
         /// <summary>
-        ///     The directory containing the MP3 file.
+        ///     Gets the directory containing the MP3 file.
         /// </summary>
         public string Directory { get; }
 
         /// <summary>
-        ///     The original name of the MP3 file, with the extension.
+        ///     Gets the original name of the MP3 file, with the extension.
         /// </summary>
         public string OriginalName { get; }
 
         /// <summary>
-        ///     The new name of the MP3 file, with the extension.
+        ///     Gets the new name of the MP3 file, with the extension.
         /// </summary>
         public string NewName { get; }
 
         /// <summary>
-        ///     The status of the rename suggestion.
+        ///     Gets the status of the rename suggestion.
         /// </summary>
         public RenameStatus Status { get; }
 
         /// <summary>
-        ///     In the case of an error (Status is <see cref="RenameStatus.Error"/>), contains the error message
+        ///     Gets in the case of an error (Status is <see cref="RenameStatus.Error"/>), contains
+        ///     the error message.
         /// </summary>
         public string ErrorMessage { get; }
 
         public override string ToString()
         {
-            switch (Status)
+            return Status switch
             {
-                case RenameStatus.CorrectlyNamed:
-                    return $"Correctly named: {OriginalName}";
-                case RenameStatus.Rename:
-                    return $"{OriginalName} ==> {NewName}";
-                case RenameStatus.Cancelled:
-                    return $"Cancelled: {OriginalName}";
-                case RenameStatus.Error:
-                    return $"Error: {OriginalName} [{ErrorMessage}]";
-                default:
-                    return base.ToString();
-            }
+                RenameStatus.CorrectlyNamed => $"Correctly named: {OriginalName}",
+                RenameStatus.Rename => $"{OriginalName} ==> {NewName}",
+                RenameStatus.Cancelled => $"Cancelled: {OriginalName}",
+                RenameStatus.Error => $"Error: {OriginalName} [{ErrorMessage}]",
+                _ => base.ToString(),
+            };
         }
     }
 

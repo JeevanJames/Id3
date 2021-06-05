@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public ConductorFrame(string value) : base(value)
+        public ConductorFrame(string value)
+            : base(value)
         {
         }
 

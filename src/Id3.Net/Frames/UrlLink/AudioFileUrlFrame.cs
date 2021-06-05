@@ -27,7 +27,8 @@ namespace Id3.Frames
         {
         }
 
-        public AudioFileUrlFrame([NotNull] string url) : base(url)
+        public AudioFileUrlFrame([NotNull] string url)
+            : base(url)
         {
         }
 

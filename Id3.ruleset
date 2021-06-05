@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Microsoft Managed Recommended Rules" Description="These rules focus on the most critical problems in your code, including potential security holes, application crashes, and other important logic and design errors. It is recommended to include this rule set in any custom rule set you create for your projects." ToolsVersion="16.0">
+    <Include Path="allrules.ruleset" Action="Default" />
+
+    <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+        <!-- StyleCop.CSharp.SpacingRules -->
+        <Rule Id="SA1005" Action="None" _Description="Single line comments must begin with single space" _Justification="Nice to have, but it raises errors with commented out code." />
+        <!-- StyleCop.CSharp.ReadabilityRules -->
+        <Rule Id="SA1101" Action="None" _Description="Prefix local calls with this" _Justification="Not needed as there can be no naming clashes between various types of members." />
+        <Rule Id="SA1116" Action="None" _Description="Split parameters must start on line after declaration" _Justification="TBD" />
+        <Rule Id="SA1117" Action="None" _Description="Parameters must be on same line or separate lines" _Justification="TBD" />
+        <Rule Id="SA1118" Action="None" _Description="Parameter must not span multiple lines" _Justification="TBD" />
+        <Rule Id="SA1124" Action="None" _Description="Do not use regions" _Justification="Nice to have, but preventing the region around the file header." />
+        <Rule Id="SA1133" Action="None" _Description="Do not combine attributes" _Justification="Should be fine for simple or related attributes." />
+        <!-- StyleCop.CSharp.OrderingRules -->
+        <Rule Id="SA1201" Action="None" _Description="Elements must appear in the correct order" _Justification="Allow related members to appear together for easier readability." />
+        <Rule Id="SA1202" Action="None" _Description="Elements must be ordered by access" _Justification="Allow members to be mixed so that related members can be together." />
+        <Rule Id="SA1204" Action="None" _Description="Static elements must appear before instance elements" _Justification="Prefer to keep static and instance in separate partial classes, even files." />
+        <!-- StyleCop.CSharp.NamingRules -->
+        <Rule Id="SA1309" Action="None" _Description="Field names must not begin with underscore" _Justification="Require underscore prefix for all private fields." />
+        <!-- StyleCop.CSharp.MaintainabilityRules -->
+        <Rule Id="SA1402" Action="None" _Description="File may only contain a single class" _Justification="Primary classes should be in separate files, but supporting classes should be allowed to be next to their primary classes." />
+        <!-- StyleCop.CSharp.LayoutRules -->
+        <Rule Id="SA1503" Action="None" _Description="Braces must not be omitted" _Justification="Braces not needed for single line blocks." />
+        <Rule Id="SA1512" Action="None" _Description="A single-line comment within C# code is followed by a blank line." _Justification="This is preventing special comments like TODO, which may need to be on their own line."/>
+        <Rule Id="SA1520" Action="None" _Description="Use braces consistently" _Justification="Brace usage justified according to block size." />
+        <!-- StyleCop.CSharp.DocumentationRules -->
+        <Rule Id="SA1633" Action="None" _Description="File must have header" _Justification="Nice to have, but this rule does not allow file headers in a region." />
+        <Rule Id="SA1652" Action="None" _Description="Enable XML documentation output" _Justification="Temporary exception. Will be removed once documentation is completed." />
+    </Rules>
+
+    <Rules AnalyzerId="SonarAnalyzer.CSharp" RuleNamespace="SonarAnalyzer.CSharp">
+        <!-- Major Code Smell -->
+        <Rule Id="S125" Action="None" _Description="Sections of code should not be commented out" _Justification="Temporary exception to allow quick pace of development. Should be removed later." />
+        <Rule Id="S1135" Action="None" _Description="Track uses of TODO tags" _Justification="TODO tags should be allowed to be committed to version control, as they indicate pending work." />
+        <Rule Id="S1168" Action="None" _Description="Empty arrays and collections should be returned instead of null" _Justification="This is the existing approach. Need to fix over time." />
+        <Rule Id="S4136" Action="None" _Description="Method overloads should be grouped together" _Justification="Doesn't make sense. Related members shoud be grouped." />
+    </Rules>
+
+    <Rules AnalyzerId="Roslynator.CSharp.Analyzers" RuleNamespace="Roslynator.CSharp.Analyzers">
+        <!-- Design -->
+        <Rule Id="RCS1194" Action="None" _Description="Implement exception constructors." _Justification="No good reason to disallow custom constructors (except for the serialization ctor)." />
+    </Rules>
+</RuleSet>

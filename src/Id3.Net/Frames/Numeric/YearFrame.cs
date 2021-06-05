@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public YearFrame(int value) : base(value)
+        public YearFrame(int value)
+            : base(value)
         {
         }
 

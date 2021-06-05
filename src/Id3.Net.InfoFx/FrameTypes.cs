@@ -34,7 +34,8 @@ namespace Id3.InfoFx
         /// </summary>
         /// <typeparam name="T">The type of <see cref="Id3Frame"/> to add.</typeparam>
         /// <returns>A reference to this <see cref="FrameTypes"/>, allowing for chaining calls.</returns>
-        public FrameTypes Add<T>() where T : Id3Frame
+        public FrameTypes Add<T>()
+            where T : Id3Frame
         {
             base.Add(typeof(T));
             return this;
@@ -56,11 +57,12 @@ namespace Id3.InfoFx
             foreach (Type type in types)
             {
                 if (type == null)
-                    throw new ArgumentException($"Cannot specify null frame types", nameof(types));
+                    throw new ArgumentException(@"Cannot specify null frame types", nameof(types));
                 if (!type.IsSubclassOf(typeof(Id3Frame)))
-                    throw new ArgumentException($"The type '{type.FullName}' is not a Id3Frame type.", nameof(types));
+                    throw new ArgumentException($@"The type '{type.FullName}' is not a Id3Frame type.", nameof(types));
                 base.Add(type);
             }
+
             return this;
         }
     }

@@ -42,6 +42,6 @@ namespace Id3.Files
         /// <summary>
         ///     An error occurred while trying to suggest a new name.
         /// </summary>
-        Error
+        Error,
     }
 }

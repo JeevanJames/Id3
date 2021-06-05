@@ -27,7 +27,8 @@ namespace Id3.Frames
         {
         }
 
-        public RecordingDateFrame(DateTime value) : base(value)
+        public RecordingDateFrame(DateTime value)
+            : base(value)
         {
         }
 

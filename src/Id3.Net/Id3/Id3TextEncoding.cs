@@ -22,6 +22,6 @@ namespace Id3
     public enum Id3TextEncoding : byte
     {
         Iso8859_1 = 0,
-        Unicode = 1
+        Unicode = 1,
     }
 }

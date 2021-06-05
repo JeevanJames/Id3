@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public AlbumFrame(string value) : base(value)
+        public AlbumFrame(string value)
+            : base(value)
         {
         }
 

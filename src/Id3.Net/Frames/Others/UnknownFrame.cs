@@ -23,7 +23,7 @@ namespace Id3.Frames
     {
         public override bool Equals(Id3Frame other)
         {
-            if (base.Equals(other))
+            if (ReferenceEquals(this, other))
                 return true;
             if (!(other is UnknownFrame unknownFrame))
                 return false;

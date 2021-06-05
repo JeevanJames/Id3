@@ -1,4 +1,4 @@
-#region --- License & Copyright Notice ---
+﻿#region --- License & Copyright Notice ---
 /*
 Copyright (c) 2005-2019 Jeevan James
 All rights reserved.
@@ -31,7 +31,7 @@ namespace Id3
     internal sealed class FrameHandler
     {
         /// <summary>
-        ///     Initializes an instance of the <see cref="FrameHandler"/> class.
+        ///     Initializes a new instance of the <see cref="FrameHandler"/> class.
         /// </summary>
         /// <param name="frameId">The ID of the frame.</param>
         /// <param name="type">Type of the <see cref="Id3Frame"/>.</param>
@@ -46,22 +46,22 @@ namespace Id3
         }
 
         /// <summary>
-        ///     The ID of the frame.
+        ///     Gets the ID of the frame.
         /// </summary>
         internal string FrameId { get; }
 
         /// <summary>
-        ///     Type of the <see cref="Id3Frame"/>.
+        ///     Gets the type of the <see cref="Id3Frame"/>.
         /// </summary>
         internal Type Type { get; }
 
         /// <summary>
-        ///     Delegate to encode a <see cref="Id3Frame"/> into a byte array.
+        ///     Gets the delegate to encode a <see cref="Id3Frame"/> into a byte array.
         /// </summary>
         internal Func<Id3Frame, byte[]> Encoder { get; }
 
         /// <summary>
-        ///     Delegate to decode a byte array into a <see cref="Id3Frame"/>.
+        ///     Gets the delegate to decode a byte array into a <see cref="Id3Frame"/>.
         /// </summary>
         internal Func<byte[], Id3Frame> Decoder { get; }
     }
@@ -71,7 +71,7 @@ namespace Id3
         /// <summary>
         ///     Shortcut method to add a <see cref="FrameHandler"/> instance to the collection.
         /// </summary>
-        /// <typeparam name="TFrame">The type of the <see cref="Id3Frame"/></typeparam>
+        /// <typeparam name="TFrame">The type of the <see cref="Id3Frame"/>.</typeparam>
         /// <param name="frameId">The ID of the frame.</param>
         /// <param name="encoder">Delegate to encode a <see cref="Id3Frame"/> into a byte array.</param>
         /// <param name="decoder">Delegate to decode a byte array into a <see cref="Id3Frame"/>.</param>

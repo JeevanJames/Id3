@@ -30,29 +30,33 @@ namespace Id3.Frames
         {
         }
 
-        public TrackFrame(int value) : base(value)
+        public TrackFrame(int value)
+            : base(value)
         {
         }
 
-        public TrackFrame(int value, int trackCount) : base(value)
+        public TrackFrame(int value, int trackCount)
+            : base(value)
         {
             TrackCount = trackCount;
         }
 
         /// <summary>
-        ///     The total number of tracks.
+        ///     Gets or sets the total number of tracks.
         ///     <para />
-        ///     If greater than 0, the ID3 value will be set as &lt;track&gt;/&lt;track count&gt;
+        ///     If greater than 0, the ID3 value will be set as &lt;track&gt;/&lt;track count&gt;.
         /// </summary>
         public int TrackCount { get; set; }
 
         /// <summary>
-        ///     Indicates whether to zero-pad the track and track count values. This is useful for some MP3 players that
-        ///     incorrectly sort unpadded values such as 1 and 10.
+        ///     Gets or sets a value indicating whether to zero-pad the track and track count values.
+        ///     This is useful for some MP3 players that incorrectly sort unpadded values such as 1
+        ///     and 10.
         ///     <para />
         ///     If this value is null, then no padding is applied.
         ///     <para />
-        ///     If this value is 0 (zero), then the track value is padded based on the length of the track count value.
+        ///     If this value is 0 (zero), then the track value is padded based on the length of the
+        ///     track count value.
         ///     <para />
         ///     If this value is greater than 0, it is used to pad the track and track count values.
         /// </summary>
@@ -72,16 +76,21 @@ namespace Id3.Frames
                 {
                     track = Value.ToString();
                     if (Padding.HasValue)
-                        track = track.PadLeft(Padding.Value <= 0 ? (trackCount ?? "").Length : Padding.Value, '0');
+                    {
+                        track = track.PadLeft(Padding.Value <= 0
+                            ? (trackCount ?? string.Empty).Length
+                            : Padding.Value, '0');
+                    }
                 }
 
-                if (track == null)
+                if (track is null)
                     return null;
                 string result = track;
                 if (trackCount != null)
                     result += $"/{trackCount}";
                 return result;
             }
+
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
@@ -112,12 +121,17 @@ namespace Id3.Frames
                 string track = match.Groups[1].Value;
                 Value = int.Parse(track);
                 if (track.StartsWith("0"))
+#pragma warning disable S2259 // Null pointers should not be dereferenced
                     Padding = Math.Max(track.Length, trackCount.Length);
+#pragma warning restore S2259 // Null pointers should not be dereferenced
             }
         }
 
-        private static readonly Regex TrackPattern = new Regex(@"^(\d+)(?:/(\d+))?$");
+        private static readonly Regex TrackPattern = new(@"^(\d+)(?:/(\d+))?$");
 
-        public static implicit operator TrackFrame(int value) => new TrackFrame(value);
+        public static implicit operator TrackFrame(int value)
+        {
+            return new(value);
+        }
     }
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Id3.Serialization</name>
+    </assembly>
+    <members>
+        <member name="M:Id3.Serialization.SerializationExtensions.IncludeId3SerializationSupport``1(``0)">
+            <summary>
+                Registers all serialization surrogates defined in this assembly with the specified formatter.
+            </summary>
+            <typeparam name="TFormatter"> The type of formatter to register for. </typeparam>
+            <param name="formatter"> The formatter to register for.</param>
+            <returns> An instance of the formatter. </returns>
+        </member>
+    </members>
+</doc>

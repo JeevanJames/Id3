@@ -22,7 +22,7 @@ using System.Diagnostics;
 namespace Id3.Frames
 {
     /// <summary>
-    ///     Represents an ID3 frame that contains textual data
+    ///     Represents an ID3 frame that contains textual data.
     /// </summary>
     public abstract class TextFrameBase : Id3Frame
     {
@@ -32,11 +32,10 @@ namespace Id3.Frames
                 text.TextValue == TextValue;
         }
 
-        public sealed override int GetHashCode() =>
-            TextValue.GetHashCode();
-
-        public override string ToString() =>
-            IsAssigned ? TextValue : string.Empty;
+        public override string ToString()
+        {
+            return (IsAssigned ? TextValue : string.Empty) ?? string.Empty;
+        }
 
         public Id3TextEncoding EncodingType { get; set; }
 
@@ -44,9 +43,9 @@ namespace Id3.Frames
             !string.IsNullOrEmpty(TextValue);
 
         /// <summary>
-        ///     Textual representation of the frame value. This is for internal usage only; derived classes should override
-        ///     the getters and setters to get and set the natively-typed value in the
-        ///     <see cref="TextFrameBase{TValue}.Value" /> property.
+        ///     Gets or sets the textual representation of the frame value. This is for internal usage
+        ///     only; derived classes should override the getters and setters to get and set the natively-typed
+        ///     value in the <see cref="TextFrameBase{TValue}.Value" /> property.
         /// </summary>
         internal abstract string TextValue { get; set; }
     }
@@ -54,7 +53,7 @@ namespace Id3.Frames
     [DebuggerDisplay("{" + nameof(Value) + "}")]
     public abstract class TextFrameBase<TValue> : TextFrameBase
     {
-        private TValue _value;
+        private TValue _value = default!;
 
         protected TextFrameBase()
         {
@@ -66,8 +65,8 @@ namespace Id3.Frames
         }
 
         /// <summary>
-        ///     Natively-typed value of the frame. Derived classes will override the <see cref="TextFrameBase.TextValue" /> to get
-        ///     and set this value.
+        ///     Gets or sets the natively-typed value of the frame. Derived classes will override the
+        ///     <see cref="TextFrameBase.TextValue" /> to get and set this value.
         /// </summary>
         public TValue Value
         {

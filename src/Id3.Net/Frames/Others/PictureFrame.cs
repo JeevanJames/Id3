@@ -108,6 +108,6 @@ namespace Id3.Frames
         ABrightColouredFish = 0x11,
         Illustration = 0x12,
         BandOrArtistLogotype = 0x13,
-        PublisherOrStudioLogotype = 0x14
+        PublisherOrStudioLogotype = 0x14,
     }
 }

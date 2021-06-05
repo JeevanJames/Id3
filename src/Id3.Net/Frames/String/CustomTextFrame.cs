@@ -27,7 +27,8 @@ namespace Id3.Frames
         {
         }
 
-        public CustomTextFrame(string value) : base(value)
+        public CustomTextFrame(string value)
+            : base(value)
         {
         }
 

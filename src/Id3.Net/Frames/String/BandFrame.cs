@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public BandFrame(string value) : base(value)
+        public BandFrame(string value)
+            : base(value)
         {
         }
 

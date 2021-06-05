@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public ContentGroupDescriptionFrame(string value) : base(value)
+        public ContentGroupDescriptionFrame(string value)
+            : base(value)
         {
         }
 

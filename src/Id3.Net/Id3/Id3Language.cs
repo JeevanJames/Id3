@@ -21,6 +21,7 @@ namespace Id3
 {
     public enum Id3Language
     {
+#pragma warning disable SA1300 // Element should begin with upper-case letter
         aar,
         abk,
         ace,
@@ -444,6 +445,7 @@ namespace Id3
         zha,
         zho,
         zul,
-        zun
+        zun,
+#pragma warning restore SA1300 // Element should begin with upper-case letter
     }
 }

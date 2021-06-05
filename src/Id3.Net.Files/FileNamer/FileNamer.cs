@@ -26,6 +26,8 @@ using System.Text.RegularExpressions;
 
 using Id3.Files.Resources;
 using Id3.Frames;
+using Id3.InfoFx;
+
 using JetBrains.Annotations;
 
 namespace Id3.Files
@@ -38,32 +40,35 @@ namespace Id3.Files
         [NotNull]
         private readonly List<string> _patterns;
 
-        /// <inheritdoc />
         /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Id3.Files.FileNamer" /> class with a single file naming pattern.
+        ///     Initializes a new instance of the <see cref="FileNamer"/> class with a single file
+        ///     naming pattern.
         /// </summary>
         /// <param name="pattern">The file naming pattern to use.</param>
-        public FileNamer([NotNull] string pattern) : this(new[] { pattern })
-        {
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="T:Id3.Files.FileNamer" /> class with one or more file naming patterns,
-        ///     specified in order of priority.
-        /// </summary>
-        /// <param name="patterns">The file naming patterns to use, in order of priority.</param>
-        public FileNamer([NotNull] params string[] patterns) : this((IEnumerable<string>)patterns)
+        public FileNamer([NotNull] string pattern)
+            : this(new[] { pattern })
         {
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="FileNamer" /> class with one or more file naming patterns, specified
-        ///     in order of priority.
+        ///     Initializes a new instance of the <see cref="FileNamer"/> class with one or more file
+        ///     naming patterns, specified in order of priority.
         /// </summary>
         /// <param name="patterns">The file naming patterns to use, in order of priority.</param>
-        /// <exception cref="ArgumentNullException">Thrown if the specified patterns parameter is null</exception>
-        /// <exception cref="ArgumentException">Thrown if no patterns are specified or if there is a null or empty pattern</exception>
+        public FileNamer([NotNull] params string[] patterns)
+            : this((IEnumerable<string>)patterns)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="FileNamer" /> class with one or more file
+        ///     naming patterns, specified in order of priority.
+        /// </summary>
+        /// <param name="patterns">The file naming patterns to use, in order of priority.</param>
+        /// <exception cref="ArgumentNullException">Thrown if the specified patterns parameter is null.</exception>
+        /// <exception cref="ArgumentException">
+        ///     Thrown if no patterns are specified or if there is a null or empty pattern.
+        /// </exception>
         public FileNamer([NotNull] IEnumerable<string> patterns)
         {
             if (patterns == null)
@@ -77,22 +82,26 @@ namespace Id3.Files
         }
 
         /// <summary>
-        ///     Ensures that all placeholders in the pattern refer to existing tag frame properties. Then it attempts to mapping
-        ///     dictionary between the frame name and the corresponding frame property, so that multiple renames can be done fast.
+        ///     Ensures that all placeholders in the pattern refer to existing tag frame properties.
+        ///     Then it attempts to mapping dictionary between the frame name and the corresponding
+        ///     frame property, so that multiple renames can be done fast.
         /// </summary>
-        /// <param name="patterns">The pattern to validate</param>
-        /// <returns>A mapping of placeholder name to property info of the correspoding frame in <see cref="Id3Tag" /></returns>
+        /// <param name="patterns">The pattern to validate.</param>
         /// <exception cref="ArgumentException">Thrown if any pattern contains invalid placeholders.</exception>
         private static void ValidatePatterns(IEnumerable<string> patterns)
         {
             // Get all distinct placeholder names in all the patterns and check whether any of them
             // do not appear as a key in the _mappings dictionary. If so, throw an exception.
             string[] invalidPlaceholders = patterns
-                .SelectMany(pattern => {
+                .SelectMany(pattern =>
+                {
                     MatchCollection matches = FramePlaceholderPattern.Matches(pattern);
                     if (matches.Count == 0)
+                    {
                         throw new ArgumentException(string.Format(FileNamerMessages.MissingPlaceholdersInPattern,
                             pattern));
+                    }
+
                     return matches.Cast<Match>().Select(m => m.Groups[1].Value);
                 })
                 .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -117,9 +126,9 @@ namespace Id3.Files
         /// <summary>
         ///     Gets naming suggestions for the MP3 files at the specified file paths.
         /// </summary>
-        /// <param name="filePaths">File paths of the MP3 files</param>
-        /// <returns>Collection of renaming suggestions for the specified files</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="filePaths">File paths of the MP3 files.</param>
+        /// <returns>Collection of renaming suggestions for the specified files.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="filePaths"/> is <c>null</c>.</exception>
         public RenameSuggestions GetSuggestions(IEnumerable<string> filePaths)
         {
             if (filePaths == null)
@@ -130,14 +139,16 @@ namespace Id3.Files
         /// <summary>
         ///     Gets naming suggestions for the MP3 files in the specified directory.
         /// </summary>
-        /// <param name="directory">The directory where the MP3 files are located</param>
+        /// <param name="directory">The directory where the MP3 files are located.</param>
         /// <param name="fileMask">File mask to use when searching for the files. Defaults tp *.mp3.</param>
         /// <param name="searchOption">
         ///     Indicates whether to search just the specified directory or recursively search through its
         ///     subdirectories as well.
         /// </param>
-        /// <returns>Collection of renaming suggestions for the matching files found in the specified directory</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns>
+        ///     Collection of renaming suggestions for the matching files found in the specified directory.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="directory"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if the specified directory does not exist.</exception>
         public RenameSuggestions GetSuggestions(string directory, string fileMask = "*.mp3",
             SearchOption searchOption = SearchOption.TopDirectoryOnly)
@@ -145,8 +156,11 @@ namespace Id3.Files
             if (directory == null)
                 throw new ArgumentNullException(nameof(directory));
             if (!Directory.Exists(directory))
+            {
                 throw new ArgumentException(string.Format(FileNamerMessages.MissingDirectory, directory),
                     nameof(directory));
+            }
+
             if (string.IsNullOrWhiteSpace(fileMask))
                 fileMask = "*.mp3";
 
@@ -182,31 +196,32 @@ namespace Id3.Files
             string directory = Path.GetDirectoryName(filePath);
             string originalName = Path.GetFileName(filePath);
 
-            using (var mp3 = new Mp3(filePath))
+            using var mp3 = new Mp3(filePath);
+
+            Id3Tag tag = mp3.GetTag(Id3Version.V23);
+            if (tag == null)
+                return new RenameSuggestion(directory, originalName, FileNamerMessages.MissingId3v23TagInFile);
+
+            //TODO: Get ID3v1 tag as well and merge with the v2 tag
+
+            string newName = GetNewName(tag, originalName, out string missingFrameName);
+
+            if (missingFrameName != null)
             {
-                Id3Tag tag = mp3.GetTag(Id3Version.V23);
-                if (tag == null)
-                    return new RenameSuggestion(directory, originalName, FileNamerMessages.MissingId3v23TagInFile);
-
-                //TODO: Get ID3v1 tag as well and merge with the v2 tag
-
-                string newName = GetNewName(tag, originalName, out string missingFrameName);
-
-                if (missingFrameName != null)
-                    return new RenameSuggestion(directory, originalName,
-                        string.Format(FileNamerMessages.MissingDataForFrame, missingFrameName));
-
-                newName += ".mp3";
-                RenamingEventArgs renamingEventResult = FireRenamingEvent(tag, originalName, newName);
-                if (renamingEventResult.Cancel)
-                    return new RenameSuggestion(directory, originalName, RenameStatus.Cancelled);
-
-                newName = renamingEventResult.NewName;
-
-                RenameStatus status = originalName.Equals(newName, StringComparison.Ordinal)
-                    ? RenameStatus.CorrectlyNamed : RenameStatus.Rename;
-                return new RenameSuggestion(directory, originalName, newName, status);
+                return new RenameSuggestion(directory, originalName,
+                    string.Format(FileNamerMessages.MissingDataForFrame, missingFrameName));
             }
+
+            newName += ".mp3";
+            RenamingEventArgs renamingEventResult = FireRenamingEvent(tag, originalName, newName);
+            if (renamingEventResult.Cancel)
+                return new RenameSuggestion(directory, originalName, RenameStatus.Cancelled);
+
+            newName = renamingEventResult.NewName;
+
+            RenameStatus status = originalName.Equals(newName, StringComparison.Ordinal)
+                ? RenameStatus.CorrectlyNamed : RenameStatus.Rename;
+            return new RenameSuggestion(directory, originalName, newName, status);
         }
 
         private string GetNewName(Id3Tag tag, string originalName, out string missingFrameName)
@@ -225,8 +240,9 @@ namespace Id3.Files
                     var hasMissingFrames = false;
 
                     int iteration = i;
-                    string newName = FramePlaceholderPattern.Replace(pattern, match => {
-                        //If this pattern already has missing frames, don't proces anything
+                    string newName = FramePlaceholderPattern.Replace(pattern, match =>
+                    {
+                        //If this pattern already has missing frames, don't process anything
                         if (hasMissingFrames)
                             return string.Empty;
 
@@ -245,6 +261,7 @@ namespace Id3.Files
                             if (!string.IsNullOrWhiteSpace(frameValue))
                                 return frameValue;
                         }
+
                         hasMissingFrames = true;
                         missingFrame = frameName;
                         return string.Empty;
@@ -254,11 +271,12 @@ namespace Id3.Files
                         return newName;
                 }
             }
-            
+
             missingFrameName = missingFrame;
             return null;
         }
-        private static readonly Regex FramePlaceholderPattern = new Regex(@"{(\w+)}");
+
+        private static readonly Regex FramePlaceholderPattern = new(@"{(\w+)}");
 
         private string FireResolveMissingDataEvent(Id3Tag tag, Id3Frame frame, string sourceName)
         {
@@ -273,9 +291,7 @@ namespace Id3.Files
         private RenamingEventArgs FireRenamingEvent(Id3Tag tag, string oldName, string newName)
         {
             EventHandler<RenamingEventArgs> renaming = Renaming;
-            var args = new RenamingEventArgs(tag, oldName) {
-                NewName = newName
-            };
+            var args = new RenamingEventArgs(tag, oldName) { NewName = newName };
             renaming?.Invoke(this, args);
             return args;
         }
@@ -286,14 +302,15 @@ namespace Id3.Files
         ///     <para />
         ///     Allows for quick lookups of the property data.
         /// </summary>
-        private static readonly Dictionary<string, PropertyInfo> _mapping;
+        private static readonly Dictionary<string, PropertyInfo> _mapping = InitializeMapping();
 
         /// <summary>
         ///     List of <see cref="Id3Tag" /> frame properties that can be used as placeholders in the file naming patterns.
         ///     <para />
         ///     Typically, these would be textual frames that have single line values of reasonable length.
         /// </summary>
-        private static readonly List<string> _allowedFrames = new List<string> {
+        private static readonly List<string> _allowedFrames = new()
+        {
             "Album",
             "Artists",
             "Band",
@@ -311,27 +328,26 @@ namespace Id3.Files
             "Subtitle",
             "Title",
             "Track",
-            "Year"
+            "Year",
         };
 
-        /// <summary>
-        ///     One-time initialization of the <see cref="_mapping" /> dictionary.
-        /// </summary>
-        static FileNamer()
+        private static Dictionary<string, PropertyInfo> InitializeMapping()
         {
             Type tagType = typeof(Id3Tag);
             Type baseFrameType = typeof(Id3Frame);
 
-            _mapping = new Dictionary<string, PropertyInfo>(_allowedFrames.Count, StringComparer.OrdinalIgnoreCase);
+            var mapping = new Dictionary<string, PropertyInfo>(_allowedFrames.Count, StringComparer.OrdinalIgnoreCase);
             foreach (string frame in _allowedFrames)
             {
                 PropertyInfo property = tagType.GetProperty(frame);
                 if (property == null)
-                    throw new Exception($"No property named {frame} exists on Id3Tag. Please check the whitelist.");
+                    throw new InfoProviderException($"No property named {frame} exists on Id3Tag. Please check the whitelist.");
                 if (!property.PropertyType.IsSubclassOf(baseFrameType))
-                    throw new Exception($"Property Id3Tag.{frame} is not a frame type. Please check the whitelist.");
+                    throw new InfoProviderException($"Property Id3Tag.{frame} is not a frame type. Please check the whitelist.");
                 _mapping.Add(frame, property);
             }
+
+            return mapping;
         }
     }
 }

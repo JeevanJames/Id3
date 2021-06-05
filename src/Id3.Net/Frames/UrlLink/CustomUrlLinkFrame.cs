@@ -28,11 +28,13 @@ namespace Id3.Frames
         {
         }
 
-        public CustomUrlLinkFrame([NotNull] string url) : base(url)
+        public CustomUrlLinkFrame([NotNull] string url)
+            : base(url)
         {
         }
 
-        public CustomUrlLinkFrame([NotNull] string url, [NotNull] string description) : base(url)
+        public CustomUrlLinkFrame([NotNull] string url, [NotNull] string description)
+            : base(url)
         {
             Description = description ?? throw new ArgumentNullException(nameof(description));
         }
@@ -41,6 +43,9 @@ namespace Id3.Frames
 
         public Id3TextEncoding EncodingType { get; set; }
 
-        public static implicit operator CustomUrlLinkFrame(string url) => new CustomUrlLinkFrame(url);
+        public static implicit operator CustomUrlLinkFrame(string url)
+        {
+            return new(url);
+        }
     }
 }

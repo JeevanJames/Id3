@@ -25,7 +25,8 @@ namespace Id3.Frames
         {
         }
 
-        public SubtitleFrame(string value) : base(value)
+        public SubtitleFrame(string value)
+            : base(value)
         {
         }
 
