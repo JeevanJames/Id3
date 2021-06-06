@@ -29,9 +29,9 @@ namespace Id3.v2
 {
     internal sealed partial class Id3V23Handler : Id3V2Handler
     {
-        internal override async Task DeleteTag(Stream stream)
+        internal override async Task DeleteTagAsync(Stream stream)
         {
-            if (!await HasTag(stream).ConfigureAwait(false))
+            if (!await HasTagAsync(stream).ConfigureAwait(false))
                 return;
 
             var buffer = new byte[BufferSize];
@@ -55,9 +55,9 @@ namespace Id3.v2
             await stream.FlushAsync().ConfigureAwait(false);
         }
 
-        internal override async Task<byte[]> GetTagBytes(Stream stream)
+        internal override async Task<byte[]> GetTagBytesAsync(Stream stream)
         {
-            if (!await HasTag(stream).ConfigureAwait(false))
+            if (!await HasTagAsync(stream).ConfigureAwait(false))
                 return null;
 
             var sizeBytes = new byte[4];
@@ -71,7 +71,7 @@ namespace Id3.v2
             return tagBytes;
         }
 
-        internal override async Task<bool> HasTag(Stream stream)
+        internal override async Task<bool> HasTagAsync(Stream stream)
         {
             stream.Seek(0, SeekOrigin.Begin);
 
@@ -82,9 +82,9 @@ namespace Id3.v2
             return magic == "ID3" && headerBytes[3] == 3;
         }
 
-        internal override async Task<(Id3Tag Tag, object AdditionalData)> ReadTagWithAdditionalData(Stream stream)
+        internal override async Task<(Id3Tag Tag, object AdditionalData)> ReadTagWithDataAsync(Stream stream)
         {
-            if (!await HasTag(stream).ConfigureAwait(false))
+            if (!await HasTagAsync(stream).ConfigureAwait(false))
                 return (null, null);
 
             Id3Tag tag = CreateTag();
@@ -161,11 +161,11 @@ namespace Id3.v2
             return (tag, additionalData);
         }
 
-        internal override async Task<bool> WriteTag(Stream stream, Id3Tag tag)
+        internal override async Task<bool> WriteTagAsync(Stream stream, Id3Tag tag)
         {
             byte[] tagBytes = GetTagBytes(tag);
             int requiredTagSize = tagBytes.Length;
-            if (await HasTag(stream).ConfigureAwait(false))
+            if (await HasTagAsync(stream).ConfigureAwait(false))
             {
                 int currentTagSize = await GetTagSize(stream).ConfigureAwait(false);
                 if (requiredTagSize > currentTagSize)

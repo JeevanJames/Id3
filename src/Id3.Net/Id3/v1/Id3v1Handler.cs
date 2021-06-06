@@ -28,18 +28,18 @@ namespace Id3.v1
 {
     internal sealed class Id3V1Handler : Id3Handler
     {
-        internal override async Task DeleteTag(Stream stream)
+        internal override async Task DeleteTagAsync(Stream stream)
         {
-            if (await HasTag(stream).ConfigureAwait(false))
+            if (await HasTagAsync(stream).ConfigureAwait(false))
             {
                 stream.SetLength(stream.Length - 128);
                 await stream.FlushAsync().ConfigureAwait(false);
             }
         }
 
-        internal override async Task<byte[]> GetTagBytes(Stream stream)
+        internal override async Task<byte[]> GetTagBytesAsync(Stream stream)
         {
-            if (!await HasTag(stream).ConfigureAwait(false))
+            if (!await HasTagAsync(stream).ConfigureAwait(false))
                 return null;
 
             stream.Seek(-128, SeekOrigin.End);
@@ -48,7 +48,7 @@ namespace Id3.v1
             return tagBytes;
         }
 
-        internal override async Task<bool> HasTag(Stream stream)
+        internal override async Task<bool> HasTagAsync(Stream stream)
         {
             if (stream.Length < 128)
                 return false;
@@ -60,9 +60,9 @@ namespace Id3.v1
             return magic == "TAG";
         }
 
-        internal override async Task<(Id3Tag Tag, object AdditionalData)> ReadTagWithAdditionalData(Stream stream)
+        internal override async Task<(Id3Tag Tag, object AdditionalData)> ReadTagWithDataAsync(Stream stream)
         {
-            if (!await HasTag(stream).ConfigureAwait(false))
+            if (!await HasTagAsync(stream).ConfigureAwait(false))
                 return (null, null);
 
             stream.Seek(-125, SeekOrigin.End);
@@ -93,7 +93,7 @@ namespace Id3.v1
             return (tag, null);
         }
 
-        internal override async Task<bool> WriteTag(Stream stream, Id3Tag tag)
+        internal override async Task<bool> WriteTagAsync(Stream stream, Id3Tag tag)
         {
             Encoding encoding = TextEncodingHelper.GetDefaultEncoding();
 
@@ -135,7 +135,7 @@ namespace Id3.v1
             if (tag.Track.Value >= 0)
                 bytes[126] = (byte)tag.Track.Value;
 
-            if (await HasTag(stream).ConfigureAwait(false))
+            if (await HasTagAsync(stream).ConfigureAwait(false))
                 stream.Seek(-128, SeekOrigin.End);
             else
                 stream.Seek(0, SeekOrigin.End);

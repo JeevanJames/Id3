@@ -82,21 +82,21 @@ namespace Id3
 
         #region Stream-manipulation overrides for the handler
 
-        internal abstract Task DeleteTag(Stream stream);
+        internal abstract Task DeleteTagAsync(Stream stream);
 
-        internal abstract Task<byte[]> GetTagBytes(Stream stream);
+        internal abstract Task<byte[]> GetTagBytesAsync(Stream stream);
 
-        internal abstract Task<bool> HasTag(Stream stream);
+        internal abstract Task<bool> HasTagAsync(Stream stream);
 
-        internal async Task<Id3Tag> ReadTag(Stream stream)
+        internal async Task<Id3Tag> ReadTagAsync(Stream stream)
         {
-            (Id3Tag tag, _) = await ReadTagWithAdditionalData(stream).ConfigureAwait(false);
+            (Id3Tag tag, _) = await ReadTagWithDataAsync(stream).ConfigureAwait(false);
             return tag;
         }
 
-        internal abstract Task<(Id3Tag Tag, object AdditionalData)> ReadTagWithAdditionalData(Stream stream);
+        internal abstract Task<(Id3Tag Tag, object AdditionalData)> ReadTagWithDataAsync(Stream stream);
 
-        internal abstract Task<bool> WriteTag(Stream stream, Id3Tag tag);
+        internal abstract Task<bool> WriteTagAsync(Stream stream, Id3Tag tag);
 
         #endregion
 

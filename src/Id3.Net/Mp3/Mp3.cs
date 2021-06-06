@@ -165,7 +165,7 @@ namespace Id3
                 .ConfigureAwait(false);
             if (handler is not null)
             {
-                await handler.DeleteTag(_stream).ConfigureAwait(false);
+                await handler.DeleteTagAsync(_stream).ConfigureAwait(false);
                 InvalidateExistingHandlers();
             }
         }
@@ -182,7 +182,7 @@ namespace Id3
                 .ConfigureAwait(false);
             if (foundHandler is not null)
             {
-                await foundHandler.DeleteTag(_stream).ConfigureAwait(false);
+                await foundHandler.DeleteTagAsync(_stream).ConfigureAwait(false);
                 InvalidateExistingHandlers();
             }
         }
@@ -194,7 +194,7 @@ namespace Id3
         {
             EnsureWritePermissions(Mp3Messages.NoWritePermissions_CannotDeleteTag);
             await foreach (Id3Handler existingHandler in GetExistingHandlers())
-                await existingHandler.DeleteTag(_stream).ConfigureAwait(false);
+                await existingHandler.DeleteTagAsync(_stream).ConfigureAwait(false);
             InvalidateExistingHandlers();
         }
         #endregion
@@ -209,7 +209,7 @@ namespace Id3
         {
             return GetExistingHandlers().SelectAwait(async handler =>
             {
-                (Id3Tag tag, _) = await handler.ReadTagWithAdditionalData(_stream).ConfigureAwait(false);
+                (Id3Tag tag, _) = await handler.ReadTagWithDataAsync(_stream).ConfigureAwait(false);
                 return tag;
             });
         }
@@ -224,7 +224,7 @@ namespace Id3
             Id3Handler familyHandler = await GetExistingHandlers()
                 .FirstOrDefaultAsync(handler => handler.Family == family)
                 .ConfigureAwait(false);
-            return familyHandler is not null ? await familyHandler.ReadTag(_stream).ConfigureAwait(false) : null;
+            return familyHandler is not null ? await familyHandler.ReadTagAsync(_stream).ConfigureAwait(false) : null;
         }
 
         public async Task<(Id3Tag Tag, object AdditionalData)> GetTagWithAdditionalData(Id3TagFamily family)
@@ -233,7 +233,7 @@ namespace Id3
                 .FirstOrDefaultAsync(handler => handler.Family == family)
                 .ConfigureAwait(false);
             return familyHandler is not null
-                ? await familyHandler.ReadTagWithAdditionalData(_stream).ConfigureAwait(false)
+                ? await familyHandler.ReadTagWithDataAsync(_stream).ConfigureAwait(false)
                 : (null, null);
         }
 
@@ -247,7 +247,7 @@ namespace Id3
             Id3Handler handler = await GetExistingHandlers()
                 .FirstOrDefaultAsync(h => h.Version == version)
                 .ConfigureAwait(false);
-            return handler is not null ? await handler.ReadTag(_stream).ConfigureAwait(false) : null;
+            return handler is not null ? await handler.ReadTagAsync(_stream).ConfigureAwait(false) : null;
         }
 
         public async Task<(Id3Tag Tag, object AdditionalData)> GetTagWithAdditionalData(Id3Version version)
@@ -256,7 +256,7 @@ namespace Id3
                 .FirstOrDefaultAsync(h => h.Version == version)
                 .ConfigureAwait(false);
             return handler is not null
-                ? await handler.ReadTagWithAdditionalData(_stream).ConfigureAwait(false)
+                ? await handler.ReadTagWithDataAsync(_stream).ConfigureAwait(false)
                 : (null, null);
         }
 
@@ -273,7 +273,7 @@ namespace Id3
             Id3Handler handler = await GetExistingHandlers()
                 .FirstOrDefaultAsync(h => h.Version == version)
                 .ConfigureAwait(false);
-            return handler is not null ? await handler.GetTagBytes(_stream).ConfigureAwait(false) : null;
+            return handler is not null ? await handler.GetTagBytesAsync(_stream).ConfigureAwait(false) : null;
         }
 
         #endregion
@@ -342,14 +342,14 @@ namespace Id3
                     if (conflictAction == WriteConflictAction.Replace)
                     {
                         Id3Handler handlerCopy = handler; //TODO: Why did we need a copy of the handler?
-                        await handlerCopy.DeleteTag(_stream).ConfigureAwait(false);
+                        await handlerCopy.DeleteTagAsync(_stream).ConfigureAwait(false);
                     }
                 }
             }
 
             //Write the tag to the file. The handler will know how to overwrite itself.
             var writeHandler = Id3Handler.GetHandler(tag.Version);
-            bool writeSuccessful = await writeHandler.WriteTag(_stream, tag).ConfigureAwait(false);
+            bool writeSuccessful = await writeHandler.WriteTagAsync(_stream, tag).ConfigureAwait(false);
             if (writeSuccessful)
                 InvalidateExistingHandlers();
             return writeSuccessful;
@@ -365,9 +365,9 @@ namespace Id3
             await foreach (Id3Handler handler in GetExistingHandlers())
             {
                 if (handler.Family == Id3TagFamily.Version2X)
-                    startBytes = await handler.GetTagBytes(_stream).ConfigureAwait(false);
+                    startBytes = await handler.GetTagBytesAsync(_stream).ConfigureAwait(false);
                 else
-                    endBytes = await handler.GetTagBytes(_stream).ConfigureAwait(false);
+                    endBytes = await handler.GetTagBytesAsync(_stream).ConfigureAwait(false);
             }
 
             long audioStreamLength = _stream.Length - (startBytes?.Length ?? 0) - (endBytes?.Length ?? 0);
@@ -410,28 +410,26 @@ namespace Id3
         // next time it is accessed.
         private async IAsyncEnumerable<Id3Handler> GetExistingHandlers()
         {
-            if (_existingHandlers is not null)
+            if (_existingHandlers is null)
             {
-                foreach (Id3Handler existingHandler in _existingHandlers)
-                    yield return existingHandler;
-
-                yield break;
-            }
-
-            bool v2HandlerFound = false;
-            _existingHandlers = new List<Id3Handler>();
-            foreach (Id3HandlerMetadata handlerMetadata in Id3Handler.AvailableHandlers)
-            {
-                Id3Handler handler = handlerMetadata.Instance;
-                if (handler.Family == Id3TagFamily.Version2X && v2HandlerFound)
-                    continue;
-
-                if (await handler.HasTag(_stream).ConfigureAwait(false))
+                bool v2HandlerFound = false;
+                _existingHandlers = new List<Id3Handler>();
+                foreach (Id3HandlerMetadata handlerMetadata in Id3Handler.AvailableHandlers)
                 {
-                    yield return handler;
-                    v2HandlerFound = handler.Family == Id3TagFamily.Version2X;
+                    Id3Handler handler = handlerMetadata.Instance;
+                    if (handler.Family == Id3TagFamily.Version2X && v2HandlerFound)
+                        continue;
+
+                    if (await handler.HasTagAsync(_stream).ConfigureAwait(false))
+                    {
+                        _existingHandlers.Add(handler);
+                        v2HandlerFound = handler.Family == Id3TagFamily.Version2X;
+                    }
                 }
             }
+
+            foreach (Id3Handler existingHandler in _existingHandlers)
+                yield return existingHandler;
         }
 
         #endregion
