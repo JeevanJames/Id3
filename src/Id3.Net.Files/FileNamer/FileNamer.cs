@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using Id3.Files.Resources;
 using Id3.Frames;
@@ -129,11 +130,11 @@ namespace Id3.Files
         /// <param name="filePaths">File paths of the MP3 files.</param>
         /// <returns>Collection of renaming suggestions for the specified files.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="filePaths"/> is <c>null</c>.</exception>
-        public RenameSuggestions GetSuggestions(IEnumerable<string> filePaths)
+        public Task<RenameSuggestions> GetSuggestions(IEnumerable<string> filePaths)
         {
-            if (filePaths == null)
+            if (filePaths is null)
                 throw new ArgumentNullException(nameof(filePaths));
-            return new RenameSuggestions(GetRenameSuggestions(filePaths));
+            return GetSuggestionsInternal(filePaths);
         }
 
         /// <summary>
@@ -150,10 +151,10 @@ namespace Id3.Files
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="directory"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if the specified directory does not exist.</exception>
-        public RenameSuggestions GetSuggestions(string directory, string fileMask = "*.mp3",
+        public Task<RenameSuggestions> GetSuggestions(string directory, string fileMask = "*.mp3",
             SearchOption searchOption = SearchOption.TopDirectoryOnly)
         {
-            if (directory == null)
+            if (directory is null)
                 throw new ArgumentNullException(nameof(directory));
             if (!Directory.Exists(directory))
             {
@@ -165,7 +166,13 @@ namespace Id3.Files
                 fileMask = "*.mp3";
 
             IEnumerable<string> files = Directory.EnumerateFiles(directory, fileMask, searchOption);
-            return new RenameSuggestions(GetRenameSuggestions(files));
+
+            return GetSuggestionsInternal(files);
+        }
+
+        private async Task<RenameSuggestions> GetSuggestionsInternal(IEnumerable<string> files)
+        {
+            return new(await GetRenameSuggestions(files).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -179,13 +186,19 @@ namespace Id3.Files
         /// </summary>
         public event EventHandler<RenamingEventArgs> Renaming;
 
-        private IEnumerable<RenameSuggestion> GetRenameSuggestions(IEnumerable<string> filePaths)
+        private async Task<IEnumerable<RenameSuggestion>> GetRenameSuggestions(IEnumerable<string> filePaths)
         {
+            var suggestions = new List<RenameSuggestion>();
             foreach (string filePath in filePaths)
-                yield return GetRenameSuggestion(filePath);
+            {
+                RenameSuggestion suggestion = await GetRenameSuggestion(filePath).ConfigureAwait(false);
+                suggestions.Add(suggestion);
+            }
+
+            return suggestions;
         }
 
-        private RenameSuggestion GetRenameSuggestion(string filePath)
+        private async Task<RenameSuggestion> GetRenameSuggestion(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 return new RenameSuggestion(filePath, filePath, FileNamerMessages.InvalidFilePath);
@@ -198,7 +211,7 @@ namespace Id3.Files
 
             using var mp3 = new Mp3(filePath);
 
-            Id3Tag tag = mp3.GetTag(Id3Version.V23);
+            Id3Tag tag = await mp3.GetTag(Id3Version.V23);
             if (tag == null)
                 return new RenameSuggestion(directory, originalName, FileNamerMessages.MissingId3v23TagInFile);
 

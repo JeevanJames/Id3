@@ -21,81 +21,80 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+
 using Id3.Frames;
 
 namespace Id3.v2
 {
     internal sealed partial class Id3V23Handler : Id3V2Handler
     {
-        internal override void DeleteTag(Stream stream)
+        internal override async Task DeleteTag(Stream stream)
         {
-            if (!HasTag(stream))
+            if (!await HasTag(stream).ConfigureAwait(false))
                 return;
 
             var buffer = new byte[BufferSize];
-            int tagSize = GetTagSize(stream);
+            int tagSize = await GetTagSize(stream).ConfigureAwait(false);
             int readPos = tagSize, writePos = 0;
             int bytesRead;
             do
             {
                 stream.Seek(readPos, SeekOrigin.Begin);
-                bytesRead = stream.Read(buffer, 0, BufferSize);
+                bytesRead = await stream.ReadAsync(buffer, 0, BufferSize).ConfigureAwait(false);
                 if (bytesRead == 0)
                     continue;
                 stream.Seek(writePos, SeekOrigin.Begin);
-                stream.Write(buffer, 0, bytesRead);
+                await stream.WriteAsync(buffer, 0, bytesRead).ConfigureAwait(false);
                 readPos += bytesRead;
                 writePos += bytesRead;
             }
             while (bytesRead == BufferSize);
 
             stream.SetLength(stream.Length - tagSize);
-            stream.Flush();
+            await stream.FlushAsync().ConfigureAwait(false);
         }
 
-        internal override byte[] GetTagBytes(Stream stream)
+        internal override async Task<byte[]> GetTagBytes(Stream stream)
         {
-            if (!HasTag(stream))
+            if (!await HasTag(stream).ConfigureAwait(false))
                 return null;
 
             var sizeBytes = new byte[4];
             stream.Seek(6, SeekOrigin.Begin);
-            stream.Read(sizeBytes, 0, 4);
+            await stream.ReadAsync(sizeBytes, 0, 4).ConfigureAwait(false);
             int tagSize = SyncSafeNumber.DecodeSafe(sizeBytes, 0, 4);
 
             var tagBytes = new byte[tagSize + 10];
             stream.Seek(0, SeekOrigin.Begin);
-            stream.Read(tagBytes, 0, tagBytes.Length);
+            await stream.ReadAsync(tagBytes, 0, tagBytes.Length).ConfigureAwait(false);
             return tagBytes;
         }
 
-        internal override bool HasTag(Stream stream)
+        internal override async Task<bool> HasTag(Stream stream)
         {
             stream.Seek(0, SeekOrigin.Begin);
 
             var headerBytes = new byte[5];
-            stream.Read(headerBytes, 0, 5);
+            await stream.ReadAsync(headerBytes, 0, 5).ConfigureAwait(false);
 
             string magic = Encoding.ASCII.GetString(headerBytes, 0, 3);
             return magic == "ID3" && headerBytes[3] == 3;
         }
 
-        internal override Id3Tag ReadTag(Stream stream, out object additionalData)
+        internal override async Task<(Id3Tag Tag, object AdditionalData)> ReadTag(Stream stream)
         {
-            if (!HasTag(stream))
-            {
-                additionalData = null;
-                return null;
-            }
+            if (!await HasTag(stream).ConfigureAwait(false))
+                return (null, null);
 
             Id3Tag tag = CreateTag();
 
             stream.Seek(4, SeekOrigin.Begin);
             var headerBytes = new byte[6];
-            stream.Read(headerBytes, 0, 6);
+            await stream.ReadAsync(headerBytes, 0, 6).ConfigureAwait(false);
 
             var headerContainer = new Id3V2Header();
-            additionalData = headerContainer;
+            object additionalData = headerContainer;
 
             byte flags = headerBytes[1];
             var header = new Id3V2StandardHeader
@@ -109,7 +108,7 @@ namespace Id3.v2
 
             int tagSize = SyncSafeNumber.DecodeSafe(headerBytes, 2, 4);
             var tagData = new byte[tagSize];
-            stream.Read(tagData, 0, tagSize);
+            await stream.ReadAsync(tagData, 0, tagSize).ConfigureAwait(false);
 
             var currentPos = 0;
             if (header.ExtendedHeader)
@@ -159,25 +158,25 @@ namespace Id3.v2
                 currentPos += frameSize;
             }
 
-            return tag;
+            return (tag, additionalData);
         }
 
-        internal override bool WriteTag(Stream stream, Id3Tag tag)
+        internal override async Task<bool> WriteTag(Stream stream, Id3Tag tag)
         {
             byte[] tagBytes = GetTagBytes(tag);
             int requiredTagSize = tagBytes.Length;
-            if (HasTag(stream))
+            if (await HasTag(stream).ConfigureAwait(false))
             {
-                int currentTagSize = GetTagSize(stream);
+                int currentTagSize = await GetTagSize(stream).ConfigureAwait(false);
                 if (requiredTagSize > currentTagSize)
-                    MakeSpaceForTag(stream, currentTagSize, requiredTagSize);
+                    await MakeSpaceForTag(stream, currentTagSize, requiredTagSize).ConfigureAwait(false);
             }
             else
-                MakeSpaceForTag(stream, 0, requiredTagSize);
+                await MakeSpaceForTag(stream, 0, requiredTagSize).ConfigureAwait(false);
 
             stream.Seek(0, SeekOrigin.Begin);
-            stream.Write(tagBytes, 0, requiredTagSize);
-            stream.Flush();
+            await stream.WriteAsync(tagBytes, 0, requiredTagSize).ConfigureAwait(false);
+            await stream.FlushAsync().ConfigureAwait(false);
 
             return true;
         }
@@ -287,16 +286,15 @@ namespace Id3.v2
             return bytes.ToArray();
         }
 
-        private static int GetTagSize(Stream stream)
+        private static async Task<int> GetTagSize(Stream stream)
         {
             stream.Seek(6, SeekOrigin.Begin);
             var sizeBytes = new byte[4];
-            stream.Read(sizeBytes, 0, 4);
-            int tagSize = SyncSafeNumber.DecodeSafe(sizeBytes, 0, 4) + 10;
-            return tagSize;
+            await stream.ReadAsync(sizeBytes, 0, 4).ConfigureAwait(false);
+            return SyncSafeNumber.DecodeSafe(sizeBytes, 0, 4) + 10;
         }
 
-        private static void MakeSpaceForTag(Stream stream, int currentTagSize, int requiredTagSize)
+        private static async Task MakeSpaceForTag(Stream stream, int currentTagSize, int requiredTagSize)
         {
             if (currentTagSize >= requiredTagSize)
                 return;
@@ -309,13 +307,13 @@ namespace Id3.v2
             var buffer = new byte[BufferSize];
             while (readPos > currentTagSize)
             {
-                int bytesToRead = (readPos - BufferSize < currentTagSize) ? readPos - currentTagSize : BufferSize;
+                int bytesToRead = readPos - BufferSize < currentTagSize ? readPos - currentTagSize : BufferSize;
                 readPos -= bytesToRead;
                 stream.Seek(readPos, SeekOrigin.Begin);
-                stream.Read(buffer, 0, bytesToRead);
+                await stream.ReadAsync(buffer, 0, bytesToRead).ConfigureAwait(false);
                 writePos -= bytesToRead;
                 stream.Seek(writePos, SeekOrigin.Begin);
-                stream.Write(buffer, 0, bytesToRead);
+                await stream.WriteAsync(buffer, 0, bytesToRead).ConfigureAwait(false);
             }
         }
 

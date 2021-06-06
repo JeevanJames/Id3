@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Id3.Frames;
 using Id3.v1;
@@ -81,15 +82,15 @@ namespace Id3
 
         #region Stream-manipulation overrides for the handler
 
-        internal abstract void DeleteTag(Stream stream);
+        internal abstract Task DeleteTag(Stream stream);
 
-        internal abstract byte[] GetTagBytes(Stream stream);
+        internal abstract Task<byte[]> GetTagBytes(Stream stream);
 
-        internal abstract bool HasTag(Stream stream);
+        internal abstract Task<bool> HasTag(Stream stream);
 
-        internal abstract Id3Tag ReadTag(Stream stream, out object additionalData);
+        internal abstract Task<(Id3Tag Tag, object AdditionalData)> ReadTag(Stream stream);
 
-        internal abstract bool WriteTag(Stream stream, Id3Tag tag);
+        internal abstract Task<bool> WriteTag(Stream stream, Id3Tag tag);
 
         #endregion
 

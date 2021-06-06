@@ -20,6 +20,7 @@ limitations under the License.
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 using Id3.Frames;
 
@@ -27,48 +28,46 @@ namespace Id3.v1
 {
     internal sealed class Id3V1Handler : Id3Handler
     {
-        internal override void DeleteTag(Stream stream)
+        internal override async Task DeleteTag(Stream stream)
         {
-            if (HasTag(stream))
+            if (await HasTag(stream).ConfigureAwait(false))
             {
                 stream.SetLength(stream.Length - 128);
-                stream.Flush();
+                await stream.FlushAsync().ConfigureAwait(false);
             }
         }
 
-        internal override byte[] GetTagBytes(Stream stream)
+        internal override async Task<byte[]> GetTagBytes(Stream stream)
         {
-            if (!HasTag(stream))
+            if (!await HasTag(stream).ConfigureAwait(false))
                 return null;
 
             stream.Seek(-128, SeekOrigin.End);
             byte[] tagBytes = new byte[128];
-            stream.Read(tagBytes, 0, 128);
+            await stream.ReadAsync(tagBytes, 0, 128).ConfigureAwait(false);
             return tagBytes;
         }
 
-        internal override bool HasTag(Stream stream)
+        internal override async Task<bool> HasTag(Stream stream)
         {
             if (stream.Length < 128)
                 return false;
 
             stream.Seek(-128, SeekOrigin.End);
             byte[] magicBytes = new byte[3];
-            stream.Read(magicBytes, 0, 3);
+            await stream.ReadAsync(magicBytes, 0, 3).ConfigureAwait(false);
             string magic = TextEncodingHelper.GetDefaultString(magicBytes, 0, 3);
             return magic == "TAG";
         }
 
-        internal override Id3Tag ReadTag(Stream stream, out object additionalData)
+        internal override async Task<(Id3Tag Tag, object AdditionalData)> ReadTag(Stream stream)
         {
-            additionalData = null;
-
-            if (!HasTag(stream))
-                return null;
+            if (!await HasTag(stream).ConfigureAwait(false))
+                return (null, null);
 
             stream.Seek(-125, SeekOrigin.End);
             byte[] tagBytes = new byte[125];
-            stream.Read(tagBytes, 0, 125);
+            await stream.ReadAsync(tagBytes, 0, 125).ConfigureAwait(false);
 
             Id3Tag tag = CreateTag();
             tag.Title.Value = ReadTagString(tagBytes, 0, 30);
@@ -91,10 +90,10 @@ namespace Id3.v1
             if (!string.IsNullOrEmpty(comment))
                 tag.Comments.Add(new CommentFrame { Comment = comment });
 
-            return tag;
+            return (tag, null);
         }
 
-        internal override bool WriteTag(Stream stream, Id3Tag tag)
+        internal override async Task<bool> WriteTag(Stream stream, Id3Tag tag)
         {
             Encoding encoding = TextEncodingHelper.GetDefaultEncoding();
 
@@ -136,12 +135,12 @@ namespace Id3.v1
             if (tag.Track.Value >= 0)
                 bytes[126] = (byte)tag.Track.Value;
 
-            if (HasTag(stream))
+            if (await HasTag(stream).ConfigureAwait(false))
                 stream.Seek(-128, SeekOrigin.End);
             else
                 stream.Seek(0, SeekOrigin.End);
 
-            stream.Write(bytes, 0, bytes.Length);
+            await stream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
 
             return true;
         }

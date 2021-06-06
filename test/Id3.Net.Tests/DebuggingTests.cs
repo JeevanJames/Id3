@@ -19,6 +19,7 @@ limitations under the License.
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 using Id3.Frames;
 
@@ -37,15 +38,15 @@ namespace Id3.Tests
         }
 
         [Fact]
-        public void DebugTest()
+        public async Task DebugTest()
         {
             var tag1 = new Id3Tag
             {
                 Track = new TrackFrame(3, 10) { Padding = 3 },
             };
-            _mp3.WriteTag(tag1, Id3Version.V23);
+            await _mp3.WriteTag(tag1, Id3Version.V23);
 
-            Id3Tag tag2 = _mp3.GetTag(Id3Version.V23);
+            Id3Tag tag2 = await _mp3.GetTag(Id3Version.V23);
             tag2.Track.Padding = 4;
             Assert.Equal(Id3Version.V23, tag2.Version);
             Assert.Equal(Id3TagFamily.Version2X, tag2.Family);
