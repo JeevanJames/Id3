@@ -169,7 +169,7 @@ namespace Id3
         public bool Contains<TFrame>(Expression<Func<Id3Tag, TFrame>> frameProperty)
             where TFrame : Id3Frame
         {
-            if (frameProperty == null)
+            if (frameProperty is null)
                 throw new ArgumentNullException(nameof(frameProperty));
 
             var lambda = (LambdaExpression)frameProperty;
@@ -500,7 +500,7 @@ namespace Id3
         {
             Type frameType = typeof(TFrame);
             bool containsKey = Frames.ContainsKey(frameType);
-            if (frame == null)
+            if (frame is null)
             {
                 if (containsKey)
                     Frames.Remove(frameType);
@@ -532,14 +532,14 @@ namespace Id3
         /// <returns>A signed number that indicates the relative values of this instance and another instance of Id3Tag.</returns>
         public int CompareTo(Id3Tag other)
         {
-            if (other == null)
+            if (other is null)
                 return 1;
             return Version.CompareTo(other.Version);
         }
 
         public bool Equals(Id3Tag other)
         {
-            if (other == null)
+            if (other is null)
                 return false;
             return Version == other.Version;
         }

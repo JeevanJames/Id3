@@ -149,7 +149,7 @@ namespace Id3.v2
                 Array.Copy(tagData, currentPos, frameData, 0, frameSize);
 
                 FrameHandler mapping = FrameHandlers[frameId];
-                if (mapping != null)
+                if (mapping is not null)
                 {
                     Id3Frame frame = mapping.Decoder(frameData);
                     tag.AddUntypedFrame(frame);
@@ -272,7 +272,7 @@ namespace Id3.v2
                 if (!frame.IsAssigned)
                     continue;
                 FrameHandler mapping = FrameHandlers[frame.GetType()];
-                if (mapping == null)
+                if (mapping is null)
                     continue;
                 byte[] frameBytes = mapping.Encoder(frame);
                 bytes.AddRange(Encoding.ASCII.GetBytes(GetFrameIdFromFrame(frame)));

@@ -52,11 +52,11 @@ namespace Id3.InfoFx
         /// </exception>
         public FrameTypes Add(params Type[] types)
         {
-            if (types == null)
+            if (types is null)
                 throw new ArgumentNullException(nameof(types));
             foreach (Type type in types)
             {
-                if (type == null)
+                if (type is null)
                     throw new ArgumentException(@"Cannot specify null frame types", nameof(types));
                 if (!type.IsSubclassOf(typeof(Id3Frame)))
                     throw new ArgumentException($@"The type '{type.FullName}' is not a Id3Frame type.", nameof(types));

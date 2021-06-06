@@ -72,7 +72,7 @@ namespace Id3.Files
         /// </exception>
         public FileNamer([NotNull] IEnumerable<string> patterns)
         {
-            if (patterns == null)
+            if (patterns is null)
                 throw new ArgumentNullException(nameof(patterns));
             _patterns = patterns.ToList();
             if (_patterns.Count == 0)
@@ -212,14 +212,14 @@ namespace Id3.Files
             using var mp3 = new Mp3(filePath);
 
             Id3Tag tag = await mp3.GetTag(Id3Version.V23);
-            if (tag == null)
+            if (tag is null)
                 return new RenameSuggestion(directory, originalName, FileNamerMessages.MissingId3v23TagInFile);
 
             //TODO: Get ID3v1 tag as well and merge with the v2 tag
 
             string newName = GetNewName(tag, originalName, out string missingFrameName);
 
-            if (missingFrameName != null)
+            if (missingFrameName is not null)
             {
                 return new RenameSuggestion(directory, originalName,
                     string.Format(FileNamerMessages.MissingDataForFrame, missingFrameName));
@@ -294,7 +294,7 @@ namespace Id3.Files
         private string FireResolveMissingDataEvent(Id3Tag tag, Id3Frame frame, string sourceName)
         {
             EventHandler<ResolveMissingDataEventArgs> resolveMissingData = ResolveMissingData;
-            if (resolveMissingData == null)
+            if (resolveMissingData is null)
                 return null;
             var args = new ResolveMissingDataEventArgs(tag, frame, sourceName);
             resolveMissingData(this, args);
@@ -353,7 +353,7 @@ namespace Id3.Files
             foreach (string frame in _allowedFrames)
             {
                 PropertyInfo property = tagType.GetProperty(frame);
-                if (property == null)
+                if (property is null)
                     throw new InfoProviderException($"No property named {frame} exists on Id3Tag. Please check the whitelist.");
                 if (!property.PropertyType.IsSubclassOf(baseFrameType))
                     throw new InfoProviderException($"Property Id3Tag.{frame} is not a frame type. Please check the whitelist.");

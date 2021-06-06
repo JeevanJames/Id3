@@ -30,7 +30,7 @@ namespace Id3.Files
         protected override Id3Tag[] GetTagInfo()
         {
             string filename = Path.GetFileNameWithoutExtension(Inputs.FileName);
-            if (filename == null)
+            if (filename is null)
                 return Empty;
 
             string[] breakup = filename.Split(new[] { " - " }, StringSplitOptions.None);

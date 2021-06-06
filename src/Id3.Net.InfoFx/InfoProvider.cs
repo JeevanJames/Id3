@@ -47,7 +47,7 @@ namespace Id3.InfoFx
             {
                 throw;
             }
-            catch (TargetInvocationException ex) when (ex.InnerException != null)
+            catch (TargetInvocationException ex) when (ex.InnerException is not null)
             {
                 throw new InfoProviderException(ex.InnerException.Message, ex.InnerException);
             }
@@ -95,7 +95,7 @@ namespace Id3.InfoFx
         {
             // If the tag is required, but is not specified.
             bool requiresTag = (Properties.Requirements & InfoProviderRequirements.Tag) == InfoProviderRequirements.Tag;
-            if (requiresTag && Inputs.Tag == null)
+            if (requiresTag && Inputs.Tag is null)
                 return false;
 
             // If a file name is required, but not specified.
@@ -105,7 +105,7 @@ namespace Id3.InfoFx
 
             // If a MP3 stream is required, but not specified.
             bool requiresStream = (Properties.Requirements & InfoProviderRequirements.MediaStream) == InfoProviderRequirements.MediaStream;
-            if (requiresStream && Inputs.Mp3Stream == null)
+            if (requiresStream && Inputs.Mp3Stream is null)
                 return false;
 
             // If the tag is required, but does not contain the required frames.

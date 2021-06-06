@@ -36,7 +36,7 @@ namespace Id3.Frames
 
         public string OwnerId { get; set; }
 
-        public override bool IsAssigned => Data != null && Data.Length > 0;
+        public override bool IsAssigned => Data is not null && Data.Length > 0;
 
         public override string ToString() => OwnerId ?? base.ToString();
     }

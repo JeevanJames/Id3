@@ -31,7 +31,7 @@ namespace Id3.InfoFx
     {
         public InfoProviderAttribute(Type providerType)
         {
-            if (providerType == null)
+            if (providerType is null)
                 throw new ArgumentNullException(nameof(providerType));
             if (!providerType.IsSubclassOf(typeof(InfoProvider)))
             {

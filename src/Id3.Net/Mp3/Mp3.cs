@@ -54,7 +54,7 @@ namespace Id3
 
         public Mp3(string filename, Mp3Permissions permissions = Mp3Permissions.Read)
         {
-            if (filename == null)
+            if (filename is null)
                 throw new ArgumentNullException(nameof(filename));
 
             FileAccess fileAccess = PermissionsToFileAccessMapping[permissions];
@@ -67,7 +67,7 @@ namespace Id3
 
         public Mp3(FileInfo fileInfo, Mp3Permissions permissions = Mp3Permissions.Read)
         {
-            if (fileInfo == null)
+            if (fileInfo is null)
                 throw new ArgumentNullException(nameof(fileInfo));
 
             FileAccess fileAccess = PermissionsToFileAccessMapping[permissions];
@@ -111,7 +111,7 @@ namespace Id3
         /// </param>
         public Mp3(byte[] byteStream, Mp3Permissions permissions = Mp3Permissions.Read)
         {
-            if (byteStream == null)
+            if (byteStream is null)
                 throw new ArgumentNullException(nameof(byteStream));
 
             //Note: For Write permissions, we cannot use the MemoryStream ctor that takes the byte
@@ -184,7 +184,7 @@ namespace Id3
             EnsureWritePermissions(Mp3Messages.NoWritePermissions_CannotDeleteTag);
             IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
             Id3Handler foundHandler = existingHandlers.FirstOrDefault(handler => handler.Family == family);
-            if (foundHandler != null)
+            if (foundHandler is not null)
             {
                 await foundHandler.DeleteTag(Stream).ConfigureAwait(false);
                 InvalidateExistingHandlers();

@@ -59,7 +59,7 @@ namespace Id3
         internal Id3Frame GetFrameFromFrameId(string frameId)
         {
             FrameHandler handler = FrameHandlers[frameId];
-            if (handler != null)
+            if (handler is not null)
                 return (Id3Frame)Activator.CreateInstance(handler.Type);
             return new UnknownFrame { Id = frameId };
         }
@@ -121,7 +121,7 @@ namespace Id3
         {
             get
             {
-                if (_frameHandlers == null)
+                if (_frameHandlers is null)
                 {
                     _frameHandlers = new FrameHandlers();
                     BuildFrameHandlers(_frameHandlers);

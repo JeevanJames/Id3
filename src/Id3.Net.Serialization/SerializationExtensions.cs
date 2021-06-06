@@ -35,7 +35,7 @@ namespace Id3.Serialization
         public static TFormatter IncludeId3SerializationSupport<TFormatter>(this TFormatter formatter)
             where TFormatter : IFormatter
         {
-            if (formatter == null)
+            if (formatter is null)
                 throw new ArgumentNullException(nameof(formatter));
 
             var selector = new SurrogateSelector();

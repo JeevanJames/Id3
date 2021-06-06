@@ -38,6 +38,6 @@ namespace Id3.Frames
 
         public byte[] Data { get; internal set; }
 
-        public override bool IsAssigned => Data != null && Data.Length > 0;
+        public override bool IsAssigned => Data is not null && Data.Length > 0;
     }
 }

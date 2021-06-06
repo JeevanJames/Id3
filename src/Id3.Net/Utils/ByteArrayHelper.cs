@@ -28,7 +28,7 @@ namespace Id3
         {
             if (ReferenceEquals(bytes1, bytes2))
                 return true;
-            if (bytes1 == null || bytes2 == null)
+            if (bytes1 is null || bytes2 is null)
                 return false;
             if (bytes1.Length != bytes2.Length)
                 return false;

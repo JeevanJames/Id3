@@ -86,7 +86,7 @@ namespace Id3.Frames
                 if (track is null)
                     return null;
                 string result = track;
-                if (trackCount != null)
+                if (trackCount is not null)
                     result += $"/{trackCount}";
                 return result;
             }

@@ -80,7 +80,7 @@ namespace Id3.v2
             where TFrame : UrlLinkFrame
         {
             var frame = (TFrame)id3Frame;
-            return frame.Url != null ? TextEncodingHelper.GetDefaultEncoding().GetBytes(frame.Url) : new byte[0];
+            return frame.Url is not null ? TextEncodingHelper.GetDefaultEncoding().GetBytes(frame.Url) : new byte[0];
         }
 
         private static Id3Frame DecodeComment(byte[] data)
@@ -163,7 +163,7 @@ namespace Id3.v2
             if (!string.IsNullOrEmpty(frame.Description))
                 bytes.AddRange(encoding.GetBytes(frame.Description));
             bytes.AddRange(TextEncodingHelper.GetSplitterBytes(frame.EncodingType));
-            if (frame.Url != null)
+            if (frame.Url is not null)
                 bytes.AddRange(TextEncodingHelper.GetDefaultEncoding().GetBytes(frame.Url));
 
             return bytes.ToArray();
@@ -201,7 +201,7 @@ namespace Id3.v2
             var frame = new PictureFrame { EncodingType = (Id3TextEncoding)data[0] };
 
             byte[] mimeType = ByteArrayHelper.GetBytesUptoSequence(data, 1, new byte[] { 0x00 });
-            if (mimeType == null)
+            if (mimeType is null)
             {
                 frame.MimeType = "image/";
                 return frame;
@@ -215,7 +215,7 @@ namespace Id3.v2
             currentPos++;
             byte[] description = ByteArrayHelper.GetBytesUptoSequence(data, currentPos,
                 TextEncodingHelper.GetSplitterBytes(frame.EncodingType));
-            if (description == null)
+            if (description is null)
                 return frame;
             frame.Description = TextEncodingHelper.GetString(description, 0, description.Length, frame.EncodingType);
 
@@ -249,7 +249,7 @@ namespace Id3.v2
                 bytes.AddRange(descriptionEncoding.GetBytes(frame.Description));
             bytes.AddRange(TextEncodingHelper.GetSplitterBytes(frame.EncodingType));
 
-            if (frame.PictureData != null && frame.PictureData.Length > 0)
+            if (frame.PictureData is not null && frame.PictureData.Length > 0)
                 bytes.AddRange(frame.PictureData);
 
             return bytes.ToArray();

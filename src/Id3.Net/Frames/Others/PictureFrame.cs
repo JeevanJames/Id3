@@ -69,7 +69,7 @@ namespace Id3.Frames
             return parts[1];
         }
 
-        public override bool IsAssigned => PictureData != null && PictureData.Length > 0;
+        public override bool IsAssigned => PictureData is not null && PictureData.Length > 0;
 
         public string Description { get; set; }
 

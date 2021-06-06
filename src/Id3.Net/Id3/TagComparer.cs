@@ -38,7 +38,7 @@ namespace Id3
         {
             if (ReferenceEquals(tag1, tag2))
                 return true;
-            if (tag1 == null || tag2 == null)
+            if (tag1 is null || tag2 is null)
                 return false;
             if (tag1.GetCount(CompareOnlyAssignedFrames) != tag2.GetCount(CompareOnlyAssignedFrames))
                 return false;
