@@ -88,7 +88,13 @@ namespace Id3
 
         internal abstract Task<bool> HasTag(Stream stream);
 
-        internal abstract Task<(Id3Tag Tag, object AdditionalData)> ReadTag(Stream stream);
+        internal async Task<Id3Tag> ReadTag(Stream stream)
+        {
+            (Id3Tag tag, _) = await ReadTagWithAdditionalData(stream).ConfigureAwait(false);
+            return tag;
+        }
+
+        internal abstract Task<(Id3Tag Tag, object AdditionalData)> ReadTagWithAdditionalData(Stream stream);
 
         internal abstract Task<bool> WriteTag(Stream stream, Id3Tag tag);
 

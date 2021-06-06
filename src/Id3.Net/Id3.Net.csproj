@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
         <RootNamespace>$(BaseNamespace)</RootNamespace>
         <AssemblyName>$(RootNamespace)</AssemblyName>
         <Description>ID3.NET is a set of libraries for reading, modifying and writing ID3 and Lyrics3 tags in MP3 audio files.</Description>
@@ -10,6 +10,11 @@
 
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+        <PackageReference Include="System.Linq.Async" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>

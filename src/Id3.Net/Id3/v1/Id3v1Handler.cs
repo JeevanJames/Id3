@@ -60,7 +60,7 @@ namespace Id3.v1
             return magic == "TAG";
         }
 
-        internal override async Task<(Id3Tag Tag, object AdditionalData)> ReadTag(Stream stream)
+        internal override async Task<(Id3Tag Tag, object AdditionalData)> ReadTagWithAdditionalData(Stream stream)
         {
             if (!await HasTag(stream).ConfigureAwait(false))
                 return (null, null);

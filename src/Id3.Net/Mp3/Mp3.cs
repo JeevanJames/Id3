@@ -29,13 +29,15 @@ namespace Id3
 {
     /// <inheritdoc />
     /// <summary>
-    ///     Represents a stream of MP3 data. Use this class to load MP3 data, manipulate the tags and save
-    ///     the data back to the stream.
+    ///     Represents a stream of MP3 data. Use this class to load MP3 data, manipulate the tags and
+    ///     save the data back to the stream.
     /// </summary>
     public class Mp3 : IDisposable
     {
+        private readonly Stream _stream;
+
         //MP3 file stream-related
-        private Mp3Permissions _permissions;
+        private readonly Mp3Permissions _permissions;
 
         //Audio stream properties
         private AudioStreamProperties _audioProperties;
@@ -43,14 +45,7 @@ namespace Id3
         //ID3 Handler management
         private IList<Id3Handler> _existingHandlers;
 
-        private Stream Stream { get; set; }
-
         protected bool StreamOwned { get; set; }
-
-        // For derived ctors
-        protected Mp3()
-        {
-        }
 
         public Mp3(string filename, Mp3Permissions permissions = Mp3Permissions.Read)
         {
@@ -59,7 +54,7 @@ namespace Id3
 
             FileAccess fileAccess = PermissionsToFileAccessMapping[permissions];
             FileStream fileStream = File.Open(filename, FileMode.Open, fileAccess, FileShare.Read);
-            SetupStream(fileStream, permissions);
+            (_stream, _permissions) = SetupStream(fileStream, permissions);
 
             //Since we created the stream, we are responsible for disposing it when we're done
             StreamOwned = true;
@@ -72,7 +67,7 @@ namespace Id3
 
             FileAccess fileAccess = PermissionsToFileAccessMapping[permissions];
             FileStream fileStream = fileInfo.Open(FileMode.Open, fileAccess, FileShare.Read);
-            SetupStream(fileStream, permissions);
+            (_stream, _permissions) = SetupStream(fileStream, permissions);
 
             //Since we created the stream, we are responsible for disposing it when we're done
             StreamOwned = true;
@@ -95,7 +90,7 @@ namespace Id3
         /// </param>
         public Mp3(Stream stream, Mp3Permissions permissions = Mp3Permissions.Read)
         {
-            SetupStream(stream, permissions);
+            (_stream, _permissions) = SetupStream(stream, permissions);
 
             //The stream is owned by the caller, so it is their responsibility to dispose it.
             StreamOwned = false;
@@ -120,10 +115,10 @@ namespace Id3
             var stream = new MemoryStream(byteStream.Length);
             stream.Write(byteStream, 0, byteStream.Length);
 
-            SetupStream(stream, permissions);
+            (_stream, _permissions) = SetupStream(stream, permissions);
         }
 
-        private void SetupStream(Stream stream, Mp3Permissions permissions)
+        private (Stream Stream, Mp3Permissions Permissions) SetupStream(Stream stream, Mp3Permissions permissions)
         {
             if (stream is null)
                 throw new ArgumentNullException(nameof(stream));
@@ -135,8 +130,7 @@ namespace Id3
             if (permissions == Mp3Permissions.ReadWrite && !stream.CanWrite)
                 throw new Id3Exception(Mp3Messages.StreamNotWritable);
 
-            Stream = stream;
-            _permissions = permissions;
+            return (stream, permissions);
         }
 
         public void Dispose()
@@ -148,7 +142,7 @@ namespace Id3
         protected virtual void Dispose(bool disposing)
         {
             if (disposing && StreamOwned)
-                Stream?.Dispose();
+                _stream?.Dispose();
         }
 
         private void EnsureWritePermissions(string errorMessage)
@@ -166,11 +160,12 @@ namespace Id3
         public async Task DeleteTag(Id3Version version)
         {
             EnsureWritePermissions(Mp3Messages.NoWritePermissions_CannotDeleteTag);
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            Id3Handler handler = existingHandlers.FirstOrDefault(h => h.Version == version);
+            Id3Handler handler = await GetExistingHandlers()
+                .FirstOrDefaultAsync(h => h.Version == version)
+                .ConfigureAwait(false);
             if (handler is not null)
             {
-                await handler.DeleteTag(Stream).ConfigureAwait(false);
+                await handler.DeleteTag(_stream).ConfigureAwait(false);
                 InvalidateExistingHandlers();
             }
         }
@@ -182,11 +177,12 @@ namespace Id3
         public async Task DeleteTag(Id3TagFamily family)
         {
             EnsureWritePermissions(Mp3Messages.NoWritePermissions_CannotDeleteTag);
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            Id3Handler foundHandler = existingHandlers.FirstOrDefault(handler => handler.Family == family);
+            Id3Handler foundHandler = await GetExistingHandlers()
+                .FirstOrDefaultAsync(handler => handler.Family == family)
+                .ConfigureAwait(false);
             if (foundHandler is not null)
             {
-                await foundHandler.DeleteTag(Stream).ConfigureAwait(false);
+                await foundHandler.DeleteTag(_stream).ConfigureAwait(false);
                 InvalidateExistingHandlers();
             }
         }
@@ -197,9 +193,8 @@ namespace Id3
         public async Task DeleteAllTags()
         {
             EnsureWritePermissions(Mp3Messages.NoWritePermissions_CannotDeleteTag);
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            foreach (Id3Handler existingHandler in existingHandlers)
-                await existingHandler.DeleteTag(Stream).ConfigureAwait(false);
+            await foreach (Id3Handler existingHandler in GetExistingHandlers())
+                await existingHandler.DeleteTag(_stream).ConfigureAwait(false);
             InvalidateExistingHandlers();
         }
         #endregion
@@ -210,17 +205,14 @@ namespace Id3
         ///     Returns a collection of all ID3 tags present in the MP3 data.
         /// </summary>
         /// <returns>A collection of all ID3 tags present in the MP3 data.</returns>
-        public async Task<IEnumerable<Id3Tag>> GetAllTags()
+        public IAsyncEnumerable<Id3Tag> GetAllTags()
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            return existingHandlers.Select(handler =>
+            return GetExistingHandlers().SelectAwait(async handler =>
             {
-                (Id3Tag tag, _) = handler.ReadTag(Stream).GetAwaiter().GetResult();
+                (Id3Tag tag, _) = await handler.ReadTagWithAdditionalData(_stream).ConfigureAwait(false);
                 return tag;
             });
         }
-
-        //TODO: Add IAsyncEnumerator overload for GetAllTags
 
         /// <summary>
         ///     Retrieves an ID3 tag of the specified tag family type - version 2.x or version 1.x.
@@ -229,20 +221,19 @@ namespace Id3
         /// <returns>The ID3 tag of the specified tag family type, or null if it doesn't exist.</returns>
         public async Task<Id3Tag> GetTag(Id3TagFamily family)
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            Id3Handler familyHandler = existingHandlers.FirstOrDefault(handler => handler.Family == family);
-            if (familyHandler is null)
-                return null;
-            (Id3Tag tag, _) = await familyHandler.ReadTag(Stream).ConfigureAwait(false);
-            return tag;
+            Id3Handler familyHandler = await GetExistingHandlers()
+                .FirstOrDefaultAsync(handler => handler.Family == family)
+                .ConfigureAwait(false);
+            return familyHandler is not null ? await familyHandler.ReadTag(_stream).ConfigureAwait(false) : null;
         }
 
         public async Task<(Id3Tag Tag, object AdditionalData)> GetTagWithAdditionalData(Id3TagFamily family)
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            Id3Handler familyHandler = existingHandlers.FirstOrDefault(handler => handler.Family == family);
+            Id3Handler familyHandler = await GetExistingHandlers()
+                .FirstOrDefaultAsync(handler => handler.Family == family)
+                .ConfigureAwait(false);
             return familyHandler is not null
-                ? await familyHandler.ReadTag(Stream).ConfigureAwait(false)
+                ? await familyHandler.ReadTagWithAdditionalData(_stream).ConfigureAwait(false)
                 : (null, null);
         }
 
@@ -253,20 +244,19 @@ namespace Id3
         /// <returns>The ID3 tag of the specified version number, or null if it doesn't exist.</returns>
         public async Task<Id3Tag> GetTag(Id3Version version)
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            Id3Handler handler = existingHandlers.FirstOrDefault(h => h.Version == version);
-            if (handler is null)
-                return null;
-            (Id3Tag tag, _) = await handler.ReadTag(Stream).ConfigureAwait(false);
-            return tag;
+            Id3Handler handler = await GetExistingHandlers()
+                .FirstOrDefaultAsync(h => h.Version == version)
+                .ConfigureAwait(false);
+            return handler is not null ? await handler.ReadTag(_stream).ConfigureAwait(false) : null;
         }
 
         public async Task<(Id3Tag Tag, object AdditionalData)> GetTagWithAdditionalData(Id3Version version)
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            Id3Handler handler = existingHandlers.FirstOrDefault(h => h.Version == version);
+            Id3Handler handler = await GetExistingHandlers()
+                .FirstOrDefaultAsync(h => h.Version == version)
+                .ConfigureAwait(false);
             return handler is not null
-                ? await handler.ReadTag(Stream).ConfigureAwait(false)
+                ? await handler.ReadTagWithAdditionalData(_stream).ConfigureAwait(false)
                 : (null, null);
         }
 
@@ -280,37 +270,34 @@ namespace Id3
         /// <returns>A byte array of the tag data.</returns>
         public async Task<byte[]> GetTagBytes(Id3Version version)
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            Id3Handler handler = existingHandlers.FirstOrDefault(h => h.Version == version);
-            return handler is not null ? await handler.GetTagBytes(Stream).ConfigureAwait(false) : null;
+            Id3Handler handler = await GetExistingHandlers()
+                .FirstOrDefaultAsync(h => h.Version == version)
+                .ConfigureAwait(false);
+            return handler is not null ? await handler.GetTagBytes(_stream).ConfigureAwait(false) : null;
         }
 
         #endregion
 
         #region Tag querying methods
 
-        public async Task<bool> HasTagOfFamily(Id3TagFamily family)
+        public ValueTask<bool> HasTagOfFamily(Id3TagFamily family)
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            return existingHandlers.Any(handler => handler.Family == family);
+            return GetExistingHandlers().AnyAsync(h => h.Family == family);
         }
 
-        public async Task<bool> HasTagOfVersion(Id3Version version)
+        public ValueTask<bool> HasTagOfVersion(Id3Version version)
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            return existingHandlers.Any(h => h.Version == version);
+            return GetExistingHandlers().AnyAsync(h => h.Version == version);
         }
 
-        public async Task<IEnumerable<Id3Version>> AvailableTagVersions()
+        public IAsyncEnumerable<Id3Version> GetAvailableTagVersions()
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            return existingHandlers.Select(h => h.Version);
+            return GetExistingHandlers().Select(h => h.Version);
         }
 
-        public async Task<bool> HasTags()
+        public async ValueTask<bool> HasTags()
         {
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            return existingHandlers.Count > 0;
+            return await GetExistingHandlers().CountAsync().ConfigureAwait(false) > 0;
         }
 
         #endregion
@@ -342,8 +329,9 @@ namespace Id3
         {
             //If a tag already exists from the same family, but is a different version than the passed tag,
             //delete it if conflictAction is Replace.
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            Id3Handler familyHandler = existingHandlers.FirstOrDefault(handler => handler.Family == tag.Family);
+            Id3Handler familyHandler = await GetExistingHandlers()
+                .FirstOrDefaultAsync(handler => handler.Family == tag.Family)
+                .ConfigureAwait(false);
             if (familyHandler is not null)
             {
                 Id3Handler handler = familyHandler;
@@ -354,14 +342,14 @@ namespace Id3
                     if (conflictAction == WriteConflictAction.Replace)
                     {
                         Id3Handler handlerCopy = handler; //TODO: Why did we need a copy of the handler?
-                        await handlerCopy.DeleteTag(Stream).ConfigureAwait(false);
+                        await handlerCopy.DeleteTag(_stream).ConfigureAwait(false);
                     }
                 }
             }
 
             //Write the tag to the file. The handler will know how to overwrite itself.
             var writeHandler = Id3Handler.GetHandler(tag.Version);
-            bool writeSuccessful = await writeHandler.WriteTag(Stream, tag).ConfigureAwait(false);
+            bool writeSuccessful = await writeHandler.WriteTag(_stream, tag).ConfigureAwait(false);
             if (writeSuccessful)
                 InvalidateExistingHandlers();
             return writeSuccessful;
@@ -374,19 +362,22 @@ namespace Id3
         public async Task<byte[]> GetAudioStream()
         {
             byte[] startBytes = null, endBytes = null;
-            IList<Id3Handler> existingHandlers = await GetExistingHandlers().ConfigureAwait(false);
-            foreach (Id3Handler handler in existingHandlers)
+            await foreach (Id3Handler handler in GetExistingHandlers())
             {
                 if (handler.Family == Id3TagFamily.Version2X)
-                    startBytes = await handler.GetTagBytes(Stream).ConfigureAwait(false);
+                    startBytes = await handler.GetTagBytes(_stream).ConfigureAwait(false);
                 else
-                    endBytes = await handler.GetTagBytes(Stream).ConfigureAwait(false);
+                    endBytes = await handler.GetTagBytes(_stream).ConfigureAwait(false);
             }
 
-            long audioStreamLength = Stream.Length - (startBytes?.Length ?? 0) - (endBytes?.Length ?? 0);
+            long audioStreamLength = _stream.Length - (startBytes?.Length ?? 0) - (endBytes?.Length ?? 0);
             var audioStream = new byte[audioStreamLength];
-            Stream.Seek(startBytes?.Length ?? 0, SeekOrigin.Begin);
-            await Stream.ReadAsync(audioStream, 0, (int)audioStreamLength).ConfigureAwait(false);
+            _stream.Seek(startBytes?.Length ?? 0, SeekOrigin.Begin);
+#if NETSTANDARD2_1_OR_GREATER
+            await _stream.ReadAsync(audioStream.AsMemory(0, (int)audioStreamLength)).ConfigureAwait(false);
+#else
+            await _stream.ReadAsync(audioStream, 0, (int)audioStreamLength).ConfigureAwait(false);
+#endif
             return audioStream;
         }
 
@@ -403,7 +394,7 @@ namespace Id3
             return _audioProperties;
         }
 
-        #endregion
+#endregion
 
         #region ID3 handler registration/management
 
@@ -417,26 +408,30 @@ namespace Id3
         // Whenever the MP3 stream is changed (such as when WriteTag or DeleteTag is called), the
         // _existingHandlers field should be reset to null so that this list can be recreated the
         // next time it is accessed.
-        private async Task<IList<Id3Handler>> GetExistingHandlers()
+        private async IAsyncEnumerable<Id3Handler> GetExistingHandlers()
         {
             if (_existingHandlers is not null)
-                return _existingHandlers;
+            {
+                foreach (Id3Handler existingHandler in _existingHandlers)
+                    yield return existingHandler;
 
-            var v2HandlerFound = false;
-            _existingHandlers = new List<Id3Handler>(2);
+                yield break;
+            }
+
+            bool v2HandlerFound = false;
+            _existingHandlers = new List<Id3Handler>();
             foreach (Id3HandlerMetadata handlerMetadata in Id3Handler.AvailableHandlers)
             {
                 Id3Handler handler = handlerMetadata.Instance;
                 if (handler.Family == Id3TagFamily.Version2X && v2HandlerFound)
                     continue;
-                if (await handler.HasTag(Stream).ConfigureAwait(false))
+
+                if (await handler.HasTag(_stream).ConfigureAwait(false))
                 {
-                    _existingHandlers.Add(handler);
+                    yield return handler;
                     v2HandlerFound = handler.Family == Id3TagFamily.Version2X;
                 }
             }
-
-            return _existingHandlers;
         }
 
         #endregion

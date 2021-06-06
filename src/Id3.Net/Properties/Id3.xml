@@ -302,8 +302,8 @@
         <member name="T:Id3.Mp3">
             <inheritdoc />
             <summary>
-                Represents a stream of MP3 data. Use this class to load MP3 data, manipulate the tags and save
-                the data back to the stream.
+                Represents a stream of MP3 data. Use this class to load MP3 data, manipulate the tags and
+                save the data back to the stream.
             </summary>
         </member>
         <member name="M:Id3.Mp3.#ctor(System.IO.Stream,Id3.Mp3Permissions)">
