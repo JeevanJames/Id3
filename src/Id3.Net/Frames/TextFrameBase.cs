@@ -17,8 +17,6 @@ limitations under the License.
 */
 #endregion
 
-using System.Diagnostics;
-
 namespace Id3.Frames
 {
     /// <summary>
@@ -39,8 +37,7 @@ namespace Id3.Frames
 
         public Id3TextEncoding EncodingType { get; set; }
 
-        public override bool IsAssigned =>
-            !string.IsNullOrEmpty(TextValue);
+        public override bool IsAssigned => !string.IsNullOrEmpty(TextValue);
 
         /// <summary>
         ///     Gets or sets the textual representation of the frame value. This is for internal usage
@@ -48,54 +45,5 @@ namespace Id3.Frames
         ///     value in the <see cref="TextFrameBase{TValue}.Value" /> property.
         /// </summary>
         internal abstract string TextValue { get; set; }
-    }
-
-    [DebuggerDisplay("{" + nameof(Value) + "}")]
-    public abstract class TextFrameBase<TValue> : TextFrameBase
-    {
-        private TValue _value = default!;
-
-        protected TextFrameBase()
-        {
-        }
-
-        protected TextFrameBase(TValue value)
-        {
-            Value = value;
-        }
-
-        /// <summary>
-        ///     Gets or sets the natively-typed value of the frame. Derived classes will override the
-        ///     <see cref="TextFrameBase.TextValue" /> to get and set this value.
-        /// </summary>
-        public TValue Value
-        {
-            get => _value;
-            set
-            {
-                ValidateValue(value);
-                _value = value;
-            }
-        }
-
-        /// <summary>
-        ///     Deriving classes can override this method to validate the native value being set.
-        ///     <para />
-        ///     If the value is invalid, the method should throw an exception.
-        /// </summary>
-        /// <param name="value">The native value being set.</param>
-        /// <exception cref="Id3Exception">Thrown if the specified native value is invalid.</exception>
-        /// <remarks>
-        ///     Note that in a lot of cases, a native value of null or something that translates to an empty string is considered
-        ///     valid. In such cases, the frame may be unassigned, but the value should still be allowed.
-        /// </remarks>
-        protected virtual void ValidateValue(TValue value)
-        {
-        }
-
-        public static implicit operator TValue(TextFrameBase<TValue> frame)
-        {
-            return frame.Value;
-        }
     }
 }

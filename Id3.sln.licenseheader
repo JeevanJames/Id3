@@ -2,7 +2,7 @@
 extensions: .cs .cpp .h
 #region --- License & Copyright Notice ---
 /*
-Copyright (c) 2005-2019 Jeevan James
+Copyright (c) 2005-2021 Jeevan James
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +18,3 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #endregion
-
-extensions:  .xml .config .xsd
-<!--
-Copyright (c) 2005-2019 Jeevan James
-All rights reserved.
--->

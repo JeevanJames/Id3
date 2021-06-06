@@ -124,7 +124,7 @@ namespace Id3
 
         private void SetupStream(Stream stream, Mp3Permissions permissions)
         {
-            if (stream == null)
+            if (stream is null)
                 throw new ArgumentNullException(nameof(stream));
             if (permissions == Mp3Permissions.Write)
                 permissions = Mp3Permissions.ReadWrite;
@@ -355,16 +355,16 @@ namespace Id3
         {
             get
             {
-                if (_audioProperties is null)
-                {
-                    byte[] audioStream = GetAudioStream();
-                    if (audioStream == null || audioStream.Length == 0)
-#pragma warning disable S2372 // Exceptions should not be thrown from property getters
-                        throw new Id3Exception(Mp3Messages.AudioStreamMissing);
-#pragma warning restore S2372 // Exceptions should not be thrown from property getters
-                    _audioProperties = new AudioStream(audioStream).Calculate();
-                }
+                if (_audioProperties is not null)
+                    return _audioProperties;
 
+                byte[] audioStream = GetAudioStream();
+                if (audioStream is null || audioStream.Length == 0)
+#pragma warning disable S2372 // Exceptions should not be thrown from property getters
+                    throw new Id3Exception(Mp3Messages.AudioStreamMissing);
+#pragma warning restore S2372 // Exceptions should not be thrown from property getters
+
+                _audioProperties = new AudioStream(audioStream).Calculate();
                 return _audioProperties;
             }
         }
@@ -376,16 +376,16 @@ namespace Id3
             _existingHandlers = null;
         }
 
-        //The list of registered ID3 handlers for existing tags in the file. This list is
-        //dynamically built and is the basis for most of the GetXXXX methods.
-        //Whenever the MP3 stream is changed (such as when WriteTag or DeleteTag is called), the
-        //_existingHandlers field should be reset to null so that this list can be recreated the
-        //next time it is accessed.
+        // The list of registered ID3 handlers for existing tags in the file. This list is
+        // dynamically built and is the basis for most of the GetXXXX methods.
+        // Whenever the MP3 stream is changed (such as when WriteTag or DeleteTag is called), the
+        // _existingHandlers field should be reset to null so that this list can be recreated the
+        // next time it is accessed.
         private IList<Id3Handler> ExistingHandlers
         {
             get
             {
-                if (_existingHandlers != null)
+                if (_existingHandlers is not null)
                     return _existingHandlers;
 
                 var v2HandlerFound = false;

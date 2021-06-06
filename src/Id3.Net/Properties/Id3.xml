@@ -39,16 +39,20 @@
         </member>
         <member name="M:Id3.Frames.TextFrameBase`1.ValidateValue(`0)">
             <summary>
-                Deriving classes can override this method to validate the native value being set.
+                Deriving classes can override this method to validate the native <paramref name="value"/>
+                being set.
                 <para />
-                If the value is invalid, the method should throw an exception.
+                If the value is invalid, the method should throw an <see cref="T:Id3.Id3Exception"/> exception.
             </summary>
-            <param name="value">The native value being set.</param>
-            <exception cref="T:Id3.Id3Exception">Thrown if the specified native value is invalid.</exception>
             <remarks>
-                Note that in a lot of cases, a native value of null or something that translates to an empty string is considered
-                valid. In such cases, the frame may be unassigned, but the value should still be allowed.
+                Note that in a lot of cases, a native value of null or something that translates to
+                an empty string is considered valid. In such cases, the frame may be unassigned, but
+                the value should still be allowed.
             </remarks>
+            <param name="value">The native value being set.</param>
+            <exception cref="T:Id3.Id3Exception">
+                Thrown if the specified native <paramref name="value"/> is invalid.
+            </exception>
         </member>
         <member name="P:Id3.Frames.TrackFrame.TrackCount">
             <summary>

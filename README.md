@@ -25,13 +25,12 @@ Reads all .mp3 files in a directory and outputs their title, artist and album de
 string[] musicFiles = Directory.GetFiles(@"C:\Music", "*.mp3");
 foreach (string musicFile in musicFiles)
 {
-    using (var mp3 = new Mp3(musicFile))
-    {
-        Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
-        Console.WriteLine("Title: {0}", tag.Title);
-        Console.WriteLine("Artist: {0}", tag.Artists);
-        Console.WriteLine("Album: {0}", tag.Album);
-    }
+    using var mp3 = new Mp3(musicFile);
+
+    Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
+    Console.WriteLine("Title: {0}", tag.Title);
+    Console.WriteLine("Artist: {0}", tag.Artists);
+    Console.WriteLine("Album: {0}", tag.Album);
 }
 ```
 
@@ -41,14 +40,13 @@ IEnumerable<string> GetMusicFrom80s(IEnumerable<string> mp3FilePaths)
 {
     foreach (var mp3FilePath in mp3FilePaths)
     {
-        using (var mp3 = new Mp3(mp3FilePath))
-        {
-            Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
-            if (!tag.Year.HasValue)
-                continue;
-            if (tag.Year >= 1980 && tag.Year < 1990)
-                yield return mp3FilePath;
-        }
+        using var mp3 = new Mp3(mp3FilePath);
+
+        Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
+        if (!tag.Year.HasValue)
+            continue;
+        if (tag.Year >= 1980 && tag.Year < 1990)
+            yield return mp3FilePath;
     }
 }
 ```
@@ -58,16 +56,15 @@ Method to write a generic copyright message to the ID3 tag, if one does not exis
 ```cs
 void SetCopyright(string mp3FilePath)
 {
-    using (var mp3 = new Mp3(mp3FilePath, Mp3Permissions.ReadWrite))
+    using var mp3 = new Mp3(mp3FilePath, Mp3Permissions.ReadWrite);
+    
+    Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
+    if (!tag.Copyright.IsAssigned)
     {
-        Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
-        if (!tag.Copyright.IsAssigned)
-        {
-            int year = tag.Year.GetValueOrDefault(2000);
-            string artists = tag.Artists.ToString();
-            tag.Copyright = $"{year} {artists}";
-            mp3.WriteTag(tag, WriteConflictAction.Replace);
-        }
+        int year = tag.Year.GetValueOrDefault(2000);
+        string artists = tag.Artists.ToString();
+        tag.Copyright = $"{year} {artists}";
+        mp3.WriteTag(tag, WriteConflictAction.Replace);
     }
 }
 ```

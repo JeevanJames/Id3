@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net40</TargetFrameworks>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>$(BaseNamespace).Serialization</RootNamespace>
         <AssemblyName>$(RootNamespace)</AssemblyName>
         <Description>
             ID3.NET is a set of libraries for reading, modifying and writing ID3 and Lyrics3 tags in MP3 audio files.
             This package provides extensions to serialize ID3.NET objects using the IFormatter-based serialization classes.
         </Description>
-        <DocumentationFile>Properties\$(AssemblyName)</DocumentationFile>
+        <DocumentationFile>Properties\$(AssemblyName).xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
