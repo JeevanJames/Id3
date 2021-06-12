@@ -33,9 +33,9 @@ namespace Id3
 
         public int Bitrate { get; }
 
-        public TimeSpan Duration { get; }
-
         public int Frequency { get; }
+
+        public TimeSpan Duration { get; }
 
         public AudioMode Mode { get; }
     }

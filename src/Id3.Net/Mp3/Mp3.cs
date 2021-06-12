@@ -118,7 +118,8 @@ namespace Id3
             (_stream, _permissions) = SetupStream(stream, permissions);
         }
 
-        private (Stream Stream, Mp3Permissions Permissions) SetupStream(Stream stream, Mp3Permissions permissions)
+        private static (Stream Stream, Mp3Permissions Permissions) SetupStream(Stream stream,
+            Mp3Permissions permissions)
         {
             if (stream is null)
                 throw new ArgumentNullException(nameof(stream));

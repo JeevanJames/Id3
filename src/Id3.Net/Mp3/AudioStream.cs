@@ -90,23 +90,14 @@ namespace Id3
             (BitrateIndex & 15) != 15 && (FrequencyIndex & 3) != 3 && (EmphasisIndex & 3) != 2;
 
         #region Audio properties
-        private AudioMode AudioMode
+
+        private AudioMode AudioMode => ModeIndex switch
         {
-            get
-            {
-                switch (ModeIndex)
-                {
-                    case 1:
-                        return AudioMode.JointStereo;
-                    case 2:
-                        return AudioMode.DualChannel;
-                    case 3:
-                        return AudioMode.SingleChannel;
-                    default:
-                        return AudioMode.Stereo;
-                }
-            }
-        }
+            1 => AudioMode.JointStereo,
+            2 => AudioMode.DualChannel,
+            3 => AudioMode.SingleChannel,
+            _ => AudioMode.Stereo,
+        };
 
         private static readonly int[,,] BitrateLookup =
         {
@@ -157,9 +148,11 @@ namespace Id3
         };
 
         private int Frequency => FrequencyLookup[VersionIndex, FrequencyIndex];
+
         #endregion
 
         #region BitHeader calculated values
+
         private int BitrateIndex => (int)((_bitHeader >> 12) & 15);
 
         private int EmphasisIndex => (int)(_bitHeader & 3);
@@ -187,6 +180,7 @@ namespace Id3
         private int ModeIndex => (int)((_bitHeader >> 6) & 3);
 
         private int VersionIndex => (int)((_bitHeader >> 19) & 3);
+
         #endregion
     }
 }

@@ -44,7 +44,11 @@ namespace Id3.v1
 
             stream.Seek(-128, SeekOrigin.End);
             byte[] tagBytes = new byte[128];
+#if NETSTANDARD2_1_OR_GREATER
+            await stream.ReadAsync(tagBytes.AsMemory(0, 128)).ConfigureAwait(false);
+#else
             await stream.ReadAsync(tagBytes, 0, 128).ConfigureAwait(false);
+#endif
             return tagBytes;
         }
 
@@ -55,7 +59,11 @@ namespace Id3.v1
 
             stream.Seek(-128, SeekOrigin.End);
             byte[] magicBytes = new byte[3];
+#if NETSTANDARD2_1_OR_GREATER
+            await stream.ReadAsync(magicBytes.AsMemory(0, 3)).ConfigureAwait(false);
+#else
             await stream.ReadAsync(magicBytes, 0, 3).ConfigureAwait(false);
+#endif
             string magic = TextEncodingHelper.GetDefaultString(magicBytes, 0, 3);
             return magic == "TAG";
         }
@@ -67,7 +75,11 @@ namespace Id3.v1
 
             stream.Seek(-125, SeekOrigin.End);
             byte[] tagBytes = new byte[125];
+#if NETSTANDARD2_1_OR_GREATER
+            await stream.ReadAsync(tagBytes.AsMemory(0, 125)).ConfigureAwait(false);
+#else
             await stream.ReadAsync(tagBytes, 0, 125).ConfigureAwait(false);
+#endif
 
             Id3Tag tag = CreateTag();
             tag.Title.Value = ReadTagString(tagBytes, 0, 30);
@@ -140,7 +152,11 @@ namespace Id3.v1
             else
                 stream.Seek(0, SeekOrigin.End);
 
+#if NETSTANDARD2_1_OR_GREATER
+            await stream.WriteAsync(bytes).ConfigureAwait(false);
+#else
             await stream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+#endif
 
             return true;
         }
