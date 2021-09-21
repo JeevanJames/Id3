@@ -272,10 +272,26 @@ namespace Id3
         #region Tag writing methods
         public bool UpdateTag(Id3Tag tag)
         {
-            return WriteTag(tag, WriteConflictAction.Replace);
+            return WriteTag(tag, new WriteTagOptions() { ConflictAction = WriteConflictAction.Replace });
         }
 
         public bool WriteTag(Id3Tag tag, WriteConflictAction conflictAction = WriteConflictAction.NoAction)
+        {
+            return WriteTag(tag, new WriteTagOptions() { ConflictAction = conflictAction });
+        }
+
+        public bool WriteTag(Id3Tag tag, Id3Version version, WriteConflictAction conflictAction = WriteConflictAction.NoAction)
+        {
+            return WriteTag(tag, version, new WriteTagOptions() { ConflictAction = conflictAction });
+        }
+
+        public bool WriteTag(Id3Tag tag, Id3Version version, WriteTagOptions options)
+        {
+            tag.Version = version;
+            return WriteTag(tag, options);
+        }
+
+        public bool WriteTag(Id3Tag tag, WriteTagOptions options)
         {
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag));
@@ -290,9 +306,9 @@ namespace Id3
                 Id3Handler handler = familyHandler;
                 if (handler.Version != tag.Version)
                 {
-                    if (conflictAction == WriteConflictAction.NoAction)
+                    if (options.ConflictAction == WriteConflictAction.NoAction)
                         return false;
-                    if (conflictAction == WriteConflictAction.Replace)
+                    if (options.ConflictAction == WriteConflictAction.Replace)
                     {
                         Id3Handler handlerCopy = handler; //TODO: Why did we need a copy of the handler?
                         handlerCopy.DeleteTag(Stream);
@@ -302,17 +318,10 @@ namespace Id3
 
             //Write the tag to the file. The handler will know how to overwrite itself.
             Id3Handler writeHandler = Id3Handler.GetHandler(tag.Version);
-            bool writeSuccessful = writeHandler.WriteTag(Stream, tag);
+            bool writeSuccessful = writeHandler.WriteTag(Stream, tag, options);
             if (writeSuccessful)
                 InvalidateExistingHandlers();
             return writeSuccessful;
-        }
-
-        public bool WriteTag(Id3Tag tag, Id3Version version,
-            WriteConflictAction conflictAction = WriteConflictAction.NoAction)
-        {
-            tag.Version = version;
-            return WriteTag(tag, conflictAction);
         }
         #endregion
 

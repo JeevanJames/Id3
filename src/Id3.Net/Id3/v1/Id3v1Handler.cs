@@ -98,7 +98,7 @@ namespace Id3.v1
             return tag;
         }
 
-        internal override bool WriteTag(Stream stream, Id3Tag tag)
+        internal override bool WriteTag(Stream stream, Id3Tag tag, WriteTagOptions options)
         {
             Encoding encoding = TextEncodingHelper.GetDefaultEncoding();
 

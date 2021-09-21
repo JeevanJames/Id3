@@ -1,4 +1,4 @@
-#region --- License & Copyright Notice ---
+    #region --- License & Copyright Notice ---
 /*
 Copyright (c) 2005-2019 Jeevan James
 All rights reserved.
@@ -156,7 +156,7 @@ namespace Id3.v2
             return tag;
         }
 
-        internal override bool WriteTag(Stream stream, Id3Tag tag)
+        internal override bool WriteTag(Stream stream, Id3Tag tag, WriteTagOptions options)
         {
             byte[] tagBytes = GetTagBytes(tag);
             int requiredTagSize = tagBytes.Length;
@@ -165,7 +165,13 @@ namespace Id3.v2
                 int currentTagSize = GetTagSize(stream);
                 if (requiredTagSize > currentTagSize)
                     MakeSpaceForTag(stream, currentTagSize, requiredTagSize);
-            } else
+                else if (requiredTagSize < currentTagSize)
+                    if (options.ShrinkFile && (currentTagSize - requiredTagSize) > options.ShrinkFileThreshold)
+                        ShrinkSpaceForTag(stream, currentTagSize, requiredTagSize);
+                    else if (options.WipeOut)
+                        WipeOutRemainingSpace(stream, currentTagSize, requiredTagSize);
+            }
+            else
                 MakeSpaceForTag(stream, 0, requiredTagSize);
 
             stream.Seek(0, SeekOrigin.Begin);
@@ -310,6 +316,39 @@ namespace Id3.v2
             }
         }
 
-        private const int BufferSize = 8192;
+        private static void ShrinkSpaceForTag(Stream stream, int currentTagSize, int requiredTagSize)
+        {
+            if (currentTagSize < requiredTagSize)
+                return;
+
+            int streamLength = (int)stream.Length;
+            var readPos = currentTagSize;
+            int writePos = requiredTagSize;
+
+            var buffer = new byte[BufferSize];
+            while (readPos < streamLength)
+            {
+                int bytesToRead = (readPos + BufferSize > streamLength) ? streamLength - readPos : BufferSize;
+                stream.Seek(readPos, SeekOrigin.Begin);
+                stream.Read(buffer, 0, bytesToRead);
+                stream.Seek(writePos, SeekOrigin.Begin);
+                stream.Write(buffer, 0, bytesToRead);
+                readPos += bytesToRead;
+                writePos += bytesToRead;
+            }
+            stream.SetLength(writePos);
+        }
+
+        private static void WipeOutRemainingSpace(Stream stream, int currentTagSize, int requiredTagSize)
+        {
+            if (currentTagSize < requiredTagSize)
+                return;
+
+            var remainingSize = currentTagSize - requiredTagSize;
+            stream.Seek(requiredTagSize, SeekOrigin.Begin);
+            stream.Write(new byte[remainingSize], 0, remainingSize);
+        }
+
+        private const int BufferSize = 512 * 1024;    // 8192 - memory is no big issue today, so reduce the seeking efforts
     }
 }
