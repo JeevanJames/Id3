@@ -89,7 +89,7 @@ namespace Id3
         internal abstract byte[] GetTagBytes(Stream stream);
         internal abstract bool HasTag(Stream stream);
         internal abstract Id3Tag ReadTag(Stream stream, out object additionalData);
-        internal abstract bool WriteTag(Stream stream, Id3Tag tag);
+        internal abstract bool WriteTag(Stream stream, Id3Tag tag, WriteTagOptions options);
         #endregion
 
         #region ID3 tag properties for the handler
