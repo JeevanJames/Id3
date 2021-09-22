@@ -195,7 +195,7 @@ namespace Id3.v2
             mappings.Add<ContentGroupDescriptionFrame>("TIT1", EncodeText<ContentGroupDescriptionFrame>, DecodeText<ContentGroupDescriptionFrame>);
             mappings.Add<CopyrightFrame>("TCOP", EncodeText<CopyrightFrame>, DecodeText<CopyrightFrame>);
             mappings.Add<CopyrightUrlFrame>("WCOP", EncodeUrlLink<CopyrightUrlFrame>, DecodeUrlLink<CopyrightUrlFrame>);
-            mappings.Add<CustomTextFrame>("TXXX", EncodeText<CustomTextFrame>, DecodeText<CustomTextFrame>);
+            mappings.Add<CustomTextFrame>("TXXX", EncodeCustomText, DecodeCustomText);
             mappings.Add<CustomUrlLinkFrame>("WXXX", EncodeCustomUrlLink, DecodeCustomUrlLink);
             mappings.Add<EncoderFrame>("TENC", EncodeText<EncoderFrame>, DecodeText<EncoderFrame>);
             mappings.Add<EncodingSettingsFrame>("TSSE", EncodeText<EncodingSettingsFrame>, DecodeText<EncodingSettingsFrame>);

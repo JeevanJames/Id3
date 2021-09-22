@@ -31,6 +31,8 @@ namespace Id3.Frames
         {
         }
 
+        public string Description { get; set; }
+
         public static implicit operator CustomTextFrame(string value) => new CustomTextFrame(value);
     }
 
