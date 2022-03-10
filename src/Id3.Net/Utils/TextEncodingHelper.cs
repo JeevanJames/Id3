@@ -47,6 +47,9 @@ namespace Id3
 
         internal static string GetString(byte[] bytes, int start, int count, Id3TextEncoding encodingType)
         {
+            if (bytes.Length == 0) 
+                return string.Empty;
+            
             Encoding encoding = GetEncoding(encodingType);
             string str = encoding.GetString(bytes, start, count);
 
